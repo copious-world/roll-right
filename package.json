@@ -1,0 +1,30 @@
+{
+  "name": "roll-right",
+  "version": "1.0.0",
+  "description": "A helper utilty for gather browser artifacts from node modules, code repositories, etc.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "bin": {
+    "roll-right": "./bin/index.js"
+  },
+  "scripts": {
+    "test": "node tests/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/copious-world/roll-right.git"
+  },
+  "keywords": [
+    "browserify",
+    "rollup",
+    "publisher"
+  ],
+  "author": "R. Leddy",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/copious-world/roll-right/issues"
+  },
+  "homepage": "https://github.com/copious-world/roll-right#readme"
+}

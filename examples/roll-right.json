@@ -1,0 +1,14 @@
+{
+    "pnpm" : {
+        "file" : "package.json",
+        "dependencies" : [
+            "crypto-wraps",
+            "ucwid"
+        ]
+    },
+    "github" : {
+    },
+    "local" : {
+        "client/IGID" : "/public/intergalactic-content/IGID.js"
+    }
+}
