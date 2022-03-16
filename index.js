@@ -7,5 +7,5 @@ module.exports.browser_code = roll_right_utilities.browser_code_access
 
 
 module.exports.identify_me = () => {
-    console.log("roll-right module management")
+    console.log("roll-right static content management and module publication")
 }
