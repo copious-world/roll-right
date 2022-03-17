@@ -70,6 +70,9 @@ async function command_line_operations() {
         console.log(`starting phase ${g_argv.phase} instantiation`)
         switch ( g_argv.phase ) {
             case 1: {
+                if ( typeof g_config.alpha === "string" ) {
+                    g_config.alpha = load_json_file(g_config.alpha)
+                }
                 let ph1 = new Phase1(g_config.alpha)
                 ph1.run()
                 break
