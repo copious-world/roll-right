@@ -10,10 +10,10 @@ const {transfer_local_directory_browser_version} = require('../lib/rr_utils')
 const Phase1 = require('../lib/phase1')
 
 var g_argv = require('minimist')(process.argv.slice(2));
-console.log(g_argv);
+console.dir(g_argv);
 
-
-let g_source_dir = g_argv._
+let g_target = g_argv._[0]
+let g_source_dir = g_argv._[1]
 if ( g_source_dir === undefined ) {
     g_source_dir = "."
 }
@@ -73,7 +73,7 @@ async function command_line_operations() {
                 if ( typeof g_config.alpha === "string" ) {
                     g_config.alpha = load_json_file(g_config.alpha)
                 }
-                let ph1 = new Phase1(g_config.alpha)
+                let ph1 = new Phase1(g_target,g_config.alpha)
                 ph1.run()
                 break
             }
