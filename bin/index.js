@@ -6,8 +6,12 @@ const {load_json_file} = require('../lib/utils')
 const {transfer_node_module_browser_version} = require('../lib/rr_utils')
 const {transfer_github_browser_version} = require('../lib/rr_utils')
 const {transfer_local_directory_browser_version} = require('../lib/rr_utils')
+const {port_modules} = require('../lib/mod_utils')
 
 const Phase1 = require('../lib/phase1')
+const Phase2 = require('../lib/phase2')
+//
+//
 
 var g_argv = require('minimist')(process.argv.slice(2));
 console.dir(g_argv);
@@ -78,7 +82,11 @@ async function command_line_operations() {
                 break
             }
             case 2: {
-
+                if ( typeof g_config.beta === "string" ) {
+                    g_config.beta = load_json_file(g_config.beta)
+                }
+                let ph2 = new Phase2(g_target,g_config.beta)
+                ph2.run()
                 break
             }
             default : {
@@ -87,7 +95,18 @@ async function command_line_operations() {
             }
         }
     }
-    
+    if ( g_argv.gather ) {
+        if ( typeof g_config.gather === "string" ) {
+            g_config.modules = load_json_file(g_config.gather)
+        }
+        read_data(g_config.gather)
+    }
+    if ( g_argv.modules ) {
+        if ( typeof g_config.modules === "string" ) {
+            g_config.modules = load_json_file(g_config.modules)
+        }
+        port_modules(g_config.modules,g_argv)
+    }
 
 }
 
