@@ -30,3 +30,11 @@ First install the command line version of roll-right.
 
 
 
+## run it
+
+```
+roll-right --phase 1 copious rollers
+```
+
+
+
