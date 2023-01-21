@@ -73,19 +73,21 @@ async function command_line_operations() {
     if ( g_argv.phase ) {
         console.log(`starting phase ${g_argv.phase} instantiation`)
         switch ( g_argv.phase ) {
-            case 1: {
+            case "template" :
+            case 1: {                       /// creates templates
                 if ( typeof g_config.alpha === "string" ) {
-                    g_config.alpha = load_json_file(g_config.alpha)
+                    g_config.alpha = load_json_file(g_config.alpha) // ALPHA
                 }
-                let ph1 = new Phase1(g_target,g_config.alpha)
+                let ph1 = new Phase1(g_target,g_config.alpha)       // g_target <- args[0] ... g_config <- read <- g_source_dir <- args[1] 
                 ph1.run()
                 break
             }
+            case "page":
             case 2: {
                 if ( typeof g_config.beta === "string" ) {
-                    g_config.beta = load_json_file(g_config.beta)
+                    g_config.beta = load_json_file(g_config.beta)   // BETA 
                 }
-                let ph2 = new Phase2(g_target,g_config.beta)
+                let ph2 = new Phase2(g_target,g_config.beta)        // g_target <- args[0] ... g_config <- read <- g_source_dir <- args[1] 
                 ph2.run()
                 break
             }
@@ -95,13 +97,13 @@ async function command_line_operations() {
             }
         }
     }
-    if ( g_argv.gather ) {
+    if ( g_argv.gather ) {  // about moving files to directories for node module, browser modules, etc.
         if ( typeof g_config.gather === "string" ) {
             g_config.modules = load_json_file(g_config.gather)
         }
         read_data(g_config.gather)
     }
-    if ( g_argv.modules ) {
+    if ( g_argv.modules ) {  // transforms and then copies base alpha code to final publication directores (npm is the only case yet)
         if ( typeof g_config.modules === "string" ) {
             g_config.modules = load_json_file(g_config.modules)
         }
