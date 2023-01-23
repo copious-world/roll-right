@@ -1,6 +1,6 @@
 {
   "name": "roll-right",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A helper utilty for gather browser artifacts from node modules, code repositories, etc.",
   "main": "index.js",
   "directories": {
