@@ -1,19 +1,21 @@
 {
   "name": "roll-right",
-  "version": "0.0.2",
+  "version": "0.1.2",
   "description": "A helper utilty for gather browser artifacts from node modules, code repositories, etc.",
   "main": "index.js",
   "directories": {
     "example": "examples"
   },
   "bin": {
-    "roll-right": "./bin/index.js"
+    "roll-right": "./bin/index.js",
+    "roll-right-breakup": "./bin/breakup.js"
   },
   "scripts": {
     "test": "node tests/index.js"
   },
   "dependencies": {
     "byte-base64": "^1.1.0",
+    "extra-file-class": "^0.9.12",
     "fs-extra": "^10.0.1",
     "handlebars": "^4.7.7",
     "minimist": "^1.2.5",

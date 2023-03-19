@@ -34,6 +34,20 @@ roll-right --phase 2 <website-identifier> <directory including config>
 ```
 
 
+## reverse it
+
+It can help, when developing, to split up a file that has been composed by **roll-right**. Later versions of **roll-right** will put in file separators when files are appended together to form a single file artifact for a web page or module. The command line tool, **roll-right-breakup**, will output a directory of all the files between the separators. There are times that it may be useful to use compare tools with the output of **roll-right-breakup** and the source files.
+
+Here is how to call it:
+
+```
+roll-right-breakup <path to file> <optional output directory>
+```
+
+
+**roll-right-breakup** will create a directory in the calling directory named **rr-breakup** or within the optional directory if it is on the command line.
+
+
 
 ## How it Helps
 
