@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const fs = require('fs')
 const {FileOperations} = require('extra-file-class')
 
 
