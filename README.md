@@ -1,15 +1,43 @@
 # roll-right
 
-A command line tool that gathers selected code components from curated bases of code and that, first, fans them into templates for site pages and that, second, populates templates with static site-specific code in order to generate static pages for sites.
+A tool that helps generate HTML pages, or other types of pages.
+
+There are two phases:
+
+1. Phase 1 takes in a configuration file and a skeleton page to generate a template from a respository of file parts.
+2. Phase 2 takes in a template and a configuration file that identifies how to populate template variables and insert content files into places in the template.
+
+> In the end, the output can be a static web page (served directly from the web server without modification). The output might be something else, such as a computer program.
+
+The process here is mostly subsitution with components having proven appearance and operation. Some of the files inserted might be code. And, this module takes into consideration the sensitivty  as to how much code should be in the page v.s. how much code should be fetched from a CDN.
+
+## Differences Compared to Bundlers
+
+* This main process used by this package is substition and expansion. The output is mainly a self contained file or a small collection of files. The output is not bundled. Also, there is a dependency on Handlebars, which handles conditional subsitution.
+
+> After Phase 2, HTML output may be compressed and ready for upload. If compression is not requested, it may be handled by a bundler.
+
+* Bundlers can be used to take some of the output from this program to create packages that finalize the packaging required for a website or web application.  Bundlers such as **rollup** or **vite** can be used for such operations if the final step is needed.
+
+* Skeleton files: These files feed into phase 1. These files might be like a language. But, they are not. They provide an outline as to the order of files to be included. They are similar to a layout. These are used to feed into template creation. They use some limited features of programming languages.
+
+* Templates: The templates output by phase 1 are ready for substitution. Substitution values are often targeted at making versions of websites for different concerns that may have the same templates.
+
+> After phase 1, unsightly HTML files will be output with variables in place for substitution. These template files are passed into phase 2.
+
+
+
+## Basic Use Process
+
 
 ***Here are steps of a generation process for site maintainers***:
 
 1. store commonly used, well-tested code in files in selected directories
-2. provide a file describing families of page skeletons
+2. provide a file describing families of pages call *skeletons*
 3. provide a JSON description that selects which skeleton parts are to be used along with source directories
 4. run roll-right in phase 1 with the JSON to generate site templates
 5. provide static components, pictures, etc. to populate templates
-6. run roll-right in phase 2 with .subst files specifying the template population
+6. run roll-right in phase 2 with .subst files specifying the template population (instantiation)
 7. use other tools to deploy files dropped into a staging directory
 
 The generation process is not limited to coalescing code for pages. There is support for generating node.js modules, generating web page modules, etc. for npm publication.

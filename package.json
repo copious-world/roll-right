@@ -1,7 +1,7 @@
 {
   "name": "roll-right",
   "version": "0.1.4",
-  "description": "A helper utilty for gather browser artifacts from node modules, code repositories, etc.",
+  "description": "A utilty for generating template files, e.g. HTML templates, in one phase, and then generating final output files, e.g. HTML, in another phase.",
   "main": "index.js",
   "directories": {
     "example": "examples"
@@ -28,7 +28,8 @@
   "keywords": [
     "browserify",
     "rollup",
-    "publisher"
+    "publisher",
+    "HTML-generation"
   ],
   "author": "R. Leddy",
   "license": "GPL-3.0-or-later",

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-const papa = require('../index.js')
-const {load_json_file} = require('../lib/utils')
+const fos = require('extra-file-class')()
 
 const {transfer_node_module_browser_version} = require('../lib/rr_utils')
 const {transfer_github_browser_version} = require('../lib/rr_utils')
@@ -22,15 +21,12 @@ if ( g_source_dir === undefined ) {
     g_source_dir = "."
 }
 
-
-function load_config(cf_name) {
+//
+//
+async function load_config(cf_name) {
     let path = g_source_dir + '/' + cf_name
-    return load_json_file(path)
+    return await fos.load_json_data_at_path(path)
 }
-
-
-const g_config = load_config("roll-right.json")
-papa.identify_me()
 
 // // 
 function read_data(roll_conf) {
@@ -70,13 +66,15 @@ function read_data(roll_conf) {
 async function command_line_operations() {
     console.log("command line operations")
 
+    g_config = await load_config("roll-right.json")
+
     if ( g_argv.phase ) {
         console.log(`starting phase ${g_argv.phase} instantiation`)
         switch ( g_argv.phase ) {
             case "template" :
             case 1: {                       /// creates templates
                 if ( typeof g_config.alpha === "string" ) {
-                    g_config.alpha = load_json_file(g_config.alpha) // ALPHA
+                    g_config.alpha = fos.load_json_data_at_path(g_config.alpha) // ALPHA
                 }
                 let ph1 = new Phase1(g_target,g_config.alpha)       // g_target <- args[0] ... g_config <- read <- g_source_dir <- args[1] 
                 ph1.run()
@@ -85,7 +83,7 @@ async function command_line_operations() {
             case "page":
             case 2: {
                 if ( typeof g_config.beta === "string" ) {
-                    g_config.beta = load_json_file(g_config.beta)   // BETA 
+                    g_config.beta = fos.load_json_data_at_path(g_config.beta)   // BETA 
                 }
                 let ph2 = new Phase2(g_target,g_config.beta)        // g_target <- args[0] ... g_config <- read <- g_source_dir <- args[1] 
                 ph2.run()
@@ -99,13 +97,13 @@ async function command_line_operations() {
     }
     if ( g_argv.gather ) {  // about moving files to directories for node module, browser modules, etc.
         if ( typeof g_config.gather === "string" ) {
-            g_config.modules = load_json_file(g_config.gather)
+            g_config.modules = fos.load_json_data_at_path(g_config.gather)
         }
         read_data(g_config.gather)
     }
     if ( g_argv.modules ) {  // transforms and then copies base alpha code to final publication directores (npm is the only case yet)
         if ( typeof g_config.modules === "string" ) {
-            g_config.modules = load_json_file(g_config.modules)
+            g_config.modules = fos.load_json_data_at_path(g_config.modules)
         }
         port_modules(g_config.modules,g_argv)
     }
@@ -113,5 +111,7 @@ async function command_line_operations() {
 }
 
 
+
+console.log("roll-right static content management and module publication")
 
 command_line_operations()
