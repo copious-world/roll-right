@@ -11,14 +11,15 @@
     "roll-right-breakup": "./bin/breakup.js"
   },
   "scripts": {
-    "test": "node tests/index.js"
+    "test": "node tests/index.js",
+    "templates" : "node bin/index.js --phase template --generator ../websites/template-configs/generate.json",
+    "assignments" : "node bin/index.js --phase assign --values ../websites/template-configs/assignments.json"
   },
   "dependencies": {
     "byte-base64": "^1.1.0",
-    "extra-file-class": "^0.9.12",
-    "fs-extra": "^10.0.1",
+    "extra-file-class": "^1.0.1",
     "handlebars": "^4.7.7",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.8",
     "untildify": "^4.0.0"
   },
   "repository": {

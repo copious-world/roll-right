@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fos = require('extra-file-class')()
+const {PathManager} = require('extra-file-class')
 
 const {transfer_node_module_browser_version} = require('../lib/rr_utils')
 const {transfer_github_browser_version} = require('../lib/rr_utils')
@@ -13,13 +14,6 @@ const Phase2 = require('../lib/phase2')
 //
 
 var g_argv = require('minimist')(process.argv.slice(2));
-console.dir(g_argv);
-
-let g_target = g_argv._[0]
-let g_source_dir = g_argv._[1]
-if ( g_source_dir === undefined ) {
-    g_source_dir = "."
-}
 
 //
 //
@@ -42,7 +36,7 @@ function read_data(roll_conf) {
                         break
                     }
                     case "github" : {
-                        transfer_github_browser_version(source_spec)
+                        transfer_github_bro[skeletons]/wser_version(source_spec)
                         break
                     }
                     case "local" : {
@@ -111,7 +105,122 @@ async function command_line_operations() {
 }
 
 
+/**
+ * 
+ * @param {string} generator
+ * 
+ * @returns Promise<undefined>
+ */
+async function generate_all_configured_templates(generator) {
+    //
+    let conf = await fos.load_json_data_at_path(generator)
+    if ( conf ) {
+        //
+        let paths = null
+        if ( typeof conf.inputs  === 'object' ) {
+            paths = new PathManager(conf.inputs)
+        }
 
+        let created_dir = conf['@target']
+        if ( typeof created_dir !== 'string' ) {
+            console.log("missging terminal (leaf) dir name in field '@target'")
+            return 1
+        }
+        let outputs = conf.outputs
+        if ( outputs && Array.isArray(outputs) ) {
+            for ( let ogroup of outputs ) {
+                let targets = ogroup.targets // targets
+                if ( typeof targets !== 'object' || Array.isArray(targets) ) {
+                    console.log("each output group in the 'output' array is expected to have a map 'targets' specifying asset name to asset directory" )
+                    return 1
+                }
+                let skeletons = ogroup.skeletons  // skeletons
+                if ( typeof skeletons !== 'object' || Array.isArray(skeletons) ) {
+                    console.log("each output group in the 'output' array is expected to have a map 'skeletons' specifying termplace file names to source skeletons" )
+                    return 1
+                }
+                let out_name_to_data = {}
+                for ( let [o_name,file] of Object.entries(skeletons) ) {
+                    let fpath = paths.compile_one_path(file)
+                    out_name_to_data[o_name] = await fos.load_data_at_path(fpath)
+                }
+                //
+                for ( let [target,directory] of Object.entries(targets) ) {
+                    console.log(target,`${directory}${created_dir}`)
+                    let top_out_dir = `${directory}${created_dir}`
+                    for ( let [opath,skeleton] of Object.entries(skeletons) ) {
+                        let skel_output_path = `${top_out_dir}${opath}`
+                        console.log(skel_output_path," => ",skeleton)
+                        let sk_path = paths.compile_one_path(skel_output_path)
+                        console.log(sk_path)
+                        await fos.ensure_directories(sk_path,"",true)
+                    }
+                }
+            }
+        } else {
+            console.log("Expected an array of output descriptors in field 'output'")
+        }
+    }
+    //
+}
+
+
+async function generate_all_templated_website_and_apps(substitutions) {
+    
+}
+
+
+
+
+async function command_line_operations_new(args) {
+    let phase = args.phase
+    //
+    if ( phase ) {
+        //
+        console.log("Operating phase:\t\t\t\t\t", phase)
+        switch ( g_argv.phase ) {
+            case "template" :
+            case 1: {                       /// creates templates
+                let generator = args.generator
+                console.log("Using input configuration for generator:\t\t",generator)
+                //
+                await generate_all_configured_templates(generator)
+                //
+                break
+            }
+            case "page":
+            case "assign":
+            case 2: {
+                let substitutions = args.values
+                console.log("Using input configuration for assignments:\t\t",substitutions)
+                 //
+                await generate_all_templated_website_and_apps(substitutions)
+                //
+                break
+            }
+            default : {
+                console.log("unnown phase")
+                break;
+            }
+        }
+        //
+    }
+
+            
+
+    if ( phase === "template" ) {
+    } else if ( phase === "assign" ) {
+    }
+    console.log("-------------------------------------------------------------")
+
+}
+
+
+console.log("-------------------------------------------------------------")
 console.log("roll-right static content management and module publication")
+console.log("-------------------------------------------------------------")
 
-command_line_operations()
+// command_line_operations()
+
+
+command_line_operations_new(g_argv)
