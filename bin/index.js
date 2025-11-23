@@ -12,6 +12,67 @@ const Phase1 = require('../lib/phase1')
 const Phase2 = require('../lib/phase2')
 //
 
+
+// needs module
+let parse_util = {
+    clear_comments : (str) => {
+        if ( str.indexOf("verbatim::") === 0 ) {
+            let check_end = str.lastIndexOf('}')
+            if ( check_end > 0 ) {
+                let front = str.substring(0,check_end+1)
+                return front
+            }
+        } else {
+            if ( str.indexOf("//") > 0 ) {
+                let lines = str.split('\n')
+                let n = lines.length
+                for ( let i = 0; i < n; i++ ) {
+                    let line = lines[i]
+                    line = line.trim()
+                    if ( line.length && (line.indexOf('//') === 0) ) {
+                        lines[i] = ""
+                    } else if ( line.length && (line.indexOf('//') > 0) ) {
+                        line = line.substring(0,(line.indexOf('//'))).trim()
+                        lines[i] = line
+                    }
+                }
+                lines = lines.filter((line) => {
+                    return line.length > 0
+                })
+                return lines.join("\n")
+            }
+        }
+        return str
+    },
+    remove_spaces: (str)=> {
+        let strs = str.split(' ')
+        strs = strs.filter((sub) => {
+            return sub.length > 0
+        })
+        return strs.join('')
+    },
+    remove_white: (str)=> {
+        str = str.replace(/\s+/g,'')
+        return str
+    },
+    flatten : (data_parts) => {
+        let flattened = []
+        for ( let part of data_parts ) {
+            if ( typeof part === "string" ) {
+                flattened.push(part)
+            } else {
+                let parted = parse_util.flatten(part)
+                for ( let p of parted ) {
+                    flattened.push(p)
+                }
+            }
+        }
+        return flattened
+    }
+}
+
+
+
 let html_start_doc_head = `
 <!doctype html>
 <html>
@@ -176,6 +237,7 @@ class SkelToTemplate {
         this.outputs = false
         let outputs = conf.outputs
         if ( outputs && Array.isArray(outputs) ) {
+            outputs = JSON.parse(JSON.stringify(outputs))
             for ( let ogroup of outputs ) {
                 let targets = ogroup.targets // targets
                 if ( typeof targets !== 'object' || Array.isArray(targets) ) {
@@ -192,6 +254,11 @@ class SkelToTemplate {
             }
             this.outputs = outputs
         }
+
+        this.range_pattern = new RegExp(/.*\<(\d),(\d)\>\<\</)
+        //
+        this.var_spec_pattern = new RegExp(/^\$\@\{(\w+)\}\$files\:\:(.*)$/)
+
     }
 
 
@@ -218,10 +285,10 @@ class SkelToTemplate {
             let promises = []
             for ( let [opath,skeleton] of Object.entries(skeletons) ) {
                 let skel_output_path = `${top_out_dir}${opath}`
-                console.log(skel_output_path," => ",skeleton)
-                let sk_path = this.paths.compile_one_path(skel_output_path)
-                console.log(sk_path)
-                promises.push(fos.ensure_directories(sk_path,"",true)) 
+                let sko_path = this.paths.compile_one_path(skel_output_path)
+                let sk_path = this.paths.compile_one_path(skeleton)
+                skeletons[opath] = sk_path
+                promises.push(fos.ensure_directories(sko_path,"",true)) 
             }
             await Promise.all(promises)
             //
@@ -268,7 +335,7 @@ class SkelToTemplate {
                 all_skeletons[fpath] = p ? 1 : p + 1;
             }
         }
-
+        //
         let data_promises = []
         let skel_keys = Object.keys(all_skeletons)
         for ( let fpath of skel_keys ) {
@@ -285,8 +352,397 @@ class SkelToTemplate {
     }
 
 
+
     /**
      * 
+     * @param {string} ctrl_str 
+     * @param {object} range 
+     * @returns {boolean}
+     */
+    has_range_expr(ctrl_str,range) {
+        let result = this.range_pattern.exec(ctrl_str)
+        if ( result ) {
+            range.lb = result[1]
+            range.ub = result[2]
+            return true
+        }
+        return false
+    }
+
+
+    /**
+     * 
+     * @param {object} data_parts 
+     */
+    sequence_expansion(data_parts) {
+        data_parts = data_parts.map((a_part) => {
+            if ( a_part.indexOf("files::") === 0 ) {
+                if ( a_part.indexOf("files::name::") === 0 ) {
+                    let range = {
+                        lb: 0,
+                        ub: 0
+                    }
+                    a_part = parse_util.remove_spaces(a_part)
+                    if ( this.has_range_expr(a_part.substring("files::name::".length),range) ) {
+                        let replacer = `<${range.lb},${range.ub}>`
+                        let lines = []
+                        for ( let i = range.lb; i <= range.ub; i++ ) {
+                            lines.push(a_part.replace(replacer,`${i}`))
+                        }
+                        return lines
+                    }
+                }
+            }
+            return a_part
+        })
+        data_parts = parse_util.flatten(data_parts)
+        return data_parts
+    }
+
+
+    /**
+     * 
+     * @param {string} param_str 
+     */
+    build_tree(param_str) {
+        if ( param_str[0] === '{' ) {
+            param_str = param_str.substring(1,param_str.lastIndexOf('}'))
+        }
+
+        let var_tree = {}
+
+        let sep_point = param_str.indexOf("<<")
+        if ( sep_point > 0 ) {
+            //
+            let key_part = param_str.substring(0,sep_point-1)
+            let rest = param_str.substring(sep_point+2)
+            //
+            do {
+                console.log("BUILD TREE", key_part,rest)
+
+                let check = this.var_spec_pattern.exec(key_part)
+                if ( check ) {
+                    let sub_tree = {}
+                    if ( rest.length ) {
+                        rest = this.capture_param_sub_call(rest,sub_tree)
+                    }
+                    let extracted_var = check[1]
+                    var_tree[extracted_var] = {
+                        "file"  : check[2],
+                        "tree"  : sub_tree
+                    }
+                }
+
+                if ( rest.length ) {
+                    sep_point = rest.indexOf("<<")
+                    if ( sep_point ) {
+                        key_part = rest.substring(0,sep_point-1)
+                        rest = rest.substring(sep_point+2)
+                    } else break
+                } else break;
+
+            } while ( key_part.length )
+            //
+        }
+
+        return var_tree
+    }
+
+    /*
+{$@{logo}$files::logo.tmplt<<$@{spacer}$files::spacer.tmplt<<$@{mushroom}$files::shroom.tmplt<<}$@{logout}$files::logo.tmplt<<
+*/
+
+    /**
+     * 
+     * @param {string} rest 
+     * @returns {Number} -- the location of the next
+     */
+    find_next(rest) {
+        if ( rest[0] === '{' ) { // handle recursive object searchs
+            let depth = 0
+            let index = 1
+            while ( depth > -1 ) {
+                let c = rest[index]
+                if ( c === '{' ) {
+                    depth++
+                } else if ( c === '}' ) {
+                    depth--
+                }
+                index++
+            }
+            return index
+        } else {
+            return 0
+        }
+    }
+
+    /**
+     * 
+     * @param {string} rest 
+     * @param {object} sub_tree -- gets populated with object information
+     */
+    capture_param_sub_call(rest,sub_tree) {
+        let next = this.find_next(rest)
+        if ( next ) {
+            let param_block = rest.substring(0,next)
+            rest = rest.substring(next)
+            let a_tree = this.build_tree(param_block)
+            for ( let ky in a_tree ) {
+                sub_tree[ky] = a_tree[ky]
+            }
+        }
+        return rest
+    }
+
+
+    /**
+     * 
+     * @param {*} data_parts 
+     * @param {*} maybe_params 
+     */
+    capture_parameters(data_parts,maybe_params) {
+
+        data_parts = data_parts.map((a_part) => {
+            if ( a_part.indexOf("files::") === 0 ) {
+                if ( a_part.indexOf("files::params::") === 0 ) {
+                    a_part = parse_util.remove_white(a_part)
+                    let parts = a_part.split('<<{')
+                    let part_key = parts.shift()
+                    let part_def = parts.join('<<{')
+                    //
+                    maybe_params[part_key] = this.build_tree(part_def.substring(0,part_def.lastIndexOf('}')))
+
+console.log("capture parameters: ", a_part)
+console.dir(maybe_params,{"depth" : 6})
+                    return part_key
+                }
+            }
+            return a_part
+        })
+        return data_parts
+    }
+/*
+{$@{logo}$files::logo.tmplt<<$@{spacer}$files::spacer.tmplt<<$@{mushroom}$files::shroom.tmplt<<}$@{logout}$files::logo.tmplt<<
+
+$$files::params::nav_bar_V.tmplt<< {
+    $@{lr_div}$files::left-right-div.tmplt<<    {
+        $@{logo}$files::logo.tmplt<< {
+            $@{svg}$files::svg_container.tmplt<<
+        },
+        $@{spacer}$files::spacer.tmplt<<,
+        $@{mushroom}$files::shroom.tmplt<<,
+    },
+    $@{logout}$files::logo.tmplt<<
+}
+
+*/
+
+
+    /**
+     * pull_out_files
+     * @param {object} data_parts 
+     */
+    pull_out_files(data_parts) {
+
+        let just_files = data_parts.filter((a_part) => {
+            return (a_part.indexOf("files::") === 0)
+        })
+        return just_files.map((a_part) => {
+            return ( a_part.substring("files::".length) )
+        })
+
+    }
+
+    /**
+     * pull_out_script
+     * @param {object} data_parts 
+     */
+    pull_out_script(data_parts) {
+        let just_scripts = data_parts.filter((a_part) => {
+            return (a_part.indexOf("script::") === 0)
+        })
+        return just_scripts.map((a_part) => {
+            return ( a_part.substring("script::".length) )
+        })
+    }
+
+    /**
+     * 
+     * @param {object} all_skeletons 
+     */
+    section_parsing(all_skeletons) {
+        let section_data = {}
+        for ( let [ky,data] of Object.entries(all_skeletons) ) {
+            let data_parts = data.split('$$')
+            let defaults = data_parts[1]
+            data_parts.shift()
+            //
+            let files = []
+            let scripts = []
+            let maybe_params = {}
+            if ( defaults ) {
+                defaults = defaults.trim()
+                if ( defaults.indexOf("defs:") === 0 ) {
+                    data_parts.shift()
+                    defaults = parse_util.clear_comments(defaults).trim()
+                    defaults = JSON.parse(defaults.substring("defs:".length))
+                }
+
+                data_parts = data_parts.map((el) => { return parse_util.clear_comments(el.trim()).trim() })
+
+                data_parts = this.sequence_expansion(data_parts)
+                data_parts = this.capture_parameters(data_parts,maybe_params)
+
+                files = this.pull_out_files(data_parts)
+                scripts = this.pull_out_script(data_parts)
+            }
+            //
+            section_data[ky] = {
+                "defaults" : defaults,
+                "skeleton" : data_parts,
+                "files" : files,
+                "scripts" : scripts,
+                "parameterized" : maybe_params
+            }
+        }
+        return section_data
+    }
+
+
+
+    /**
+     * 
+     * @param {*} transform_1 
+     * @returns 
+     */
+    coalesce_scripts(transform_1) {
+
+        let scripts_occurences = {}
+
+        for ( let dpart of Object.values(transform_1) ) {
+            let scripts = dpart.scripts
+            if ( scripts.length ) {
+                for ( let script of scripts ) {
+                    let p = scripts_occurences[script]
+                    scripts_occurences[script] = p ? p + 1 : 1
+                }
+            }
+        }
+
+        return scripts_occurences
+    }
+
+
+    /**
+     * 
+     * @param {object} script_stats 
+     * @param {number} threshold 
+     * @returns {object}
+     */
+    partition(script_stats) {
+        let partitions = []
+
+        let keys = Object.keys(script_stats)
+        keys.sort((k1,k2) => {
+            let v1 = script_stats[k1]
+            let v2 = script_stats[k2]
+            return v1 - v2
+        })
+
+        let sorted_stats = {}
+        for ( let ky of keys ) {
+            sorted_stats[ky] = script_stats[ky]
+        }
+
+        console.log("sorted_stats")
+        console.dir(sorted_stats)
+
+        let bdiff = Object.values(sorted_stats)
+        let n = bdiff.length
+        let diffs = []
+        for ( let i = 0; i < n-1; i++ ) {
+            let v0 = bdiff[i]
+            let v1 = bdiff[i+1]
+            diffs.push(v1-v0)
+        }
+
+        console.dir(diffs)
+
+        let last_big_diff = 0
+        partitions.push([])
+        let p_index = 0
+        let skeys = Object.keys(sorted_stats)
+        for ( let i = 0; i < n-1; i++ ) {
+            let d = diffs[i]
+            if ( d > last_big_diff ) {
+                d = last_big_diff
+                partitions.push([])
+                p_index++
+            }
+            partitions[p_index].push(skeys[i])
+        }
+        partitions[p_index].push(skeys[n-1])
+
+
+
+        // for ( let [file,value] of Object.entries(script_stats) ) {
+        //     if ( value >= threshold ) {
+        //         partitions.above.push(file)
+        //     } else {
+        //         partitions.below.push(file)
+        //     }
+        // }
+
+        return partitions
+    }
+
+
+    /**
+     * 
+     * @param {object} transformed 
+     * @param {object} script_stats 
+     */
+    update_script_stats_usage(transformed,script_stats) {
+        //
+        let outputs = this.outputs
+
+        let top_level_skel_counts = {}
+
+        for ( let output of outputs ) {
+            let n_concerns = output.targets.concerns.length
+            let skeletons = output.skeletons
+            let mid_level_skel_counts = {}
+            for ( let skel of Object.values(skeletons) ) {
+                let p = mid_level_skel_counts[skel]
+                mid_level_skel_counts[skel] = p ? p + 1 : 1
+            }
+            for ( let [skel,count] of Object.entries(mid_level_skel_counts) ) {
+                let p = top_level_skel_counts[skel]
+                top_level_skel_counts[skel] = p ? p + count*n_concerns : count*n_concerns
+            }
+        }
+
+
+        for ( let [skel,count] of Object.entries(top_level_skel_counts) ) {
+
+            let usages = transformed[skel]
+            if ( usages ) {
+
+                for ( let script of usages.scripts ) {
+                    let p = script_stats[script]
+                    if ( p ) {
+                        script_stats[script] = p*count
+                    }
+                }
+            }
+        }
+
+
+    }
+
+
+    /**
+     * section_parsing(all_skeletons)
      * The one parameter `all_skeletons` is a map from file names to skeleton ascii.
      * 
      * This method parses the skeleton ascii, managing the document structure, 
@@ -300,7 +756,20 @@ class SkelToTemplate {
      * @param {object} all_skeletons
      */
     async skeleton_parsing(all_skeletons) {
+        let transform_1 = this.section_parsing(all_skeletons)
 
+        let script_stats = this.coalesce_scripts(transform_1)
+        this.update_script_stats_usage(transform_1,script_stats)
+
+console.log("script stats update:")
+console.dir(script_stats,{depth: 3})
+
+        let occurence_partition = this.partition(script_stats)
+console.dir(occurence_partition,{depth: 3})
+
+        let str = JSON.stringify(transform_1,null,4)
+
+await fos.write_out_string("testo.json",str)
     }
 
 
@@ -328,7 +797,6 @@ class SkelToTemplate {
         //
         let all_skeletons = await this.load_skeletons()
         //
-        console.log(Object.keys(all_skeletons))
         await this.skeleton_parsing(all_skeletons)
     }
 

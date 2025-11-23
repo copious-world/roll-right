@@ -1,0 +1,413 @@
+{
+    "/home/richard/GitHub/alphas/alpha-copious/pre-template/web3-boxy.skel": {
+        "defaults": {
+            "defaults": {
+                "path_abreviations": {
+                    "[alpha-copious]": "[github]/alphas/alpha-copious",
+                    "[github]": "~/GitHub",
+                    "[websites]": "[alphas]/websites"
+                },
+                "ext_default_dir": {
+                    "tmplt": "[alpha-copious]/html",
+                    "js": "[alpha-copious]/client",
+                    "svg": "[alpha-copious]/icons",
+                    "css": "[alpha-copious]/css"
+                },
+                "top_dir_location": {
+                    "script": "[alpha-copious]/script",
+                    "for-humans": "[alpha-copious]/for-humans",
+                    "files": "[alpha-copious]/html"
+                }
+            }
+        },
+        "skeleton": [
+            "html:start_doc_head<<",
+            "files::header.tmplt<<",
+            "html:end_head<<",
+            "html:start_style<<",
+            "files<css>::styles1<<",
+            "html:end_style<<",
+            "html:start_script<<",
+            "files<js>::top_vars<<",
+            "html:end_script<<",
+            "html:start_body<<",
+            "files::params::nav_bar_V.tmplt",
+            "files::flexy_items_A-main.tmplt<<",
+            "files::footer_A.tmplt<<",
+            "verbatim::{\n<!-- start dynamic content -->\n}",
+            "files::squashable_menu_A.tmplt<<",
+            "files::name::contact_box<<",
+            "files::name::about_box<<",
+            "files::name::thankyou_box<<",
+            "files::name::topicBox_1<<",
+            "files::name::topicBox_2<<",
+            "files::name::topicBox_3<<",
+            "files::name::register<<",
+            "files::name::login<<",
+            "files::intergalactic-explain.tmplt<<",
+            "template::{\n{{{advertPopups.content}}}\n}",
+            "html:end_body_html<<",
+            "html:start_script<<",
+            "script::script/flexy_items_A-top.js<<",
+            "script::common.js<<",
+            "script::field_checks.js<<",
+            "script::https_checks.js<<",
+            "script::post_fetch.js<<",
+            "script::uploader_class.js<<",
+            "script::validation_class.js<<",
+            "script::captcha_service.js<<",
+            "script::login-logout.js<<",
+            "script::one_table_db.js<<",
+            "script::file_ops.js<<",
+            "script::script/flexy_items_A-layout-and-menu.js<<",
+            "script::script/flexy_items_A-animation.js<<",
+            "script::captcha_app.js<<",
+            "verbatim::{\n//  === ---------------------------------------  === ---------------------------------------  === --------------------------------------\n// APPLICATIONS\n// -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --\n}",
+            "script::for-humans/shared_constants.js<<",
+            "script::for-humans/external-id-intake.js<<",
+            "script::for-humans/human_frame_client.js<<",
+            "script::for-humans/frame_page_opener.js<<",
+            "script::for-humans/site_page_tab_com.js<<",
+            "script::app<scripts>/user_db.js<<",
+            "script::app<scripts>/site_app.js<<",
+            "script::script/flexy_items_A-app-finalize.js<<",
+            "html:end_script<<"
+        ],
+        "files": [
+            "header.tmplt<<",
+            "params::nav_bar_V.tmplt",
+            "flexy_items_A-main.tmplt<<",
+            "footer_A.tmplt<<",
+            "squashable_menu_A.tmplt<<",
+            "name::contact_box<<",
+            "name::about_box<<",
+            "name::thankyou_box<<",
+            "name::topicBox_1<<",
+            "name::topicBox_2<<",
+            "name::topicBox_3<<",
+            "name::register<<",
+            "name::login<<",
+            "intergalactic-explain.tmplt<<"
+        ],
+        "scripts": [
+            "script/flexy_items_A-top.js<<",
+            "common.js<<",
+            "field_checks.js<<",
+            "https_checks.js<<",
+            "post_fetch.js<<",
+            "uploader_class.js<<",
+            "validation_class.js<<",
+            "captcha_service.js<<",
+            "login-logout.js<<",
+            "one_table_db.js<<",
+            "file_ops.js<<",
+            "script/flexy_items_A-layout-and-menu.js<<",
+            "script/flexy_items_A-animation.js<<",
+            "captcha_app.js<<",
+            "for-humans/shared_constants.js<<",
+            "for-humans/external-id-intake.js<<",
+            "for-humans/human_frame_client.js<<",
+            "for-humans/frame_page_opener.js<<",
+            "for-humans/site_page_tab_com.js<<",
+            "app<scripts>/user_db.js<<",
+            "app<scripts>/site_app.js<<",
+            "script/flexy_items_A-app-finalize.js<<"
+        ],
+        "parameterized": {
+            "files::params::nav_bar_V.tmplt": {
+                "lr_div": {
+                    "file": "left-right-div.tmpl",
+                    "tree": {
+                        "logo": {
+                            "file": "logo.tmpl",
+                            "tree": {}
+                        },
+                        "spacer": {
+                            "file": "spacer.tmpl",
+                            "tree": {}
+                        },
+                        "mushroom": {
+                            "file": "shroom.tmpl",
+                            "tree": {}
+                        }
+                    }
+                },
+                "logout": {
+                    "file": "logo.tmpl",
+                    "tree": {}
+                }
+            }
+        }
+    },
+    "/home/richard/GitHub/alphas/alpha-copious/pre-template/login-boxy.skel": {
+        "defaults": {
+            "defaults": {
+                "path_abreviations": {
+                    "[alpha-copious]": "[github]/alphas/alpha-copious",
+                    "[github]": "~/GitHub",
+                    "[websites]": "[alphas]/websites"
+                },
+                "ext_default_dir": {
+                    "tmplt": "[alpha-copious]/html",
+                    "js": "[alpha-copious]/client",
+                    "svg": "[alpha-copious]/icons",
+                    "css": "[alpha-copious]/css"
+                },
+                "top_dir_location": {
+                    "script": "[alpha-copious]/script",
+                    "for-humans": "[alpha-copious]/for-humans",
+                    "files": "[alpha-copious]/html"
+                }
+            }
+        },
+        "skeleton": [
+            "html:start_doc_head<<",
+            "files::header.tmplt<<",
+            "html:end_head<<",
+            "html:start_style<<",
+            "files<css>::styles1<<",
+            "html:end_style<<",
+            "html:start_script<<",
+            "files<js>::top_vars<<",
+            "html:end_script<<",
+            "html:start_body<<",
+            "files::nav_bar_A.tmplt<<",
+            "files::flexy_items_A-main.tmplt<<",
+            "files::footer_A.tmplt<<",
+            "files::squashable_menu_A.tmplt<<",
+            "files::name::contact_box<<",
+            "files::name::about_box<<",
+            "files::name::thankyou_box<<",
+            "files::name::topicBox_1<<",
+            "files::name::topicBox_2<<",
+            "files::name::topicBox_3<<",
+            "files::name::register<<",
+            "files::name::login<<",
+            "files::intergalactic-explain.tmplt<<",
+            "verbatim::{\n{{{advertPopups.content}}}\n\n{{{yourProileLinks.content}}}\n{{{yourDashboardLinks.content}}}\n}",
+            "html:end_body_html<<",
+            "html:start_script<<",
+            "script::script/flexy_items_A-top.js<<",
+            "script::common.js<<",
+            "script::field_checks.js<<",
+            "script::https_checks.js<<",
+            "script::post_fetch.js<<",
+            "script::uploader_class.js<<",
+            "script::validation_class.js<<",
+            "script::captcha_service.js<<",
+            "script::login-logout.js<<",
+            "script::one_table_db.js<<",
+            "script::file_ops.js<<",
+            "script::script/flexy_items_A-layout-and-menu.js<<",
+            "script::script/flexy_items_A-animation.js<<",
+            "script::captcha_app.js<<",
+            "verbatim::{\n//  === ---------------------------------------  === ---------------------------------------  === --------------------------------------\n// APPLICATIONS\n// -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --\n}",
+            "script::for-humans/shared_constants.js<<",
+            "script::for-humans/external-id-intake.js<<",
+            "verbatim::{\n\tsetupLogoutRestoration()\n}",
+            "html:end_script<<"
+        ],
+        "files": [
+            "header.tmplt<<",
+            "nav_bar_A.tmplt<<",
+            "flexy_items_A-main.tmplt<<",
+            "footer_A.tmplt<<",
+            "squashable_menu_A.tmplt<<",
+            "name::contact_box<<",
+            "name::about_box<<",
+            "name::thankyou_box<<",
+            "name::topicBox_1<<",
+            "name::topicBox_2<<",
+            "name::topicBox_3<<",
+            "name::register<<",
+            "name::login<<",
+            "intergalactic-explain.tmplt<<"
+        ],
+        "scripts": [
+            "script/flexy_items_A-top.js<<",
+            "common.js<<",
+            "field_checks.js<<",
+            "https_checks.js<<",
+            "post_fetch.js<<",
+            "uploader_class.js<<",
+            "validation_class.js<<",
+            "captcha_service.js<<",
+            "login-logout.js<<",
+            "one_table_db.js<<",
+            "file_ops.js<<",
+            "script/flexy_items_A-layout-and-menu.js<<",
+            "script/flexy_items_A-animation.js<<",
+            "captcha_app.js<<",
+            "for-humans/shared_constants.js<<",
+            "for-humans/external-id-intake.js<<"
+        ],
+        "parameterized": {}
+    },
+    "/home/richard/GitHub/alphas/alpha-copious/pre-template/galactic-blog.skel": {
+        "defaults": {
+            "defaults": {
+                "path_abreviations": {
+                    "[alpha-copious]": "[github]/alphas/alpha-copious",
+                    "[github]": "~/GitHub",
+                    "[websites]": "[alphas]/websites"
+                },
+                "ext_default_dir": {
+                    "tmplt": "[alpha-copious]/html",
+                    "js": "[alpha-copious]/client",
+                    "svg": "[alpha-copious]/icons",
+                    "css": "[alpha-copious]/css"
+                },
+                "top_dir_location": {
+                    "script": "[alpha-copious]/script",
+                    "for-humans": "[alpha-copious]/for-humans",
+                    "files": "[alpha-copious]/html"
+                }
+            }
+        },
+        "skeleton": [
+            "html:start_doc_head<<",
+            "files::header.tmplt<<",
+            "html:end_head<<",
+            "html:start_style<<",
+            "files<css>::styles1<<",
+            "html:end_style<<",
+            "html:start_script<<",
+            "files<js>::counter_interface<<",
+            "html:end_script<<",
+            "html:start_body<<",
+            "files::nav_bar_C.tmplt<<",
+            "verbatim::{\n<main id='app-main'>\n</main>\n}",
+            "files::footer_A.tmplt<<",
+            "html:end_body_html<<",
+            "html:start_script<<",
+            "script::pc_location.js<<",
+            "script::common.js<<",
+            "script::https_checks.js<<",
+            "script::post_fetch.js<<",
+            "script::for-humans/shared_constants.js<<",
+            "script::for-humans/human_frame_client.js<<",
+            "script::for-humans/hosted_page_tab_com.js<<",
+            "script::for-humans/frame_page_opener.js<<",
+            "script::for-humans/hosted_page_tab_com.js<<",
+            "script::app<scripts>/hosted_app.js<<",
+            "html:end_script<<"
+        ],
+        "files": [
+            "header.tmplt<<",
+            "nav_bar_C.tmplt<<",
+            "footer_A.tmplt<<"
+        ],
+        "scripts": [
+            "pc_location.js<<",
+            "common.js<<",
+            "https_checks.js<<",
+            "post_fetch.js<<",
+            "for-humans/shared_constants.js<<",
+            "for-humans/human_frame_client.js<<",
+            "for-humans/hosted_page_tab_com.js<<",
+            "for-humans/frame_page_opener.js<<",
+            "for-humans/hosted_page_tab_com.js<<",
+            "app<scripts>/hosted_app.js<<"
+        ],
+        "parameterized": {}
+    },
+    "/home/richard/GitHub/alphas/alpha-copious/pre-template/web3-mixed-boxy.skel": {
+        "skeleton": [],
+        "files": [],
+        "scripts": [],
+        "parameterized": {}
+    },
+    "/home/richard/GitHub/alphas/alpha-copious/pre-template/galactic.skel": {
+        "defaults": {
+            "defaults": {
+                "path_abreviations": {
+                    "[alpha-copious]": "[github]/alphas/alpha-copious",
+                    "[github]": "~/GitHub",
+                    "[websites]": "[alphas]/websites"
+                },
+                "ext_default_dir": {
+                    "tmplt": "[alpha-copious]/html",
+                    "js": "[alpha-copious]/client",
+                    "svg": "[alpha-copious]/icons",
+                    "css": "[alpha-copious]/css"
+                },
+                "top_dir_location": {
+                    "script": "[alpha-copious]/script",
+                    "for-humans": "[alpha-copious]/for-humans",
+                    "files": "[alpha-copious]/html"
+                }
+            }
+        },
+        "skeleton": [
+            "html:start_doc_head<<",
+            "files::header_app.tmplt<<",
+            "html:end_head<<",
+            "html:start_style<<",
+            "files<css>::styles1-galactic<<",
+            "html:end_style<<",
+            "html:start_script<<",
+            "files<js>::top_vars<<",
+            "html:end_script<<",
+            "html:start_body<<",
+            "files::nav_bar_B.tmplt<<",
+            "verbatim::{\n<main id='app-main'>\n</main>\n}",
+            "files::drop_click.tmplt<<",
+            "files::footer_A.tmplt<<",
+            "html:end_body_html<<",
+            "html:start_script<<",
+            "script::pc_location.js<<",
+            "script::common.js<<",
+            "script::https_checks.js<<",
+            "script::post_fetch.js<<",
+            "script::crypto-global.js<<",
+            "script::base64.js<<",
+            "script::base_string.js<<",
+            "script::crypto-hash.js<<",
+            "script::crypto-wraps.js<<",
+            "script::cwid.js<<",
+            "script::ucwid.js<<",
+            "script::one_table_db.js<<",
+            "script::file_ops.js<<",
+            "script::for-humans/shared_constants.js<<",
+            "script::for-humans/human_frame_client.js<<",
+            "script::for-humans/id_builder_page_tab_com.js<<",
+            "verbatim::{\n//  === ---------------------------------------  === ---------------------------------------  === --------------------------------------- \n\nfunction set_user_title(u_name) {\n\tlet el = document.getElementById('active-user-title')\n\tif ( el  && u_name && (typeof u_name === \"string\") ) {\n\t\tel.innerHTML = u_name\n\t}\n}\n\n}",
+            "script::app<scripts>/user_db.js<<",
+            "script::app<scripts>/window_app.js<<",
+            "html:end_script<<"
+        ],
+        "files": [
+            "header_app.tmplt<<",
+            "nav_bar_B.tmplt<<",
+            "drop_click.tmplt<<",
+            "footer_A.tmplt<<"
+        ],
+        "scripts": [
+            "pc_location.js<<",
+            "common.js<<",
+            "https_checks.js<<",
+            "post_fetch.js<<",
+            "crypto-global.js<<",
+            "base64.js<<",
+            "base_string.js<<",
+            "crypto-hash.js<<",
+            "crypto-wraps.js<<",
+            "cwid.js<<",
+            "ucwid.js<<",
+            "one_table_db.js<<",
+            "file_ops.js<<",
+            "for-humans/shared_constants.js<<",
+            "for-humans/human_frame_client.js<<",
+            "for-humans/id_builder_page_tab_com.js<<",
+            "app<scripts>/user_db.js<<",
+            "app<scripts>/window_app.js<<"
+        ],
+        "parameterized": {}
+    },
+    "/home/richard/GitHub/alphas/alpha-copious/pre-template/shop-kiosk.skel": {
+        "skeleton": [],
+        "files": [],
+        "scripts": [],
+        "parameterized": {}
+    }
+}
