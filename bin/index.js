@@ -252,6 +252,7 @@ class SkelToTemplate {
         this.range_pattern = new RegExp(/.*\<(\d),(\d)\>\<\</)
         //
         this.var_spec_pattern = new RegExp(/^\$\@\{(\w+)\}\$files\:\:(.*)$/)
+        this.cross_type_directory = new RegExp(/^(\w+)\<(\w+)\>\:\:(\w+|\_)/)
 
         this.name_drops_db = {}
 
@@ -426,7 +427,6 @@ class SkelToTemplate {
             let rest = param_str.substring(sep_point+2)
             //
             do {
-
                 let check = this.var_spec_pattern.exec(key_part)
                 if ( check ) {
                     let sub_tree = {}
@@ -822,27 +822,78 @@ $$files::params::nav_bar_V.tmplt<< {
 
     }
 
-    leaf_hmtl_directives(skeleton_src) {
+    async leaf_hmtl_directives(skeleton_src) {
 
         for ( let skel_def of Object.values(skeleton_src) ) {
             let sk_map = {}
+            let html_spec_count = 0
             let skeleton = skel_def.skeleton
             for ( let step_entry of skeleton ) {
                 step_entry = step_entry.replace('<<','')
-
                 // now get its value depending on its tyle
                 if ( step_entry.startsWith('html:') ) {
+                    html_spec_count++
                     let html_map = base_patterns['html:']
                     let ky = step_entry.substring('html:'.length)
+                    step_entry = step_entry.replace('html:',`html(${html_spec_count}):`)
                     sk_map[step_entry] = html_map[ky]
                 } else if ( step_entry.startsWith('verbatim::')  ) {
                     // crypto
                     let str = step_entry.substring(('verbatim::').length)
                     let hashed = crypto.hash('sha1',str)
-                    
                     sk_map[`verbatim::${hashed}`] = str
                 } else {
-                    sk_map[step_entry] = ""
+                    if ( step_entry.startsWith('files::') ) {
+                        if ( step_entry.startsWith('files::name::') ) {
+                            sk_map[step_entry] = "name"
+                        } else if ( step_entry.startsWith('files::params::') ) {
+                            sk_map[step_entry] = "params"
+                        } else {
+                            let file_name = step_entry.substring(('files::').length)
+                            let file_path = this.top_dir_locations["html"]
+                            file_path = `${file_path}/${file_name}`
+                            let data = await fos.load_data_at_path(file_path)
+                            sk_map[step_entry] = {
+                                "type" : "tmplt",
+                                "file" : file_path,
+                                "data" : data
+                            }
+                        }
+                    } else if ( step_entry.startsWith('css::') ) {
+                        let file_name = step_entry.substring(('css::').length)
+                        let file_path = this.top_dir_locations["css"]
+                        file_path = `${file_path}/${file_name}`
+                        let data = await fos.load_data_at_path(file_path)
+                        sk_map[step_entry] = {
+                            "type" : "css",
+                            "file" : file_path,
+                            "data" : data
+                        }
+                    } else {
+                        let check = this.cross_type_directory.exec(step_entry)
+                        if ( check ) {
+                            //
+                            let dir_loc = check[1]
+                            let type = check[2]
+                            let file_name = check[3]
+                            if ( file_name.indexOf('.') < 0 ) {
+                                file_name = `${file_name}.${type}`
+                            }
+                            //
+                            if ( dir_loc === "files" ) dir_loc = "html"
+                            //
+                            let file_path = this.top_dir_locations[dir_loc]
+                            file_path = `${file_path}/${file_name}`
+                            let data = await fos.load_data_at_path(file_path)
+                            sk_map[step_entry] = {
+                                "type" : "css",
+                                "file" : file_path,
+                                "data" : data
+                            }
+                        } else {
+                            sk_map[step_entry] = ""
+                        }
+                    }
                 }
             }
             skel_def.skeleton_map = sk_map
@@ -875,7 +926,7 @@ $$files::params::nav_bar_V.tmplt<< {
         let occurence_partition = this.partition(script_stats)
 console.dir(occurence_partition,{depth: 3})
 
-        this.leaf_hmtl_directives(transform_1)
+        await this.leaf_hmtl_directives(transform_1)
 
         let str = JSON.stringify(transform_1,null,4)
         await fos.write_out_string(this.top_level_parsed,str)
