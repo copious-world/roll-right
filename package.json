@@ -12,8 +12,9 @@
   },
   "scripts": {
     "test": "node tests/index.js",
-    "templates" : "node bin/index.js --phase template --generator ../websites/template-configs/generate.json",
-    "assignments" : "node bin/index.js --phase assign --values ../websites/template-configs/assignments.json"
+    "prepare" : "node bin/index.js --phase prepare --sources ../websites/template-configs/  --generator generate.json --structure parsed.json",
+    "templates" : "node bin/index.js --phase template --sources ../websites/template-configs/ --generator generate.json --structure parsed.json",
+    "assignments" : "node bin/index.js --phase assign --sources ../websites/template-configs/ --values assignments.json"
   },
   "dependencies": {
     "byte-base64": "^1.1.0",

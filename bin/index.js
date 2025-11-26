@@ -13,6 +13,11 @@ const Phase2 = require('../lib/phase2')
 //
 
 
+const TESTING = true
+
+const {base_patterns} = require('../lib/html_directives')
+const crypto = require('crypto')
+
 // needs module
 let parse_util = {
     clear_comments : (str) => {
@@ -72,19 +77,6 @@ let parse_util = {
 }
 
 
-
-let html_start_doc_head = `
-<!doctype html>
-<html>
-<head>
-`
-
-let base_patterns = {
-
-    "html" : {
-        "start_doc_head" : html_start_doc_head
-    }
-}
 
 //
 
@@ -209,6 +201,8 @@ class SkelToTemplate {
             this.paths = new PathManager(conf.inputs)
         }
         //
+        this.top_level_parsed = conf.top_level_parsed
+        //
         this.ext_default_dirs = Object.assign({},conf.ext_default_dirs)
         this.top_dir_locations =  Object.assign({},conf.top_dir_locations)
         //
@@ -258,6 +252,8 @@ class SkelToTemplate {
         this.range_pattern = new RegExp(/.*\<(\d),(\d)\>\<\</)
         //
         this.var_spec_pattern = new RegExp(/^\$\@\{(\w+)\}\$files\:\:(.*)$/)
+
+        this.name_drops_db = {}
 
     }
 
@@ -352,6 +348,18 @@ class SkelToTemplate {
     }
 
 
+    async load_name_drops_db(file) {
+        this.name_drops_db = {}
+        let name_db_loc = this.paths.get_path("[names]")
+        let name_db_file = file ? file : `${name_db_loc}/name-drop.db`
+        if ( file ) {
+            return await fos.load_json_data_at_path(name_db_file)
+        }
+        this.name_drops_db = await fos.load_json_data_at_path(name_db_file)
+        return this.name_drops_db
+    }
+
+
 
     /**
      * 
@@ -418,13 +426,15 @@ class SkelToTemplate {
             let rest = param_str.substring(sep_point+2)
             //
             do {
-                console.log("BUILD TREE", key_part,rest)
 
                 let check = this.var_spec_pattern.exec(key_part)
                 if ( check ) {
                     let sub_tree = {}
                     if ( rest.length ) {
                         rest = this.capture_param_sub_call(rest,sub_tree)
+                    }
+                    if ( Object.keys(sub_tree).length === 0 ) {
+                        sub_tree = false
                     }
                     let extracted_var = check[1]
                     var_tree[extracted_var] = {
@@ -445,12 +455,13 @@ class SkelToTemplate {
             //
         }
 
+        if ( Object.keys(var_tree).length === 0 ) {
+            return false
+        }
+
         return var_tree
     }
 
-    /*
-{$@{logo}$files::logo.tmplt<<$@{spacer}$files::spacer.tmplt<<$@{mushroom}$files::shroom.tmplt<<}$@{logout}$files::logo.tmplt<<
-*/
 
     /**
      * 
@@ -511,9 +522,7 @@ class SkelToTemplate {
                     let part_def = parts.join('<<{')
                     //
                     maybe_params[part_key] = this.build_tree(part_def.substring(0,part_def.lastIndexOf('}')))
-
-console.log("capture parameters: ", a_part)
-console.dir(maybe_params,{"depth" : 6})
+                    //
                     return part_key
                 }
             }
@@ -521,8 +530,9 @@ console.dir(maybe_params,{"depth" : 6})
         })
         return data_parts
     }
+
+
 /*
-{$@{logo}$files::logo.tmplt<<$@{spacer}$files::spacer.tmplt<<$@{mushroom}$files::shroom.tmplt<<}$@{logout}$files::logo.tmplt<<
 
 $$files::params::nav_bar_V.tmplt<< {
     $@{lr_div}$files::left-right-div.tmplt<<    {
@@ -566,12 +576,26 @@ $$files::params::nav_bar_V.tmplt<< {
         })
     }
 
+
+    /**
+     * pull_out_html_directives
+     * @param {object} data_parts 
+     */
+    pull_out_html_directives(data_parts) {
+        let just_html_d = data_parts.filter((a_part) => {
+            return (a_part.indexOf("html:") === 0)
+        })
+        return just_html_d
+    }
     /**
      * 
      * @param {object} all_skeletons 
      */
     section_parsing(all_skeletons) {
         let section_data = {}
+        if ( TESTING ) {
+            this.test_html = {}
+        }
         for ( let [ky,data] of Object.entries(all_skeletons) ) {
             let data_parts = data.split('$$')
             let defaults = data_parts[1]
@@ -580,6 +604,8 @@ $$files::params::nav_bar_V.tmplt<< {
             let files = []
             let scripts = []
             let maybe_params = {}
+            // for testing
+
             if ( defaults ) {
                 defaults = defaults.trim()
                 if ( defaults.indexOf("defs:") === 0 ) {
@@ -595,6 +621,14 @@ $$files::params::nav_bar_V.tmplt<< {
 
                 files = this.pull_out_files(data_parts)
                 scripts = this.pull_out_script(data_parts)
+                // for testing
+                if ( TESTING ) {
+                    let htmls = this.pull_out_html_directives(data_parts)
+                    for ( let html of htmls ) {
+                        let p = this.test_html[html]
+                        this.test_html[html] = (p ? (p+1) : 1)
+                    }
+                }
             }
             //
             section_data[ky] = {
@@ -605,14 +639,62 @@ $$files::params::nav_bar_V.tmplt<< {
                 "parameterized" : maybe_params
             }
         }
+
+        console.log("OUTPUT TEST HTML")
+        console.dir(this.test_html)
+
         return section_data
     }
 
 
+    /**
+     * 
+     * Outputs to each concern the variable forms table, yielding default substitutions.
+     * If the developer chooses to change these before final template generation he may.
+     * 
+     */
+    async name_parameters_output() {
+        //
+        let outputs = this.outputs
+        for ( let ogroup of outputs ) {
+            let concerns = ogroup.targets.concerns
+            let name_parameters = ogroup.name_parameters ? true : false
+            if ( name_parameters ) {
+                for ( let concern of concerns ) {
+                    name_parameters = Object.assign({},ogroup.name_parameters)  // actually its an object
+                    let drops_db = this.name_drops_db
+                    if ( name_parameters.db ) {
+                        let name_db = this.paths.compile_one_path(name_parameters.db)
+                        drops_db = await this.load_name_drops_db(name_db)
+                        delete name_parameters.db
+                    }
+                    let output = name_parameters.parameter_values ? this.paths.compile_one_path(name_parameters.parameter_values) : false
+                    if ( output ) {
+                        output = output.replace('@concern',concern)
+                        output = output.replace("@target",this.created_dir)
+                        delete name_parameters.parameter_values
+                        let value_object = {}
+                        for ( let [ky,selections] of Object.entries(name_parameters) ) {
+                            value_object[ky] = {}
+                            let nm_set = drops_db[ky]
+                            if ( nm_set ) {
+                                for ( let form_name of selections ) {
+                                    value_object[ky][form_name] = nm_set[form_name]
+                                }
+                            }
+                        }
+                        await fos.write_out_pretty_json(output,value_object,4)
+                    }
+                }
+            }
+        }
+        //
+    }
+
 
     /**
      * 
-     * @param {*} transform_1 
+     * @param {object} transform_1 
      * @returns 
      */
     coalesce_scripts(transform_1) {
@@ -740,6 +822,35 @@ $$files::params::nav_bar_V.tmplt<< {
 
     }
 
+    leaf_hmtl_directives(skeleton_src) {
+
+        for ( let skel_def of Object.values(skeleton_src) ) {
+            let sk_map = {}
+            let skeleton = skel_def.skeleton
+            for ( let step_entry of skeleton ) {
+                step_entry = step_entry.replace('<<','')
+
+                // now get its value depending on its tyle
+                if ( step_entry.startsWith('html:') ) {
+                    let html_map = base_patterns['html:']
+                    let ky = step_entry.substring('html:'.length)
+                    sk_map[step_entry] = html_map[ky]
+                } else if ( step_entry.startsWith('verbatim::')  ) {
+                    // crypto
+                    let str = step_entry.substring(('verbatim::').length)
+                    let hashed = crypto.hash('sha1',str)
+                    
+                    sk_map[`verbatim::${hashed}`] = str
+                } else {
+                    sk_map[step_entry] = ""
+                }
+            }
+            skel_def.skeleton_map = sk_map
+        }
+
+    }
+
+
 
     /**
      * section_parsing(all_skeletons)
@@ -761,15 +872,13 @@ $$files::params::nav_bar_V.tmplt<< {
         let script_stats = this.coalesce_scripts(transform_1)
         this.update_script_stats_usage(transform_1,script_stats)
 
-console.log("script stats update:")
-console.dir(script_stats,{depth: 3})
-
         let occurence_partition = this.partition(script_stats)
 console.dir(occurence_partition,{depth: 3})
 
-        let str = JSON.stringify(transform_1,null,4)
+        this.leaf_hmtl_directives(transform_1)
 
-await fos.write_out_string("testo.json",str)
+        let str = JSON.stringify(transform_1,null,4)
+        await fos.write_out_string(this.top_level_parsed,str)
     }
 
 
@@ -796,8 +905,10 @@ await fos.write_out_string("testo.json",str)
     async skeleton_unification() {
         //
         let all_skeletons = await this.load_skeletons()
+        await this.load_name_drops_db()
         //
         await this.skeleton_parsing(all_skeletons)
+        await this.name_parameters_output()
     }
 
     async generate_all_concerns_templates() {
@@ -837,13 +948,20 @@ async function command_line_operations_new(args) {
         //
         console.log("Operating phase:\t\t\t\t\t", phase)
         switch ( g_argv.phase ) {
-            case "template" :
+            case "prepare" :
             case 1: {                       /// creates templates
+                let project_dir = args.sources
                 let generator = args.generator  // a string
+                generator = `${project_dir}/${generator}`
                 console.log("Using input configuration for generator:\t\t",generator)
                 //
+                let parsed = args.structure
+                parsed = `${project_dir}/${parsed}`
+                console.log("Using output to configuration for template formation:\t\t",parsed)
+
                 let conf = await fos.load_json_data_at_path(generator)
                 if ( conf ) {
+                    conf.top_level_parsed = parsed
                     let to_templates = new SkelToTemplate(conf)
                     await to_templates.prepare_directories()
                     await to_templates.skeleton_unification()
@@ -851,10 +969,25 @@ async function command_line_operations_new(args) {
                 }
                 break
             }
+            case "template" : 
+            case 3: {
+                let project_dir = args.sources
+                let generator = args.generator  // a string
+                generator = `${project_dir}/${generator}`
+                console.log("Using input configuration from generation:\t\t",generator)
+
+                let parsed = args.structure
+                parsed = `${project_dir}/${parsed}`
+                console.log("Using input configuration for template formation:\t\t",parsed)
+
+                break
+            }
             case "page":
             case "assign":
-            case 2: {
+            case 3: {
+                let project_dir = args.sources
                 let substitutions = args.values
+                substitutions = `${project_dir}/${substitutions}`
                 console.log("Using input configuration for assignments:\t\t",substitutions)
                  //
                 await generate_all_templated_website_and_apps(substitutions)

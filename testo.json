@@ -120,21 +120,21 @@
                     "tree": {
                         "logo": {
                             "file": "logo.tmpl",
-                            "tree": {}
+                            "tree": false
                         },
                         "spacer": {
                             "file": "spacer.tmpl",
-                            "tree": {}
+                            "tree": false
                         },
-                        "mushroom": {
+                        "menu": {
                             "file": "shroom.tmpl",
-                            "tree": {}
+                            "tree": false
                         }
                     }
                 },
                 "logout": {
                     "file": "logo.tmpl",
-                    "tree": {}
+                    "tree": false
                 }
             }
         }
