@@ -15,7 +15,7 @@ const Phase2 = require('../lib/phase2')
 
 const TESTING = true
 
-const {base_patterns} = require('../lib/html_directives')
+const {base_patterns_mod} = require('../lib/html_directives')
 const crypto = require('crypto')
 
 // needs module
@@ -23,12 +23,13 @@ let parse_util = {
     clear_comments : (str) => {
         if ( str.indexOf("verbatim::") === 0 ) {
             let check_end = str.lastIndexOf('}')
+            //
             if ( check_end > 0 ) {
                 let front = str.substring(0,check_end+1)
                 return front
             }
         } else {
-            if ( str.indexOf("//") > 0 ) {
+            if ( str.indexOf("//") >= 0 ) {
                 let lines = str.split('\n')
                 let n = lines.length
                 for ( let i = 0; i < n; i++ ) {
@@ -47,7 +48,7 @@ let parse_util = {
                 return lines.join("\n")
             }
         }
-        return str
+        return str.trim()
     },
     remove_spaces: (str)=> {
         let strs = str.split(' ')
@@ -75,8 +76,6 @@ let parse_util = {
         return flattened
     }
 }
-
-
 
 //
 
@@ -205,6 +204,11 @@ class SkelToTemplate {
         //
         this.ext_default_dirs = Object.assign({},conf.ext_default_dirs)
         this.top_dir_locations =  Object.assign({},conf.top_dir_locations)
+        this.find_concerns = Object.assign({},conf["use_case<[targets.dir]>"])
+        this.target_dir_key = "targets.dir"
+        this.find_in_group = {
+            "targets.dir" : (obj) => obj.targets.dir
+        }
         //
         this.created_dir = conf['@target']   // will often appear in the top level of project directory
         if ( typeof this.created_dir !== 'string' ) {
@@ -249,16 +253,39 @@ class SkelToTemplate {
             this.outputs = outputs
         }
 
-        this.range_pattern = new RegExp(/.*\<(\d),(\d)\>\<\</)
+        this.range_pattern = new RegExp(/.*\<(\d),(\d+)\>\<\</)
+        this.list_pattern = new RegExp(/.*\<(\w+)\>\<\</)
         //
         this.var_spec_pattern = new RegExp(/^\$\@\{(\w+)\}\$files\:\:(.*)$/)
-        this.cross_type_directory = new RegExp(/^(\w+)\<(\w+)\>\:\:(\w+|\_)/)
+        this.cross_type_directory = new RegExp(/^(\w+)\<(\w+)\>\:\:(.*)$/)
+        this.executable_pattern = new RegExp(/\>\>.*\<\</)
+        this.entry_starter = new RegExp(/^(\w+)\:\:/)
+        this.sibling_type_directory_match = new RegExp(/^\[([\w-]+)\]\/(.*)$/)
+
+        this.concerns_directory_redirect_match = new RegExp(/^\[(([\w-]+)\<([\w]+)\>)\]\/(.*)$/)
+
+        this.entry_remap_map = {
+            "files" : { "source" : "html", "type" : "tmplt"},
+            "css" : { "source" : "css", "type" : "css"}
+        }
 
         this.name_drops_db = {}
 
     }
 
 
+    /**
+     * 
+     * @param {string} entry_directive 
+     * @returns {pair} - a two element array with ary[0] being the true directory name and ary[1] being the file type (extension)
+     */
+    entry_directive_location_remap(entry_directive) {
+        let remap = this.entry_remap_map[entry_directive]
+        if ( remap ) {
+            return Object.values(remap)
+        }
+        return [entry_directive,entry_directive]
+    }
 
     /**
      * 
@@ -314,7 +341,7 @@ class SkelToTemplate {
     /**
      * 
      * Loads the skeleton files. Creates a map from output names to skeleton source names.
-     * Returs the map.
+     * Returns the map.
      * 
      * @returns object
     */
@@ -326,12 +353,38 @@ class SkelToTemplate {
         for ( let ogroup of outputs ) {
             let skeletons = ogroup.skeletons  // skeletons
             //
-            for ( let file of Object.values(skeletons) ) {
+            for ( let [fky,file] of Object.entries(skeletons) ) {
                 let fpath = this.paths.compile_one_path(file)
                 let p = all_skeletons[fpath]
-                all_skeletons[fpath] = p ? 1 : p + 1;
+                let concerns = {} 
+                let tdir = ogroup.targets.dir
+                for ( let crn of ogroup.targets.concerns ) {
+                    let crn_tdir = tdir.replace("@concern",crn)
+                    concerns[crn] = {
+                        usages: [fky],
+                        dir : crn_tdir
+                    }
+                }
+                if ( p ) {
+                    let update_concerns = all_skeletons[file].concerns
+                    for ( let [cky, useage]  of Object.entries(concerns) ) {
+                        if ( cky in update_concerns ) {
+//    console.dir(update_concerns)
+                            update_concerns[cky].usages = update_concerns[cky].usages.concat(useage.usages)
+                        } else {
+//    console.log("HERE")
+                            update_concerns[cky] = useage
+                        }
+                    }
+                    all_skeletons[file].concerns = update_concerns
+                    all_skeletons[file].count = (p.count + 1)
+                } else {
+                    let count = 1
+                    all_skeletons[file] = { count, concerns }
+                }
             }
         }
+        this.skel_to_concerns = Object.assign({},all_skeletons)
         //
         let data_promises = []
         let skel_keys = Object.keys(all_skeletons)
@@ -349,6 +402,11 @@ class SkelToTemplate {
     }
 
 
+    /**
+     * 
+     * @param {string} file 
+     * @returns {object}
+     */
     async load_name_drops_db(file) {
         this.name_drops_db = {}
         let name_db_loc = this.paths.get_path("[names]")
@@ -363,6 +421,9 @@ class SkelToTemplate {
 
 
     /**
+     * The range parameter is a structure that will have lb (lower bound)
+     * and ub (upper bound) filled out if the control string `ctrl_str`
+     * matches the pattern. The pattern will be of the fomr `prefix`<lb,ub>`postfix`
      * 
      * @param {string} ctrl_str 
      * @param {object} range 
@@ -371,49 +432,37 @@ class SkelToTemplate {
     has_range_expr(ctrl_str,range) {
         let result = this.range_pattern.exec(ctrl_str)
         if ( result ) {
-            range.lb = result[1]
-            range.ub = result[2]
+            range.lb = parseInt(result[1])
+            range.ub = parseInt(result[2])
             return true
         }
         return false
     }
 
-
     /**
+     * The `var_holder` parameter is an array that will
+     * contain the bracket identifier
+     * if the control string `ctrl_str`
+     * matches the pattern. The pattern will be of the form `prefix`<identifier>`postfix`
      * 
-     * @param {object} data_parts 
+     * @param {string} ctrl_str 
+     * @param {Array} var_holder 
+     * @returns {boolean}
      */
-    sequence_expansion(data_parts) {
-        data_parts = data_parts.map((a_part) => {
-            if ( a_part.indexOf("files::") === 0 ) {
-                if ( a_part.indexOf("files::name::") === 0 ) {
-                    let range = {
-                        lb: 0,
-                        ub: 0
-                    }
-                    a_part = parse_util.remove_spaces(a_part)
-                    if ( this.has_range_expr(a_part.substring("files::name::".length),range) ) {
-                        let replacer = `<${range.lb},${range.ub}>`
-                        let lines = []
-                        for ( let i = range.lb; i <= range.ub; i++ ) {
-                            lines.push(a_part.replace(replacer,`${i}`))
-                        }
-                        return lines
-                    }
-                }
-            }
-            return a_part
-        })
-        data_parts = parse_util.flatten(data_parts)
-        return data_parts
+    has_list_expr(ctrl_str,var_holder) {
+        let result = this.list_pattern.exec(ctrl_str)
+        if ( result ) {
+            var_holder[0] = result[1]
+            return true
+        }
+        return false
     }
-
 
     /**
      * 
      * @param {string} param_str 
      */
-    build_tree(param_str) {
+    async build_tree(part_key,param_str) {
         if ( param_str[0] === '{' ) {
             param_str = param_str.substring(1,param_str.lastIndexOf('}'))
         }
@@ -423,7 +472,7 @@ class SkelToTemplate {
         let sep_point = param_str.indexOf("<<")
         if ( sep_point > 0 ) {
             //
-            let key_part = param_str.substring(0,sep_point-1)
+            let key_part = param_str.substring(0,sep_point)
             let rest = param_str.substring(sep_point+2)
             //
             do {
@@ -431,22 +480,39 @@ class SkelToTemplate {
                 if ( check ) {
                     let sub_tree = {}
                     if ( rest.length ) {
-                        rest = this.capture_param_sub_call(rest,sub_tree)
+                        rest = await this.capture_param_sub_call(part_key,rest,sub_tree)
                     }
                     if ( Object.keys(sub_tree).length === 0 ) {
                         sub_tree = false
                     }
                     let extracted_var = check[1]
+                    let the_file = check[2]
+                    //
+                    let data = ""
+                    let parts_of_key = part_key.split('::')
+                    if ( parts_of_key.length > 1 ) {
+                        let [path_finder,ftype] = this.entry_directive_location_remap(parts_of_key[0])
+                        let locus = this.top_dir_locations[path_finder]
+                        if ( locus ) {
+console.log("build_tree",part_key,path_finder,locus,the_file)
+                            if ( the_file.indexOf('::') > 0 ) {
+                                the_file = the_file.substring(the_file.indexOf('::') + 2)
+                            }
+                            let file_path = `${locus}/${the_file}`
+                            data = await fos.load_data_at_path(file_path)
+                        }
+                    }
                     var_tree[extracted_var] = {
-                        "file"  : check[2],
-                        "tree"  : sub_tree
+                        "file"  : the_file,
+                        "tree"  : sub_tree,
+                        "data"  : data
                     }
                 }
 
                 if ( rest.length ) {
                     sep_point = rest.indexOf("<<")
                     if ( sep_point ) {
-                        key_part = rest.substring(0,sep_point-1)
+                        key_part = rest.substring(0,sep_point)
                         rest = rest.substring(sep_point+2)
                     } else break
                 } else break;
@@ -492,12 +558,12 @@ class SkelToTemplate {
      * @param {string} rest 
      * @param {object} sub_tree -- gets populated with object information
      */
-    capture_param_sub_call(rest,sub_tree) {
+    async capture_param_sub_call(part_key,rest,sub_tree) {
         let next = this.find_next(rest)
         if ( next ) {
             let param_block = rest.substring(0,next)
             rest = rest.substring(next)
-            let a_tree = this.build_tree(param_block)
+            let a_tree = await this.build_tree(part_key,param_block)
             for ( let ky in a_tree ) {
                 sub_tree[ky] = a_tree[ky]
             }
@@ -506,14 +572,65 @@ class SkelToTemplate {
     }
 
 
+
+    /**
+     * 
+     * @param {object} data_parts 
+     */
+    sequence_expansion(data_parts,maybe_params) {
+        data_parts = data_parts.map((a_part) => {
+            if ( a_part.indexOf("files::") === 0 ) {
+                if ( a_part.indexOf("files::loop::") === 0 ) {
+                    let range = {
+                        lb: 0,
+                        ub: 0
+                    }
+                    let var_holder = []
+                    a_part = parse_util.remove_spaces(a_part)
+                    a_part = parse_util.remove_white(a_part)
+                    if ( this.has_range_expr(a_part.substring("files::loop::".length),range) ) {
+                        let replacer = `<${range.lb},${range.ub}>`
+                        let lines = []
+                        for ( let i = range.lb; i <= range.ub; i++ ) {
+                            let this_part = a_part.replace(replacer,`${i}`)
+                            this_part = this_part.replace("::loop","")
+                            lines.push(this_part)
+                        }
+                        return lines
+                    } else if ( this.has_list_expr(a_part.substring("files::loop::".length,a_part.indexOf('[')),var_holder) ) {
+                        let parts = a_part.split('<<')
+                        let part_key = parts.shift()
+                        part_key = part_key.replace("::loop","")
+                        part_key = part_key.substring(0,part_key.indexOf('<'))
+                        let part_def = parts.shift()
+                        let def = part_def
+                        try {
+                            def = JSON.parse(part_def)
+                        } catch (e){}
+                        //
+                        maybe_params[part_key] = {
+                            "list" : def,
+                            "index" : var_holder[0]
+                        }
+                        //
+                        return part_key
+                    }
+                }
+            }
+            return a_part
+        })
+        data_parts = parse_util.flatten(data_parts)
+        return data_parts
+    }
+
     /**
      * 
      * @param {*} data_parts 
      * @param {*} maybe_params 
      */
-    capture_parameters(data_parts,maybe_params) {
+    async capture_parameters(data_parts,maybe_params) {
 
-        data_parts = data_parts.map((a_part) => {
+        let promisory = data_parts.map(async (a_part) => {
             if ( a_part.indexOf("files::") === 0 ) {
                 if ( a_part.indexOf("files::params::") === 0 ) {
                     a_part = parse_util.remove_white(a_part)
@@ -521,13 +638,14 @@ class SkelToTemplate {
                     let part_key = parts.shift()
                     let part_def = parts.join('<<{')
                     //
-                    maybe_params[part_key] = this.build_tree(part_def.substring(0,part_def.lastIndexOf('}')))
+                    maybe_params[part_key] = await this.build_tree(part_key,part_def.substring(0,part_def.lastIndexOf('}')))
                     //
                     return part_key
                 }
             }
             return a_part
         })
+        data_parts = await Promise.all(promisory)
         return data_parts
     }
 
@@ -591,7 +709,7 @@ $$files::params::nav_bar_V.tmplt<< {
      * 
      * @param {object} all_skeletons 
      */
-    section_parsing(all_skeletons) {
+    async section_parsing(all_skeletons) {
         let section_data = {}
         if ( TESTING ) {
             this.test_html = {}
@@ -616,8 +734,8 @@ $$files::params::nav_bar_V.tmplt<< {
 
                 data_parts = data_parts.map((el) => { return parse_util.clear_comments(el.trim()).trim() })
 
-                data_parts = this.sequence_expansion(data_parts)
-                data_parts = this.capture_parameters(data_parts,maybe_params)
+                data_parts = await this.sequence_expansion(data_parts,maybe_params)
+                data_parts = await this.capture_parameters(data_parts,maybe_params)
 
                 files = this.pull_out_files(data_parts)
                 scripts = this.pull_out_script(data_parts)
@@ -818,79 +936,339 @@ $$files::params::nav_bar_V.tmplt<< {
                 }
             }
         }
-
-
     }
+
+
+    /**
+     * 
+     * @param {string} step_entry 
+     * @param {Array} cross_directory_check - optional
+     * @returns {Array} - a tripple [file name, token indicating a compiled path, the type of file]
+     */
+    get_file_data_descriptor(step_entry,cross_directory_check) {
+        //
+        let file_name = false
+        let path_finder = false
+        let entry_type = false
+        let entry_directive = false
+        //
+        let file_entry_starter = !(cross_directory_check) ? this.entry_starter.exec(step_entry) : false
+        if ( !file_entry_starter ) {
+            file_entry_starter = cross_directory_check ? cross_directory_check : this.cross_type_directory.exec(step_entry)
+            if ( file_entry_starter ) {
+                entry_directive = file_entry_starter[1]
+                entry_type = file_entry_starter[2]
+                file_name = file_entry_starter[3]
+                if ( file_name.indexOf('.') < 0 ) {
+                    file_name = `${file_name}.${entry_type}`
+                }
+                if ( entry_type === 'js' ) entry_type = "script"
+            }
+        } else {
+            entry_directive = file_entry_starter[1]
+            file_name = step_entry.substring((entry_directive).length + 2)
+        }
+        if ( entry_directive ) {
+            let [pf,et] = this.entry_directive_location_remap(entry_directive)
+            path_finder = pf
+            entry_type = (entry_type && (et !== entry_type)) ? entry_type : et
+        }
+        return [file_name,path_finder,entry_type]
+    }
+
+
+    /**
+     * Looks at the entry specifiers and determines the absolute location of a file to load.
+     * If successful, this returns an a key-value object with three keys, type, file, data, corresponding to
+     * the type of the file, the file path, and the data stored in the file (a string)
+     * 
+     * @param {string} step_entry 
+     * @param {Array} cross_directory_check - optional  .. the result of a RegExp,exec if it is provide
+     * @returns {object|string}
+     */
+    async entry_loading(step_entry,cross_directory_check) {
+        //
+        let map_value = {}
+        let [file_name,path_finder,entry_type] = this.get_file_data_descriptor(step_entry,cross_directory_check)
+        //
+        if ( file_name ) {
+            let file_path = this.top_dir_locations[path_finder]
+            if ( file_name[0] === '[' ) {
+                let entry_match = this.sibling_type_directory_match.exec(file_name)
+                if ( entry_match ) {
+                    let path_f = entry_match[1]
+                    file_path = this.top_dir_locations[path_f]
+                    file_name = entry_match[2]
+                } else {
+                    // handle special cases where the developer has custom leaf code
+                    // use the syntax to get information for constructing the directory name.
+                    // Do not load a file. That will be done in a second phase.
+                    if ( file_name.indexOf('<') > 0 ) {
+                        entry_match = this.concerns_directory_redirect_match.exec(file_name)
+                        if ( entry_match ) {
+                            let search_form = entry_match[1]
+                            let use_case = entry_match[2]
+                            let p_finder = entry_match[3]
+                            let file_form = this.find_concerns[search_form]
+                            let data = `{{{ @{${file_form}} }}}`
+                            map_value = {
+                                "search_form" : search_form,
+                                "file" : this.find_concerns[search_form],
+                                "use_case" : use_case,
+                                "kernel" : p_finder,
+                                "type" : entry_type,
+                                "data" : data
+                            }
+                            return map_value
+                        }
+                    } else {
+                        return "not_handled"
+                    }
+                }
+            }
+            file_path = `${file_path}/${file_name}`
+            let data = await fos.load_data_at_path(file_path)
+            data = parse_util.clear_comments(data)
+            map_value = {
+                "type" : entry_type,
+                "file" : file_path,
+                "data" : data
+            }
+            if ( this.check_recursive_data(data) ) {
+                map_value.recursive = await this.get_files_and_vars(step_entry,data)
+            }
+            //
+            this.shared_entries[step_entry] = Object.assign({},map_value)
+            return map_value
+        }
+        return "not hanlded"
+    }
+
+
+    /**
+     * The data provided is expected to be a string which may or may not include subfiles or the kind of 
+     * variable used in skeleton processing.
+     * 
+     * This looks to see if there is at least one instance of some structured text indicating that
+     * further procesing may be done (especially in a recursive fashion).
+     * 
+     * @param {string} data 
+     * @returns {boolean}
+     */
+    check_recursive_data(data) {
+        if ( !data ) return false
+        //
+        if ( data.indexOf("$$file") > 0 ) {
+            return true
+        }
+        if ( data.indexOf("$$icons") > 0 ) {
+            return true
+        }
+        if ( data.indexOf("$$css") > 0 ) {
+            return true
+        }
+        if ( data.indexOf("@{") >= 0 ) {
+            return true
+        }
+        if ( this.executable_pattern.test(data) ) {
+            return true
+        }
+        return false
+    }
+
+
+
+
+
+/*
+$$files::loop::LOOPER-special_frame.smplt<el><<{
+    { "group_name" : "docs", "SOURCE-LINK" : {{{shop_docs}}}, "FRAME-ACTIONS" : "onclick=''" },
+    { "group_name" : "blog", "SOURCE-LINK" :  {{{shop_blog}}}, "FRAME-ACTIONS" : "onclick=''" },
+    { "group_name" : "search", "SOURCE-LINK" : {{{shop_search}}}, "FRAME-ACTIONS" : "onclick=''" }
+}
+*/
+
+    //
+    // case 1:
+    // @params<{lr_div:file,logout:file}>
+    //
+    // case 2:
+    // @list<el><{ group_name <- el[1], SOURCE-LINK <- el[2], FRAME-ACTIONS <- el[3]}>
+    // ...
+    // <@el>
+    //  ...
+    // </@el>
+    //
+    // case 3:
+    // >>@{FRAME-ACTIONS} ? @{FRAME-ACTIONS} : <<"
+    // 
+    // case 4:
+    // @{group_name}
+    //
+    // case 5: 
+    // >> any action at all <<
+    // EXAMPLE: >> @p = 2 + 4; put @p here; put @p after next div; <<
+    // EXAMPLE: >> @p = 2 + 4; @bubble = @p; << //late @bubble appears in the html (text)
+    // 
+    // case 6:
+    // $$icons::mushroom-menu-icon.svg
+    // OR $$`path-finder`::`file-stem`.`ext`
+    //
+
+
+    /**
+     * 
+     * @param {string} step_entry 
+     * @param {string} data 
+     * @returns {object}
+     */
+    async get_files_and_vars(step_entry,data) {
+        //
+        if ( data.indexOf('//') >= 0 ) {
+            data = parse_util.clear_comments(data)
+        }
+
+        let params_def = false
+
+        if ( data.startsWith("@params<") ) {
+    
+            let lines = data.split("\n")
+            let first_line = lines.shift()
+            first_line = parse_util.remove_spaces(first_line)
+            let end_def = first_line.indexOf("}>")
+            while ( end_def < 0 ) {
+                let next_line = lines.shift()
+                first_line += '\n' + next_line
+                end_def = next_line.indexOf("}>")
+            }
+
+            lines = first_line.split('\n')
+            first_line = lines.join("")
+
+            // @params<{lr_div:file,logout:file}>
+            let var_defs = first_line.replace("@params<","")
+            var_defs = var_defs.replace(">","")
+            var_defs = var_defs.replace("{",'{\"')
+            var_defs = var_defs.replace("}",'\"}')
+            //
+            let colon_split = var_defs.split(":")
+            var_defs = colon_split.join('\":\"')
+            let comma_split = var_defs.split(",")
+            var_defs = comma_split.join('\",\"')
+            //
+            try {
+                params_def = JSON.parse(var_defs)
+            } catch(e) {}
+
+            console.dir(params_def)
+        }
+        //
+        return { params_def }
+    }
+
+
+    is_language_section_control(step_entry) {
+        return false
+    }
+
+    /**
+     *  // generalization for later
+     * @param {string} step_entry 
+     * @returns {string}
+     */
+    extract_lang_controller_key(step_entry) {
+        return step_entry.substring(0,step_entry.indexOf(':'))
+    }
+
 
     async leaf_hmtl_directives(skeleton_src) {
 
-        for ( let skel_def of Object.values(skeleton_src) ) {
+        this.shared_entries = {}
+
+        for ( let [sk_key, skel_def ] of Object.entries(skeleton_src) ) {
             let sk_map = {}
-            let html_spec_count = 0
+            let lang_spec_count = 0
             let skeleton = skel_def.skeleton
             for ( let step_entry of skeleton ) {
                 step_entry = step_entry.replace('<<','')
                 // now get its value depending on its tyle
                 if ( step_entry.startsWith('html:') ) {
-                    html_spec_count++
-                    let html_map = base_patterns['html:']
+                    lang_spec_count++
+                    let html_map = base_patterns_mod['html:']
                     let ky = step_entry.substring('html:'.length)
-                    step_entry = step_entry.replace('html:',`html(${html_spec_count}):`)
+                    step_entry = step_entry.replace('html:',`html(${lang_spec_count}):`)
                     sk_map[step_entry] = html_map[ky]
-                } else if ( step_entry.startsWith('verbatim::')  ) {
-                    // crypto
+                } else if ( this.is_language_section_control(step_entry) ) {  // a generalization for later
+                    lang_spec_count++
+                    let lang_key = this.extract_lang_controller_key(step_entry)
+                    let lang_map = base_patterns_mod[lang_key]
+                    let ky = step_entry.substring(lang_key.length)
+                    step_entry = step_entry.replace(lang_key,`${lang_key}(${lang_spec_count}):`)
+                    sk_map[step_entry] = lang_map[ky]
+                } else if ( step_entry.startsWith('verbatim::') ) {
                     let str = step_entry.substring(('verbatim::').length)
-                    let hashed = crypto.hash('sha1',str)
+                    let hashed = crypto.hash('sha1',str)        // cryptos
                     sk_map[`verbatim::${hashed}`] = str
                 } else {
-                    if ( step_entry.startsWith('files::') ) {
-                        if ( step_entry.startsWith('files::name::') ) {
-                            sk_map[step_entry] = "name"
-                        } else if ( step_entry.startsWith('files::params::') ) {
-                            sk_map[step_entry] = "params"
-                        } else {
-                            let file_name = step_entry.substring(('files::').length)
-                            let file_path = this.top_dir_locations["html"]
-                            file_path = `${file_path}/${file_name}`
-                            let data = await fos.load_data_at_path(file_path)
-                            sk_map[step_entry] = {
-                                "type" : "tmplt",
-                                "file" : file_path,
-                                "data" : data
-                            }
-                        }
-                    } else if ( step_entry.startsWith('css::') ) {
-                        let file_name = step_entry.substring(('css::').length)
-                        let file_path = this.top_dir_locations["css"]
-                        file_path = `${file_path}/${file_name}`
-                        let data = await fos.load_data_at_path(file_path)
-                        sk_map[step_entry] = {
-                            "type" : "css",
-                            "file" : file_path,
-                            "data" : data
-                        }
+                    let entry = this.shared_entries[step_entry]
+                    if ( entry && typeof entry === "object" ) {
+                        sk_map[step_entry] = Object.assign({},entry)
                     } else {
-                        let check = this.cross_type_directory.exec(step_entry)
-                        if ( check ) {
-                            //
-                            let dir_loc = check[1]
-                            let type = check[2]
-                            let file_name = check[3]
-                            if ( file_name.indexOf('.') < 0 ) {
-                                file_name = `${file_name}.${type}`
+                        if ( step_entry.startsWith('files::') || step_entry.startsWith('files<') ||step_entry.startsWith('css::') ) {
+                            if ( step_entry.startsWith('files::name::') ) {
+console.log("NEED NAME HANDLING")
+                                sk_map[step_entry] = "name"
+                            } else if ( step_entry.startsWith('files::params::') || step_entry.startsWith('css::params::') ) {
+                                let loadable_entry = step_entry.replace("::params","")
+                                sk_map[step_entry] = await this.entry_loading(loadable_entry)
+console.log("NEED PARAMS HANDLING")
+                            } else if ( step_entry.startsWith('files::elements::') || step_entry.startsWith('css::elements::') ) {
+                                let loadable_entry = step_entry.replace("::elements","")
+                                sk_map[step_entry] = await this.entry_loading(loadable_entry)
+console.log("NEED ELEMENTS HANDLING")
+                            } else {
+                                sk_map[step_entry] = await this.entry_loading(step_entry)
                             }
+                        } else if ( step_entry.startsWith('template::') ) {
+                            let data = step_entry.substring(('template::').length)
+                            data = data.trim()
+                            let brace_i = data.indexOf('{')
+                            let brace_n = data.lastIndexOf('}')
+                            data = data.substring(brace_i,brace_n-1)
+                            data = parse_util.clear_comments(data)
                             //
-                            if ( dir_loc === "files" ) dir_loc = "html"
-                            //
-                            let file_path = this.top_dir_locations[dir_loc]
-                            file_path = `${file_path}/${file_name}`
-                            let data = await fos.load_data_at_path(file_path)
                             sk_map[step_entry] = {
-                                "type" : "css",
-                                "file" : file_path,
+                                "type" : "template",
                                 "data" : data
                             }
+                            if ( this.check_recursive_data(data) ) {
+                                sk_map[step_entry].recursive = await this.get_files_and_vars(step_entry,data)
+                            }
+                        } else if ( step_entry.startsWith('script::') ) {
+                            let script_spec =  await this.entry_loading(step_entry)
+                            let data_form = script_spec.data
+                            if ( typeof script_spec.kernel !== "undefined" ) {
+                                let sk_c = Object.assign({},this.skel_to_concerns[sk_key].concerns)
+                                for ( let [crn,usages] of Object.entries(sk_c) ) {
+                                    let dr = usages.dir
+                                    dr = dr.replace('@kernel',script_spec.kernel)
+                                    dr = this.paths.compile_one_path(dr)
+                                    usages.dir = dr
+                                    let dir_key = '@{[targets.dir]}'
+                                    let dat = data_form.replace(dir_key,dr)
+                                    if ( dat === data_form ) {
+                                        dir_key = `@{[targets.dir]/${script_spec.use_case}}`
+                                        dat = data_form.replace(dir_key,dr)
+                                    }
+                                    usages.data = dat
+                                }
+
+                                script_spec.customizations = sk_c
+                                //
+                            }
+                            sk_map[step_entry] = script_spec
                         } else {
+console.log("NOT HANDLED YET: ",step_entry)
                             sk_map[step_entry] = ""
                         }
                     }
@@ -898,7 +1276,6 @@ $$files::params::nav_bar_V.tmplt<< {
             }
             skel_def.skeleton_map = sk_map
         }
-
     }
 
 
@@ -918,7 +1295,7 @@ $$files::params::nav_bar_V.tmplt<< {
      * @param {object} all_skeletons
      */
     async skeleton_parsing(all_skeletons) {
-        let transform_1 = this.section_parsing(all_skeletons)
+        let transform_1 = await this.section_parsing(all_skeletons)
 
         let script_stats = this.coalesce_scripts(transform_1)
         this.update_script_stats_usage(transform_1,script_stats)
@@ -956,6 +1333,7 @@ console.dir(occurence_partition,{depth: 3})
     async skeleton_unification() {
         //
         let all_skeletons = await this.load_skeletons()
+
         await this.load_name_drops_db()
         //
         await this.skeleton_parsing(all_skeletons)
