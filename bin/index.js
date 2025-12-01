@@ -18,6 +18,7 @@ const TESTING = true
 const {base_patterns_mod} = require('../lib/html_directives')
 const crypto = require('crypto')
 
+
 // needs module
 let parse_util = {
     clear_comments : (str) => {
@@ -74,9 +75,20 @@ let parse_util = {
             }
         }
         return flattened
+    },
+    subst : (str,ky,val) => {
+        while ( str.indexOf(ky) >= 0 ) {
+            str = str.replace(ky,val)
+        }
+        return str
+    },
+    extract_var : (str) => {
+        let var_up = str.substring(str.indexOf('@{') + 2)
+        let vname = var_up.substring(0,var_up.indexOf('}'))
+        return vname
     }
 }
-
+s
 //
 
 var g_argv = require('minimist')(process.argv.slice(2));
@@ -621,11 +633,10 @@ class SkelToTemplate {
                             def = JSON.parse(part_def)
                         } catch (e){}
                         //
-                        maybe_params[part_key] = {
-                            "list" : def,
-                            "index" : var_holder[0]
-                        }
-                        //
+                        let pars = {}
+                        pars[var_holder[0]] = "list"
+                        pars[`_type<${var_holder[0]}>`] = def
+                        maybe_params[part_key] = pars
                         return part_key
                     }
                 }
@@ -1191,43 +1202,59 @@ class SkelToTemplate {
         let ternary = this.ternary_check.exec(parseable)
         if ( ternary ) {
             let cond = ternary[1].trim()
-            let prest = parseable.substring(parseable.indexOf('?') + 1)
-            prest = prest.split('::')
-
-            let first = prest.shift()
-            let second = prest.shift()
-            let third = prest.shift()
-            if ( first.indexOf(':') > 0 ) {
-                let fparts = first.split(':')
-                first = fparts[0]
-                second = fparts[1] + "::" + second
-                if ( third ) {
-                    second = second + "::"  + third
+            //
+            let first = ""
+            let second = ""
+            let third = ""
+            //
+            if ( parseable.indexOf("::") < 0 ) {
+                first = ternary[2]
+                second = ternary[3]
+                third = false
+            } else {
+                let prest = parseable.substring(parseable.indexOf('?') + 1)
+                prest = prest.split('::')
+                //
+                first = prest.shift()
+                second = prest.shift()
+                third = prest.shift()
+                //
+                if ( first.indexOf(':') > 0 ) {
+                    let fparts = first.split(':')
+                    first = fparts[0]
+                    second = fparts[1] + "::" + second
+                    if ( third ) {
+                        second = second + "::"  + third
+                    }
+                } else if ( second && (second.indexOf(':') >= 0) ) {
+                    let sparts = second.split(':')
+                    first = first + "::" + sparts[0]
+                    second = sparts[1]
+                    if ( third ) {
+                        second = second + "::"  + third
+                    }
                 }
-            } else if ( second && (second.indexOf(':') >= 0) ) {
-                let sparts = second.split(':')
-                first = first + "::" + sparts[0]
-                second = sparts[1]
-                if ( third ) {
-                    second = second + "::"  + third
-                }
-            } 
-
-            
+            }
+            //
             let pos = first.trim()
             let neg = second.trim()
 
             if ( pos === "@nothing" ) pos = ""
             if ( neg === "@nothing" ) neg = ""
 
-            exec_report.condition = {cond}
+            let variable = parse_util.extract_var(cond)
+
+            exec_report.condition = {cond,variable}
             exec_report.positive_exec = {pos}
             exec_report.negative_exec = {neg}
-
+            //
             return true
         }
         return false
     }
+
+
+
 
 
     /**
@@ -1236,11 +1263,15 @@ class SkelToTemplate {
      * @returns 
      */
     parse_executable(parseable) {
+        //
         let exec = {
+            "replace" : parseable,
             "condition" : true,
             "positive_exec" : parseable.trim(),
             "negative_exec" : "",
         }
+        parseable = parseable.replace(">>","").trim()
+        parseable = parseable.substring(0,parseable.lastIndexOf("<<")).trim()
         if ( this.ternary_conditional(parseable,exec) ) {
             //
             let an_import = this.seek_imports(exec.positive_exec.pos)
@@ -1316,9 +1347,9 @@ class SkelToTemplate {
             let parts = data_form.split('>>')
             for ( let i = 1; i < parts.length; i++ ) {
                 let p = parts[i]
-                p = p.substring(0,p.indexOf("<<")).trim()
+                p = p.substring(0,p.indexOf("<<"))
                 parts[i] = p.substring(p.indexOf("<<") + 2)
-                p = this.parse_executable(p)
+                p = this.parse_executable(">>" + p + "<<")
                 execs.push(p)
             }
             for ( let i = 1; i < parts.length; i++ ) {
@@ -1375,6 +1406,11 @@ class SkelToTemplate {
     }
 
 
+
+    /**
+     * 
+     * @param {stringify} skeleton_src 
+     */
     async leaf_hmtl_directives(skeleton_src) {
 
         this.shared_entries = {}
@@ -1528,7 +1564,6 @@ console.log("NOT HANDLED YET: ",step_entry)
         this.update_script_stats_usage(transform_1,script_stats)
 
         let occurence_partition = this.partition(script_stats)
-console.dir(occurence_partition,{depth: 3})
 
         await this.leaf_hmtl_directives(transform_1)
 
@@ -1537,6 +1572,138 @@ console.dir(occurence_partition,{depth: 3})
 
         let str = JSON.stringify(transform_1,null,4)
         await fos.write_out_string(this.top_level_parsed,str)
+    }
+
+
+    /**
+     * 
+     * @param {*} el_var_map - var name and types
+     * @param {*} el        - var name and valuess
+     * @param {*} target_data 
+     * @return {string}
+     * 
+     */
+    var_substitution(el_var_map,el,target_data) {
+        //
+        let td_update = "" + target_data
+        for ( let [ky,vtype] of el_var_map ) {
+            let  val = el[ky]
+            if ( typeof val === vtype ) {
+                td_update = parse_util.subst(td_update,`@{${ky}}`,val)
+            }
+        }
+        //
+        return td_update
+    }
+
+
+    /**
+     * 
+     * @param {object} resolver 
+     * @returns {string}
+     */
+    assemble_subfile(resolver) {
+        // return ""
+        let {file,tree,data,recursive} = resolver
+        //
+        let tranformed_data = "" + data
+        let var_assigns = this.parameterized_block_unification(file,recursive,tree)
+        if ( var_assigns && (typeof var_assigns === "object") ) {
+            //
+            let executables = recursive.executables
+            let required_values = recursive.params_def
+            if ( executables && required_values ) {
+                for ( let execu of executables ) {
+                    let replace_form = execu.replace
+                    let cond = execu.condition
+                    let vname = cond.variable
+                    let case_to_use = ""
+                    if ( required_values[vname] !== undefined ) {
+                        case_to_use = execu.positive_exec.pos
+                    } else {
+                        case_to_use = execu.negative_exec.neg
+                    }
+                    tranformed_data = tranformed_data.replace(replace_form,case_to_use)
+                }
+            }
+            //
+            tranformed_data = this.var_substitution(resolver,var_assigns,loop_part,tranformed_data)
+        }
+        //
+        return tranformed_data
+    }
+
+
+    
+    /**
+     * 
+     * @param {string} file_key 
+     * @param {object} level_1_parameterized_file 
+     * @param {object} parameterization_map 
+     */
+    parameterized_block_unification(file_key,level_1_parameterized_file,parameterization_map) {
+        let file_inputs = parameterization_map[file_key]    // skeletal level parameterizations from loaded subfiles (e.g. key is file at the skeleton level)
+        let l1pf = level_1_parameterized_file   // already got it when getting file key (a description of what is in the file at the skeleton level)
+        try {
+            let required_values = l1pf.recursive.params_def  // variable to types (sibling to executable if present)
+            let executables = l1pf.recursive.executables
+            for ( let [vname,vtype] of Object.entries(required_values) ) {
+                if ( vname[0] === '_' ) continue
+                let resolver = file_inputs[vname]  // 
+                if ( resolver[vtype] ) {
+                    let resolved_data = ""
+                    switch( vtype ) {
+                        case "file" : {
+                            if ( resolver.tree ) {
+                                resolved_data = this.assemble_subfile(resolver)
+                            } else {
+                                resolved_data = resolver.data
+                            }
+                            break;
+                        }
+                        case "list" : {
+                            let vtype_def = `_type<${vname}>`
+                            let el_var_map = required_values[vtype_def]
+                            //
+                            let data_tmplt = l1pf.data
+                            let start_loop = `<${vname}>`
+                            let end_loop = `</${vname}>`
+                            let loop_part = data_tmplt.substring(data_tmplt.indexOf(start_loop),data_tmplt.indexOf(end_loop))
+                            let dlist = resolver[vtype]
+                            for ( let el of dlist ) {
+                                let el_subst = this.var_substitution(el_var_map,el,loop_part)
+                                if ( el_subst ) {
+                                    resolved_data += el_subst
+                                }
+                            }
+                            //
+                            break;
+                        }
+                    }
+
+                    required_values[vname] = resolved_data
+                }
+            }
+
+            let data = l1pf.data
+            if ( executables ) {
+                for ( let execu of executables ) {
+                    let replace_form = execu.replace
+                    let cond = execu.condition
+                    let vname = cond.variable
+                    let case_to_use = ""
+                    if ( required_values[vname] !== undefined ) {
+                        case_to_use = execu.positive_exec.pos
+                    } else {
+                        case_to_use = execu.negative_exec.neg
+                    }
+                    data = data.replace(replace_form,case_to_use)
+                }
+                l1pf.data = data
+            }
+            l1pf.data = this.var_substitution(required_values,required_values,data)
+
+        } catch (e) {}
     }
 
 
