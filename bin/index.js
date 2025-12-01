@@ -264,12 +264,18 @@ class SkelToTemplate {
 
         this.concerns_directory_redirect_match = new RegExp(/^\[(([\w-]+)\<([\w]+)\>)\]\/(.*)$/)
 
+        this.start_of_list = new RegExp(/^\@list\<(\w+)\>\<\{/)
+
+        this.ternary_check = new RegExp(/^(.+)\?(.+)\:(.*)/)
+
         this.entry_remap_map = {
             "files" : { "source" : "html", "type" : "tmplt"},
             "css" : { "source" : "css", "type" : "css"}
         }
 
         this.name_drops_db = {}
+        //
+        this.delay_file_loading_queue = []
 
     }
 
@@ -286,6 +292,8 @@ class SkelToTemplate {
         }
         return [entry_directive,entry_directive]
     }
+
+
 
     /**
      * 
@@ -369,10 +377,8 @@ class SkelToTemplate {
                     let update_concerns = all_skeletons[file].concerns
                     for ( let [cky, useage]  of Object.entries(concerns) ) {
                         if ( cky in update_concerns ) {
-//    console.dir(update_concerns)
                             update_concerns[cky].usages = update_concerns[cky].usages.concat(useage.usages)
                         } else {
-//    console.log("HERE")
                             update_concerns[cky] = useage
                         }
                     }
@@ -439,6 +445,7 @@ class SkelToTemplate {
         return false
     }
 
+
     /**
      * The `var_holder` parameter is an array that will
      * contain the bracket identifier
@@ -457,6 +464,8 @@ class SkelToTemplate {
         }
         return false
     }
+
+
 
     /**
      * 
@@ -494,7 +503,6 @@ class SkelToTemplate {
                         let [path_finder,ftype] = this.entry_directive_location_remap(parts_of_key[0])
                         let locus = this.top_dir_locations[path_finder]
                         if ( locus ) {
-console.log("build_tree",part_key,path_finder,locus,the_file)
                             if ( the_file.indexOf('::') > 0 ) {
                                 the_file = the_file.substring(the_file.indexOf('::') + 2)
                             }
@@ -506,6 +514,10 @@ console.log("build_tree",part_key,path_finder,locus,the_file)
                         "file"  : the_file,
                         "tree"  : sub_tree,
                         "data"  : data
+                    }
+                    if ( this.check_recursive_data(data) ) {
+                        let map_value = var_tree[extracted_var]
+                        map_value.recursive = await this.get_files_and_vars(part_key,data)
                     }
                 }
 
@@ -575,7 +587,8 @@ console.log("build_tree",part_key,path_finder,locus,the_file)
 
     /**
      * 
-     * @param {object} data_parts 
+     * @param {Array} data_parts 
+     * @param {object} maybe_params 
      */
     sequence_expansion(data_parts,maybe_params) {
         data_parts = data_parts.map((a_part) => {
@@ -623,10 +636,12 @@ console.log("build_tree",part_key,path_finder,locus,the_file)
         return data_parts
     }
 
+
+
     /**
      * 
-     * @param {*} data_parts 
-     * @param {*} maybe_params 
+     * @param {Array} data_parts 
+     * @param {object} maybe_params 
      */
     async capture_parameters(data_parts,maybe_params) {
 
@@ -648,22 +663,6 @@ console.log("build_tree",part_key,path_finder,locus,the_file)
         data_parts = await Promise.all(promisory)
         return data_parts
     }
-
-
-/*
-
-$$files::params::nav_bar_V.tmplt<< {
-    $@{lr_div}$files::left-right-div.tmplt<<    {
-        $@{logo}$files::logo.tmplt<< {
-            $@{svg}$files::svg_container.tmplt<<
-        },
-        $@{spacer}$files::spacer.tmplt<<,
-        $@{mushroom}$files::shroom.tmplt<<,
-    },
-    $@{logout}$files::logo.tmplt<<
-}
-
-*/
 
 
     /**
@@ -1044,7 +1043,6 @@ $$files::params::nav_bar_V.tmplt<< {
         return "not hanlded"
     }
 
-
     /**
      * The data provided is expected to be a string which may or may not include subfiles or the kind of 
      * variable used in skeleton processing.
@@ -1053,67 +1051,44 @@ $$files::params::nav_bar_V.tmplt<< {
      * further procesing may be done (especially in a recursive fashion).
      * 
      * @param {string} data 
-     * @returns {boolean}
+     * @returns {number}
      */
     check_recursive_data(data) {
         if ( !data ) return false
         //
-        if ( data.indexOf("$$file") > 0 ) {
-            return true
+        if ( data.indexOf("$$file") >= 0 ) {
+            return 1
         }
-        if ( data.indexOf("$$icons") > 0 ) {
-            return true
+        if ( data.indexOf("$$icons") >= 0 ) {
+            return 2
         }
-        if ( data.indexOf("$$css") > 0 ) {
-            return true
+        if ( data.indexOf("$$css") >= 0 ) {
+            return 3
         }
         if ( data.indexOf("@{") >= 0 ) {
-            return true
+            return 4
         }
         if ( this.executable_pattern.test(data) ) {
-            return true
+            return 5
         }
         return false
     }
 
 
-
-
-
-/*
-$$files::loop::LOOPER-special_frame.smplt<el><<{
-    { "group_name" : "docs", "SOURCE-LINK" : {{{shop_docs}}}, "FRAME-ACTIONS" : "onclick=''" },
-    { "group_name" : "blog", "SOURCE-LINK" :  {{{shop_blog}}}, "FRAME-ACTIONS" : "onclick=''" },
-    { "group_name" : "search", "SOURCE-LINK" : {{{shop_search}}}, "FRAME-ACTIONS" : "onclick=''" }
-}
-*/
-
-    //
-    // case 1:
-    // @params<{lr_div:file,logout:file}>
-    //
-    // case 2:
-    // @list<el><{ group_name <- el[1], SOURCE-LINK <- el[2], FRAME-ACTIONS <- el[3]}>
-    // ...
-    // <@el>
-    //  ...
-    // </@el>
-    //
-    // case 3:
-    // >>@{FRAME-ACTIONS} ? @{FRAME-ACTIONS} : <<"
-    // 
-    // case 4:
-    // @{group_name}
-    //
-    // case 5: 
-    // >> any action at all <<
-    // EXAMPLE: >> @p = 2 + 4; put @p here; put @p after next div; <<
-    // EXAMPLE: >> @p = 2 + 4; @bubble = @p; << //late @bubble appears in the html (text)
-    // 
-    // case 6:
-    // $$icons::mushroom-menu-icon.svg
-    // OR $$`path-finder`::`file-stem`.`ext`
-    //
+    /**
+     * 
+     * @param {string} data 
+     * @param {object} carrier - an object with the filed `var`
+     * @returns 
+     */
+    list_start(data,carrier) {
+        let dat_match = this.start_of_list.exec(data)
+        if ( dat_match ) {
+            carrier.var = dat_match[1]
+            return true
+        }
+        return false
+    }
 
 
     /**
@@ -1129,21 +1104,24 @@ $$files::loop::LOOPER-special_frame.smplt<el><<{
         }
 
         let params_def = false
+        let carrier = {}
 
+        let lines = []
         if ( data.startsWith("@params<") ) {
-    
-            let lines = data.split("\n")
+            //
+            lines = data.split("\n")
             let first_line = lines.shift()
             first_line = parse_util.remove_spaces(first_line)
             let end_def = first_line.indexOf("}>")
-            while ( end_def < 0 ) {
+            while ( (end_def < 0) && lines.length ) {
                 let next_line = lines.shift()
+                next_line = parse_util.remove_spaces(next_line)
                 first_line += '\n' + next_line
                 end_def = next_line.indexOf("}>")
             }
-
-            lines = first_line.split('\n')
-            first_line = lines.join("")
+            //
+            let flines = first_line.split('\n')
+            first_line = flines.join("")
 
             // @params<{lr_div:file,logout:file}>
             let var_defs = first_line.replace("@params<","")
@@ -1159,12 +1137,228 @@ $$files::loop::LOOPER-special_frame.smplt<el><<{
             try {
                 params_def = JSON.parse(var_defs)
             } catch(e) {}
-
-            console.dir(params_def)
+            //
+        } else if ( this.list_start(data,carrier) ) {
+            //
+            lines = data.split("\n")
+            let first_line = lines.shift()
+            first_line = parse_util.remove_spaces(first_line)
+            let end_def = first_line.indexOf("}>")
+            while ( (end_def < 0) && lines.length ) {
+                let next_line = lines.shift()
+                next_line = parse_util.remove_spaces(next_line)
+                first_line += '\n' + next_line
+                end_def = next_line.indexOf("}>")
+            }
+            let var_defs = first_line.substring(first_line.indexOf('<{') + 1,first_line.indexOf('}>') + 1)
+            //
+            var_defs = var_defs.replace("{",'{\"')
+            var_defs = var_defs.replace("}",'\"}')
+            //
+            let colon_split = var_defs.split("<-")
+            var_defs = colon_split.join('\":\"')
+            let comma_split = var_defs.split(",")
+            var_defs = comma_split.join('\",\"')
+            try {
+                params_def = JSON.parse(var_defs)
+            } catch(e) {}
+            //
+            params_def._var_name = carrier.var
+            //
+        } else {
+            let executables = this.extract_excecutables(data)
+            return {executables}
         }
         //
-        return { params_def }
+        let executables = []
+        if ( lines.length ) {
+            let rest = lines.join('\n')
+            executables = this.extract_excecutables(rest)
+        }
+        //
+        return { params_def, executables }
     }
+
+
+
+    /**
+     * 
+     * @param {string} parseable 
+     * @param {object} exec_report 
+     * @returns {boolean}
+     */
+    ternary_conditional(parseable,exec_report) {
+        let ternary = this.ternary_check.exec(parseable)
+        if ( ternary ) {
+            let cond = ternary[1].trim()
+            let prest = parseable.substring(parseable.indexOf('?') + 1)
+            prest = prest.split('::')
+
+            let first = prest.shift()
+            let second = prest.shift()
+            let third = prest.shift()
+            if ( first.indexOf(':') > 0 ) {
+                let fparts = first.split(':')
+                first = fparts[0]
+                second = fparts[1] + "::" + second
+                if ( third ) {
+                    second = second + "::"  + third
+                }
+            } else if ( second && (second.indexOf(':') >= 0) ) {
+                let sparts = second.split(':')
+                first = first + "::" + sparts[0]
+                second = sparts[1]
+                if ( third ) {
+                    second = second + "::"  + third
+                }
+            } 
+
+            
+            let pos = first.trim()
+            let neg = second.trim()
+
+            if ( pos === "@nothing" ) pos = ""
+            if ( neg === "@nothing" ) neg = ""
+
+            exec_report.condition = {cond}
+            exec_report.positive_exec = {pos}
+            exec_report.negative_exec = {neg}
+
+            return true
+        }
+        return false
+    }
+
+
+    /**
+     * 
+     * @param {string} parseable 
+     * @returns 
+     */
+    parse_executable(parseable) {
+        let exec = {
+            "condition" : true,
+            "positive_exec" : parseable.trim(),
+            "negative_exec" : "",
+        }
+        if ( this.ternary_conditional(parseable,exec) ) {
+            //
+            let an_import = this.seek_imports(exec.positive_exec.pos)
+            if ( an_import ) {
+                exec.positive_exec.file = an_import
+            }
+            an_import = this.seek_imports(exec.negative_exec.neg)
+            if ( an_import ) {
+                exec.negative_exec.file = an_import
+            }
+            //
+        }
+        return exec
+    }
+
+
+    /**
+     * seek_imports
+     * 
+     * @param {string} maybe_imports 
+     * @returns {Array | boolean}
+     */
+    seek_imports(maybe_imports) {
+        let type = this.check_recursive_data(maybe_imports)
+        let rest = maybe_imports
+        //
+        let imports = []
+        let i = 0
+        while ( (type >= 1) && (type <= 3) && rest.length ) {
+            let entry_loc = rest.indexOf('$$')
+            if ( entry_loc < 0 ) break;
+            //
+            let step_entry = rest.substring(entry_loc + 2)
+            rest = rest.substring(entry_loc + 2 + step_entry.indexOf("::"))
+            
+            if ( step_entry.length ) {
+                if ( step_entry.indexOf("<<") > 0  ) {
+                    step_entry = step_entry.substring(0,step_entry.indexOf("<<"))
+                    rest = rest.substring(rest.indexOf("<<")+2)
+                }
+                //
+                let [file_name, path_finder, entry_type] = this.get_file_data_descriptor(step_entry)
+                //
+                let map_value = {
+                                "type" : entry_type,
+                                "file" : file_name,
+                                "path_finder" : path_finder,
+                                "data" : false
+                            }
+                //
+                imports.push(map_value)
+                this.delay_file_loading_queue.push(map_value)
+            }
+            if ( rest.indexOf('<<') > 0 ) {
+                type = this.check_recursive_data(rest)
+            } else break
+        }
+        if ( imports.length ) return imports
+        return false
+    }
+
+    /**
+     * extract_excecutables
+     * 
+     * @param {string} data_form 
+     * @returns {object}
+     */
+    extract_excecutables(data_form) {
+        //
+        let execs = []
+        let imports = []
+        if ( data_form.indexOf('>>') >= 0 ) {
+            let parts = data_form.split('>>')
+            for ( let i = 1; i < parts.length; i++ ) {
+                let p = parts[i]
+                p = p.substring(0,p.indexOf("<<")).trim()
+                parts[i] = p.substring(p.indexOf("<<") + 2)
+                p = this.parse_executable(p)
+                execs.push(p)
+            }
+            for ( let i = 1; i < parts.length; i++ ) {
+                let an_import = this.seek_imports(parts[i])
+                if ( an_import ) {
+                    imports = imports.concat(an_import)
+                }
+            }
+        } else {
+            imports = this.seek_imports(data_form)
+        }
+        return {execs,imports}
+    }
+
+    //
+    // case 1:
+    // @params<{lr_div:file,logout:file}>
+    //
+    // case 2:
+    // @list<el><{ group_name <- el[1], SOURCE-LINK <- el[2], FRAME-ACTIONS <- el[3]}>
+    // ...
+    // <@el>
+    //  ...
+    // </@el>
+    //
+    // case 3:
+    // >>@{FRAME-ACTIONS} ? @{FRAME-ACTIONS} : @nothing <<
+    // 
+    // case 4:
+    // @{group_name}
+    //
+    // case 5: 
+    // >> any action at all <<
+    // EXAMPLE: >> @p = 2 + 4; put @p here; put @p after next div; <<
+    // EXAMPLE: >> @p = 2 + 4; @bubble = @p; << //late @bubble appears in the html (text)
+    // 
+    // case 6:
+    // $$icons::mushroom-menu-icon.svg
+    // OR $$`path-finder`::`file-stem`.`ext`
+    //
 
 
     is_language_section_control(step_entry) {
@@ -1221,11 +1415,11 @@ console.log("NEED NAME HANDLING")
                             } else if ( step_entry.startsWith('files::params::') || step_entry.startsWith('css::params::') ) {
                                 let loadable_entry = step_entry.replace("::params","")
                                 sk_map[step_entry] = await this.entry_loading(loadable_entry)
-console.log("NEED PARAMS HANDLING")
+//console.log("NEED PARAMS HANDLING")
                             } else if ( step_entry.startsWith('files::elements::') || step_entry.startsWith('css::elements::') ) {
                                 let loadable_entry = step_entry.replace("::elements","")
                                 sk_map[step_entry] = await this.entry_loading(loadable_entry)
-console.log("NEED ELEMENTS HANDLING")
+//console.log("NEED ELEMENTS HANDLING")
                             } else {
                                 sk_map[step_entry] = await this.entry_loading(step_entry)
                             }
@@ -1280,6 +1474,39 @@ console.log("NOT HANDLED YET: ",step_entry)
 
 
 
+    async delay_file_loading() {
+        let q = this.delay_file_loading_queue
+        let name_to_data = {}
+        //
+        if ( q.length ) {
+            for ( let el of q ) {
+                if ( el.file ) {
+                    name_to_data[el.file] = el.path_finder
+                }
+            }
+            //
+            let loader_promises = []
+            for ( let [file,path_finder] of Object.entries(name_to_data) ) {
+                let file_path = this.top_dir_locations[path_finder]
+                let file_name = `${file_path}/${file}`
+                let p = fos.load_data_at_path(file_name)
+                loader_promises.push(p)
+            }
+            let loader_data = await Promise.all(loader_promises)
+            let keys = Object.keys(name_to_data)
+            for ( let dat of loader_data ) {
+                let key = keys.shift()
+                name_to_data[key] = dat
+            }
+            for ( let el of q ) {
+                el.data = "" + name_to_data[el.file]
+            }
+            //
+        }
+    }
+
+
+
     /**
      * section_parsing(all_skeletons)
      * The one parameter `all_skeletons` is a map from file names to skeleton ascii.
@@ -1304,6 +1531,9 @@ console.log("NOT HANDLED YET: ",step_entry)
 console.dir(occurence_partition,{depth: 3})
 
         await this.leaf_hmtl_directives(transform_1)
+
+
+        await this.delay_file_loading()
 
         let str = JSON.stringify(transform_1,null,4)
         await fos.write_out_string(this.top_level_parsed,str)
@@ -1340,6 +1570,12 @@ console.dir(occurence_partition,{depth: 3})
         await this.name_parameters_output()
     }
 
+
+
+
+    /**
+     * 
+     */
     async generate_all_concerns_templates() {
 
     }
@@ -1348,28 +1584,10 @@ console.dir(occurence_partition,{depth: 3})
 
 
 
-
 /**
  * 
- * @param {string} generator
- * 
- * @returns Promise<undefined>
+ * @param {object} args 
  */
-async function generate_all_configured_templates(generator) {
-    //
-    //
- 
-    //
-}
-
-
-async function generate_all_templated_website_and_apps(substitutions) {
-    
-}
-
-
-
-
 async function command_line_operations_new(args) {
     let phase = args.phase
     //
@@ -1398,7 +1616,7 @@ async function command_line_operations_new(args) {
                 }
                 break
             }
-            case "template" : 
+            case "template" :
             case 3: {
                 let project_dir = args.sources
                 let generator = args.generator  // a string
@@ -1409,10 +1627,11 @@ async function command_line_operations_new(args) {
                 parsed = `${project_dir}/${parsed}`
                 console.log("Using input configuration for template formation:\t\t",parsed)
 
+                //await to_templates.generate_all_concerns_templates()
                 break
             }
-            case "page":
-            case "assign":
+            case "page"   :
+            case "assign" :
             case 3: {
                 let project_dir = args.sources
                 let substitutions = args.values
@@ -1431,11 +1650,6 @@ async function command_line_operations_new(args) {
         //
     }
 
-            
-
-    if ( phase === "template" ) {
-    } else if ( phase === "assign" ) {
-    }
     console.log("-------------------------------------------------------------")
 
 }
