@@ -88,7 +88,6 @@ let parse_util = {
         return vname
     }
 }
-s
 //
 
 var g_argv = require('minimist')(process.argv.slice(2));
@@ -212,6 +211,9 @@ class SkelToTemplate {
             this.paths = new PathManager(conf.inputs)
         }
         //
+        this.global_variable_values = conf.global_variable_values ? conf.global_variable_values : {}
+        this.vars_unset_in_run = {}
+        //
         this.top_level_parsed = conf.top_level_parsed
         //
         this.ext_default_dirs = Object.assign({},conf.ext_default_dirs)
@@ -279,6 +281,10 @@ class SkelToTemplate {
         this.start_of_list = new RegExp(/^\@list\<(\w+)\>\<\{/)
 
         this.ternary_check = new RegExp(/^(.+)\?(.+)\:(.*)/)
+        this.var_pattern = new RegExp(/\@\{(\w+)\}/g)
+        this.var_set_expr_pattern = new RegExp(/\{([\w\=\+\-\d]+)\}/)
+
+        this.basic_function_call_match = new RegExp(/f\@(\w[\w\d]*)\{(\w[\w\d]*)\}/)
 
         this.entry_remap_map = {
             "files" : { "source" : "html", "type" : "tmplt"},
@@ -532,7 +538,7 @@ class SkelToTemplate {
                         map_value.recursive = await this.get_files_and_vars(part_key,data)
                     }
                 }
-
+                //
                 if ( rest.length ) {
                     sep_point = rest.indexOf("<<")
                     if ( sep_point ) {
@@ -715,6 +721,8 @@ class SkelToTemplate {
         })
         return just_html_d
     }
+
+
     /**
      * 
      * @param {object} all_skeletons 
@@ -983,6 +991,7 @@ class SkelToTemplate {
             path_finder = pf
             entry_type = (entry_type && (et !== entry_type)) ? entry_type : et
         }
+        //
         return [file_name,path_finder,entry_type]
     }
 
@@ -1101,6 +1110,41 @@ class SkelToTemplate {
         return false
     }
 
+    /**
+     * 
+     * @param {object | boolean} params_def 
+     * @param {string} data 
+     * @returns {object}
+     */
+    errant_variable_extraction(params_def,data) {
+        //
+        let eve_results = {}
+        let occurrences = data.match(this.var_pattern)
+        //
+        if ( !occurrences ) return undefined
+        //
+        occurrences = occurrences.map((occ) => {
+            return occ.replace("@{","").replace("}","")
+        })
+        //
+        if ( occurrences.length ) {
+            for ( let occur of occurrences ) {
+                eve_results[occur] = ""
+            }
+            if ( !params_def ) {
+                params_def = eve_results
+            } else {
+                for ( let ky of Object.keys(eve_results) ) {
+                    if ( !(ky in params_def) ) {
+                        params_def[ky] = eve_results[ky]
+                    }
+                }
+            }
+            return params_def
+        }
+        //
+        return undefined
+    }
 
     /**
      * 
@@ -1178,8 +1222,11 @@ class SkelToTemplate {
             //
         } else {
             let executables = this.extract_excecutables(data)
-            return {executables}
+            params_def = this.errant_variable_extraction(params_def,data)
+            return {params_def, executables}
         }
+
+        params_def = this.errant_variable_extraction(params_def,data)
         //
         let executables = []
         if ( lines.length ) {
@@ -1199,6 +1246,9 @@ class SkelToTemplate {
      * @returns {boolean}
      */
     ternary_conditional(parseable,exec_report) {
+
+//console.log("ternary_conditional",parseable)
+
         let ternary = this.ternary_check.exec(parseable)
         if ( ternary ) {
             let cond = ternary[1].trim()
@@ -1256,7 +1306,6 @@ class SkelToTemplate {
 
 
 
-
     /**
      * 
      * @param {string} parseable 
@@ -1264,6 +1313,7 @@ class SkelToTemplate {
      */
     parse_executable(parseable) {
         //
+//console.log("parse_executable",parseable)
         let exec = {
             "replace" : parseable,
             "condition" : true,
@@ -1276,10 +1326,12 @@ class SkelToTemplate {
             //
             let an_import = this.seek_imports(exec.positive_exec.pos)
             if ( an_import ) {
+                exec.positive_exec.replace = exec.positive_exec.neg
                 exec.positive_exec.file = an_import
             }
             an_import = this.seek_imports(exec.negative_exec.neg)
             if ( an_import ) {
+                exec.negative_exec.replace = exec.negative_exec.neg
                 exec.negative_exec.file = an_import
             }
             //
@@ -1304,6 +1356,7 @@ class SkelToTemplate {
             let entry_loc = rest.indexOf('$$')
             if ( entry_loc < 0 ) break;
             //
+            let replacer = rest.indexOf("<<") >= 0 ? rest.substring(entry_loc,rest.indexOf("<<") + 2) : undefined
             let step_entry = rest.substring(entry_loc + 2)
             rest = rest.substring(entry_loc + 2 + step_entry.indexOf("::"))
             
@@ -1316,6 +1369,7 @@ class SkelToTemplate {
                 let [file_name, path_finder, entry_type] = this.get_file_data_descriptor(step_entry)
                 //
                 let map_value = {
+                                "replace" : replacer,
                                 "type" : entry_type,
                                 "file" : file_name,
                                 "path_finder" : path_finder,
@@ -1347,9 +1401,17 @@ class SkelToTemplate {
             let parts = data_form.split('>>')
             for ( let i = 1; i < parts.length; i++ ) {
                 let p = parts[i]
-                p = p.substring(0,p.indexOf("<<"))
-                parts[i] = p.substring(p.indexOf("<<") + 2)
-                p = this.parse_executable(">>" + p + "<<")
+                let skip = 2
+                let reattach_end = "<<"
+                if ( p.indexOf("<<<<") > 0 ) {  // executable with import
+                    p = p.substring(0,p.indexOf("<<<<"))
+                    reattach_end = "<<<<"
+                    skip = 4
+                } else {
+                    p = p.substring(0,p.indexOf("<<"))
+                }
+                parts[i] = p.substring(p.indexOf("<<") + skip)
+                p = this.parse_executable(">>" + p + reattach_end)
                 execs.push(p)
             }
             for ( let i = 1; i < parts.length; i++ ) {
@@ -1408,6 +1470,196 @@ class SkelToTemplate {
 
 
     /**
+     * has_calc(entry_data)
+     */
+
+    has_calc(entry_data) {
+
+        for ( let fcall of Object.values(entry_data.key_values) ) {
+            if ( (fcall === "f@incr{$}") || (fcall === "f@init{$}") ) {
+                continue
+            }
+            let parse_call = this.basic_function_call_match.exec(fcall)
+            if ( parse_call ) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+
+    /**
+     * 
+     * @param {object} entry_data 
+     * @returns {Array}
+     */
+    gather_calculations(entry_data) {
+        let all_calls = []
+        for ( let [vname,fcall] of Object.entries(entry_data.key_values) ) {
+            if ( (fcall === "f@incr{$}") || (fcall === "f@init{$}") ) {
+                continue
+            }
+            let parse_call = this.basic_function_call_match.exec(fcall)
+            if ( parse_call ) {
+                let one_call = {}
+                one_call.set_var = vname
+                one_call.func = parse_call[1]
+                one_call.param = parse_call[2]
+                //
+                all_calls.push(one_call)
+            } else {
+                let one_call = {}
+                one_call.set_var = vname
+                one_call.func = "copy"
+                one_call.param = fcall // actually just a string
+                //
+                all_calls.push(one_call)
+            }
+        }
+        return all_calls
+    }
+
+
+    /**
+     * 
+     * @param {object} entry_data 
+     * @param {string} fcall 
+     * @param {string} caller_stem 
+     */
+    make_call(entry_data,fcall,caller_stem) {
+        let func = fcall.func
+        if ( (typeof entry_data.evaluations) !== "object" ) {
+            entry_data.evaluations = {}
+        }
+        switch ( func ) {
+            case "name" : {
+                let target = fcall.param
+                if ( target === "parent" ) {
+                    entry_data.evaluations[fcall.set_var] = caller_stem
+                }
+                break;
+            }
+            case "copy" : {
+                 entry_data.evaluations[fcall.set_var] = fcall.param
+                break
+            }
+            default: {
+                break
+            }
+        }
+    }
+
+
+    /**
+     * 
+     * @param {port_modules} entry_data 
+     * @returns {boolean}
+     */
+    conditionless_evaluations_substitution(entry_data) {
+        let data = entry_data.data
+
+        if ( !data ) return false
+        if ( data.indexOf("?") > 0 ) {
+            if ( this.ternary_check.test(data) ) {
+                return false
+            }
+        }
+        
+        let evals = entry_data.evaluations
+
+        if ( (typeof evals === "object") && Object.keys(evals).length ) {
+            for ( let [vky, vval]  of Object.entries(evals) ) {
+                let var_form = `@{${vky}}`
+                data = parse_util.subst(data,var_form,vval)
+            }
+            entry_data.data = data
+        }
+        return true
+    }
+
+
+    /**
+     * 
+     * @param {object} entry_data 
+     * @returns {boolean}
+     */
+    has_incrementer(entry_data) {
+        //
+        if ( typeof entry_data.key_values === "object" ) {
+            let values = Object.values(entry_data.key_values)
+            for ( let val of values ) {
+                if ( (val === "f@incr{$}") || (val === "f@init{$}") ) {
+                    return true
+                }
+            }
+        }
+        //
+        return false
+    }
+
+
+    /**
+     * 
+     * @param {object} incrementer_set 
+     * @param {string} step_entry 
+     * @param {object} entry_data 
+     */
+    add_to_incrementers(incrementer_set,entry_data,var_set_expr) {
+        //
+        let incr_vname = false
+        let start_val = false
+        let op = ""
+        if ( var_set_expr.length ) {
+            let unloader = this.var_set_expr_pattern.exec(var_set_expr)
+            if ( unloader ) {
+                let vexpr = unloader[1]
+                if ( vexpr.indexOf("=") > 0 ) {
+                    let pieces = vexpr.split('=')
+                    incr_vname = pieces[0]
+                    start_val = parseInt(pieces[1].trim())
+                    op = '='
+                } else if ( vexpr.indexOf("++") > 0 ) {
+                    incr_vname = vexpr.substring(0,vexpr.indexOf("++"))
+                    op = "++"
+                } else if ( vexpr.indexOf("--") > 0 ) {
+                    incr_vname = vexpr.substring(0,vexpr.indexOf("--"))
+                    op = "--"
+                }
+            }
+        }
+        if ( (typeof entry_data === "object") &&  (typeof entry_data.key_values === "object") ) {
+            for ( let [vname, form] of Object.entries(entry_data.key_values) ) {
+                if ( (form === "f@incr{$}") || (form === "f@init{$}") ) {
+                    let ky_vname = incr_vname ? incr_vname : vname
+                    entry_data.op = op
+                    if ( ky_vname in incrementer_set ) {
+                        let incr_descr = incrementer_set[ky_vname]
+                        if ( form === "f@init{$}" ) {
+                            incr_descr.starter = entry_data
+                            incr_descr.start_val = start_val
+                        } else {
+                            incr_descr.list.push(entry_data)
+                        }
+                    } else {
+                        incrementer_set[ky_vname] = {
+                            "print_vname" : ky_vname,
+                            "apply_to" : vname,
+                            "start_val" : start_val,
+                            "starter" : entry_data,
+                            "list" : [entry_data]
+                        }
+                    }
+                    return true
+                }
+            }
+        }
+        return false
+        //
+    }
+
+
+    /**
      * 
      * @param {stringify} skeleton_src 
      */
@@ -1417,6 +1669,7 @@ class SkelToTemplate {
 
         for ( let [sk_key, skel_def ] of Object.entries(skeleton_src) ) {
             let sk_map = {}
+            let incrementer_set = {}
             let lang_spec_count = 0
             let skeleton = skel_def.skeleton
             for ( let step_entry of skeleton ) {
@@ -1445,9 +1698,46 @@ class SkelToTemplate {
                         sk_map[step_entry] = Object.assign({},entry)
                     } else {
                         if ( step_entry.startsWith('files::') || step_entry.startsWith('files<') ||step_entry.startsWith('css::') ) {
-                            if ( step_entry.startsWith('files::name::') ) {
-console.log("NEED NAME HANDLING")
+                            if ( step_entry.startsWith('files::calc::') ) {
                                 sk_map[step_entry] = "name"
+                                if ( step_entry.indexOf("_<") < 0 ) {
+                                    let var_set_expr = ""
+                                    let db = this.name_drops_db
+                                    let db_ky = step_entry.substring("files::calc::".length)
+                                    if ( db_ky.indexOf("$") > 0 ) {
+                                        let db_ky_parts = db_ky.split("$")
+                                        db_ky = db_ky_parts[0]
+                                        var_set_expr = db_ky_parts[1]
+                                    }
+                                    let entry_data = db[db_ky]
+                                    let back_ref_ky = db_ky
+                                    if ( typeof entry_data === "object" ) {
+                                        sk_map[step_entry] = Object.assign({},entry_data)
+                                    } else {
+                                        back_ref_ky = db_ky
+                                        db_ky = db_ky.substring(0,db_ky.lastIndexOf('_') + 1)
+                                        entry_data = db[db_ky]
+                                        sk_map[step_entry] = Object.assign({},entry_data)
+                                    }
+                                    entry_data = sk_map[step_entry]
+                                    if ( entry_data.file ) {        // delay loading the file ... 
+                                        entry_data.path_finder = "html"
+                                        this.delay_file_loading_queue.push(entry_data)
+                                    }
+                                    if ( this.has_incrementer(entry_data) ) {
+                                        this.add_to_incrementers(incrementer_set,entry_data,var_set_expr)
+                                    }
+                                    //
+                                    if ( this.has_calc(entry_data) ) {
+                                        let calls = this.gather_calculations(entry_data)
+                                        for ( let a_call of calls ) {
+                                            this.make_call(entry_data,a_call,back_ref_ky)
+                                        }
+                                    }
+                                    //
+                                }
+                               //
+                                //
                             } else if ( step_entry.startsWith('files::params::') || step_entry.startsWith('css::params::') ) {
                                 let loadable_entry = step_entry.replace("::params","")
                                 sk_map[step_entry] = await this.entry_loading(loadable_entry)
@@ -1505,11 +1795,23 @@ console.log("NOT HANDLED YET: ",step_entry)
                 }
             }
             skel_def.skeleton_map = sk_map
+            skel_def.incrementer_set = incrementer_set
         }
     }
 
 
 
+    /**
+     * Called after other processing during the preparation phase, but before writing out the results of preparation.
+     * 
+     * There is queue, `delay_file_loading_queue`, that hold structures with empty data components and with file names. 
+     * The elements of the queue were processed during synchronous analysis of text and time was not alloted to 
+     * loading the data. 
+     * 
+     * This loads the data asynchronously from the files on the queue, parallelizing the loading as much as possible 
+     * with a Promise.all.
+     * 
+     */
     async delay_file_loading() {
         let q = this.delay_file_loading_queue
         let name_to_data = {}
@@ -1534,13 +1836,241 @@ console.log("NOT HANDLED YET: ",step_entry)
                 let key = keys.shift()
                 name_to_data[key] = dat
             }
-            for ( let el of q ) {
-                el.data = "" + name_to_data[el.file]
-            }
             //
+        }
+
+        return name_to_data
+    }
+
+
+    evaluate_delayed_queue(name_to_data) {
+        let q = this.delay_file_loading_queue
+        if ( q && q.length ) {
+            for ( let el of q ) {
+                el.data = "" + name_to_data[el.file]            // data first enters into the entry object here
+                if ( el.evaluations || el.recursive ) {         // only backup files that have skeletal level evaluations
+                    el.backup_data = "" + el.data               // if the user runs an intermediate step, then the original data will be utilized     
+                }
+                if ( el.evaluations ) {
+                    this.conditionless_evaluations_substitution(el)
+                }
+            }
         }
     }
 
+
+    /**
+     * 
+     * @param {Array} conds 
+     * @param {object} params 
+     * @returns {Array}
+     */
+    conds_reduction(conds,params) {
+        //
+        let reduced_conds = []
+        for ( let cond of conds ) {
+            //
+            let vname = cond.condition.variable
+            let val = params[vname]
+            let vform = cond.condition.cond
+            let replacer = ""
+            if ( val && (typeof val === "string") && val.length > 0 ) {
+                replacer = cond.positive_exec.pos
+                replacer = parse_util.subst(replacer,vform,val)
+            } else {
+                replacer = cond.negative_exec.neg
+                replacer = parse_util.subst(replacer,vform,val)
+            }
+            //
+            let a_reduction = {
+                "replace" :  cond.replace,
+                "replacer" : replacer
+            }
+            reduced_conds.push(a_reduction)
+        }
+
+        return reduced_conds
+    }
+
+
+    /**
+     * 
+     * @param {string} data 
+     * @param {Array} subst_list 
+     * @param {string} index_var 
+     */
+//<@el>
+// </@el>
+
+    map_to_substs(data,subst_list,index_var) {
+        //
+        let loop_start_len = index_var.length + "<@>".length
+        let loop_body_start = data.indexOf(`<@${index_var}>`) + loop_start_len
+        let loop_body_end = data.indexOf(`</@${index_var}>`)
+
+        for ( let asubst of subst_list ) {
+            //
+            let loop_body = data.substring(loop_body_start,loop_body_end)
+            //
+            let params = asubst.params_def
+            let conds = asubst.conds
+            //
+            for ( let acond of conds ) {
+                loop_body = parse_util.subst(loop_body,acond.replace,acond.replacer)
+            }
+            for ( let param in params ) {
+                let var_form = `@{${param}}`
+                let val = params[param]
+                loop_body = parse_util.subst(loop_body,var_form,val)
+            }
+            //
+            asubst.data = loop_body
+        }
+        
+    }
+
+
+
+    /**
+     * 
+     * @param {object} transformed 
+     */
+    conditional_evaluations(transformed) {
+        for ( let [sk_name,skel] of Object.entries(transformed) ) {
+            let sk_map = skel.skeleton_map
+            if ( typeof sk_map !== "object" ) continue
+            if ( skel.parameterized ) {
+                for ( let [entry_ky,desciptor] of Object.entries(skel.parameterized) ) {
+                    let keys = Object.keys(desciptor)
+                    let list_key = keys.find((ky) => {
+                        if ( ky.startsWith("_type<") ) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    })
+                    //
+                    if ( list_key ) {
+                        let entry = sk_map[entry_ky]
+                        if ( entry.subst_recursive && entry.conds ) {
+                            for ( let evalr of entry.subst_recursive ) {
+                                let params = evalr.params_def
+                                evalr.conds = this.conds_reduction(entry.conds,params)
+                            }
+                            let data = entry.data
+                            entry.backup_data = "" + data
+                            this.map_to_substs(data,entry.subst_recursive,entry.recursive.params_def._var_name)
+                        } else {
+                            continue
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 
+     * @param {Array} exec_list 
+     */
+
+    find_conditionals(exec_list) {
+        //
+        if ( exec_list && Array.isArray(exec_list) ) {
+            let conds_only = exec_list.filter((el) => {
+                if ( el.condition && (typeof el.condition === "object") ) {
+                    return true
+                }
+                return false
+            })
+            return conds_only
+        }
+        return false
+        //
+    }
+
+
+
+    list_to_skeletal_variable_assignment(transformed) {
+        for ( let [sk_name,skel] of Object.entries(transformed) ) {
+            let sk_map = skel.skeleton_map
+            if ( typeof sk_map !== "object" ) continue
+            if ( skel.parameterized ) {
+                for ( let [entry_ky,desciptor] of Object.entries(skel.parameterized) ) {
+                    let keys = Object.keys(desciptor)
+                    let list_key = keys.find((ky) => {
+                        if ( ky.startsWith("_type<") ) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    })
+                    //
+                    if ( list_key ) {
+                        let entry = sk_map[entry_ky]
+                        if ( entry.recursive ) {
+console.log("list_to_skeletal_variable_assignment",entry.recursive.params_def)
+                        } else {
+                            continue
+                        }
+                        let par_src = entry.recursive.params_def
+                        entry.subst_recursive = []
+                        let el_var = list_key.replace("_type<","").replace(">","").trim()
+                        if ( desciptor[el_var] === "list" ) {
+                            let alist = desciptor[list_key]
+                            if ( Array.isArray(alist) ) {
+                                for ( let var_vals of alist ) {
+                                    // entry.subst_recursive
+                                    let subst_vals = {}
+                                    for ( let ky in par_src ) {
+                                        subst_vals[ky] = var_vals[ky]
+                                    }
+                                    entry.subst_recursive.push({ "params_def" : subst_vals })
+                                    entry.conds = this.find_conditionals(entry.recursive.executables.execs)
+                                }
+                            }
+                        }
+                    }
+                    //
+                }
+            }
+        }
+    }
+
+
+
+    /**
+     * 
+     * @param {object} transformed 
+     */
+    incremental_evaluations(transformed) {
+        //
+        for ( let [sk_name,skel] of Object.entries(transformed) ) {
+            if ( typeof skel.incrementer_set === "object" ) {
+                for ( let [ky_vname,incr_descr] of Object.entries(skel.incrementer_set) ) {
+                    let subst_var = `@{${incr_descr.apply_to}}`
+                    let i = parseInt(incr_descr.start_val)
+                    let n = incr_descr.list.length
+                    let stepper = incr_descr.starter
+                    //
+                    let data = stepper.data
+                    stepper.data = parse_util.subst(data,subst_var,i)
+                    let l = incr_descr.list
+                    for ( let k = 0; k < n; k++ ) {
+                        let next = l[k]
+                        if ( next !== stepper ) {
+                            i++
+                            let data = next.data
+                            next.data = parse_util.subst(data,subst_var,i)
+                        }
+                    }
+                }
+            }
+        }
+        //
+    }
 
 
     /**
@@ -1567,18 +2097,40 @@ console.log("NOT HANDLED YET: ",step_entry)
 
         await this.leaf_hmtl_directives(transform_1)
 
+        let name_to_data = await this.delay_file_loading()
 
-        await this.delay_file_loading()
+        this.evaluate_delayed_queue(name_to_data)
+
+        this.incremental_evaluations(transform_1)
+
+        this.list_to_skeletal_variable_assignment(transform_1)
+
+        this.conditional_evaluations(transform_1)
 
         let str = JSON.stringify(transform_1,null,4)
         await fos.write_out_string(this.top_level_parsed,str)
     }
 
 
+
+
+    // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+    /**
+     * 
+     */
+    async generate_all_concerns_templates() {
+
+    }
+
+
+
+
     /**
      * 
      * @param {*} el_var_map - var name and types
-     * @param {*} el        - var name and valuess
+     * @param {*} el        - var name and values
      * @param {*} target_data 
      * @return {string}
      * 
@@ -1590,6 +2142,7 @@ console.log("NOT HANDLED YET: ",step_entry)
             let  val = el[ky]
             if ( typeof val === vtype ) {
                 td_update = parse_util.subst(td_update,`@{${ky}}`,val)
+                delete el[ky]  // may test to see if something is not sets
             }
         }
         //
@@ -1627,15 +2180,35 @@ console.log("NOT HANDLED YET: ",step_entry)
                 }
             }
             //
-            tranformed_data = this.var_substitution(resolver,var_assigns,loop_part,tranformed_data)
+            tranformed_data = this.var_substitution(resolver,var_assigns,tranformed_data)
         }
         //
         return tranformed_data
     }
 
 
-    
     /**
+     * This is a test...
+     * 
+     * @param {object} vset 
+     * @param {string} data 
+     */
+    resolve_with_configuration(vset,data) {
+        let vsource = Object.assign({},this.global_variable_values)
+        let t_data = this.var_substitution(vset,vsource,data)
+        //
+        this.vars_unset_in_run = Object.assign({},this.vars_unset_in_run,vsource)
+        //
+        return t_data
+    }
+
+
+    /**
+     * This is supposed to be the starting point got calling variable instantiation
+     * on the blocks at the skeleton level. The level_1_parameterized_file parameter 
+     * should be the expansion that is the value keyed by the file name in the skeleton map.
+     * 
+     * 
      * 
      * @param {string} file_key 
      * @param {object} level_1_parameterized_file 
@@ -1703,6 +2276,13 @@ console.log("NOT HANDLED YET: ",step_entry)
             }
             l1pf.data = this.var_substitution(required_values,required_values,data)
 
+            data = l1pf.data
+            let vset = {}
+            vset = this.errant_variable_extraction(vset,data)
+            if ( vset && Object.keys(vset).length ) {
+                l1pf.data = this.resolve_with_configuration(vset,data)
+            }
+
         } catch (e) {}
     }
 
@@ -1737,15 +2317,6 @@ console.log("NOT HANDLED YET: ",step_entry)
         await this.name_parameters_output()
     }
 
-
-
-
-    /**
-     * 
-     */
-    async generate_all_concerns_templates() {
-
-    }
 
 }
 
