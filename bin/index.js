@@ -490,11 +490,13 @@ class SkelToTemplate {
      * @param {string} param_str 
      */
     async build_tree(part_key,param_str) {
+        //
         if ( param_str[0] === '{' ) {
             param_str = param_str.substring(1,param_str.lastIndexOf('}'))
         }
 
         let var_tree = {}
+        let easy_access_parse = {}
 
         let sep_point = param_str.indexOf("<<")
         if ( sep_point > 0 ) {
@@ -514,6 +516,8 @@ class SkelToTemplate {
                     }
                     let extracted_var = check[1]
                     let the_file = check[2]
+                    //
+                    easy_access_parse[extracted_var] = "file"
                     //
                     let data = ""
                     let parts_of_key = part_key.split('::')
@@ -555,6 +559,8 @@ class SkelToTemplate {
             return false
         }
 
+        let par_state = `_params<${Object.keys(easy_access_parse).join(',')}>`
+        var_tree[par_state] = easy_access_parse
         return var_tree
     }
 
@@ -1942,8 +1948,15 @@ console.log("NOT HANDLED YET: ",step_entry)
             if ( skel.parameterized ) {
                 for ( let [entry_ky,desciptor] of Object.entries(skel.parameterized) ) {
                     let keys = Object.keys(desciptor)
-                    let list_key = keys.find((ky) => {
+                    let list_key = keys.find((ky) => {  // find all list types
                         if ( ky.startsWith("_type<") ) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    })
+                    let parameter_key = keys.find((ky) => {  // find all list types
+                        if ( ky.startsWith("_params<") ) {
                             return true
                         } else {
                             return false
@@ -1963,7 +1976,53 @@ console.log("NOT HANDLED YET: ",step_entry)
                         } else {
                             continue
                         }
+                    }
+                    if ( parameter_key ) {
+                        let pars = parameter_key.replace("_params<","").replace(">","").split(",")
+                        for ( let par of pars ) {
+                            if ( typeof desciptor[par].tree === "object" ) {
+                                this.go_deep(desciptor[par])
+                            } else {
+                                console.log("par with value",par)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
+
+
+    go_deep(param_descr) {
+        //
+        param_descr.backup_data = "" + param_descr.data
+        //console.dir(param_descr.tree)
+        //
+        let keys = Object.keys(param_descr.tree)
+        
+        //
+        let parameter_key = keys.find((ky) => {  // find all list types
+            if ( ky.startsWith("_params<") ) {
+                return true
+            } else {
+                return false
+            }
+        })
+        //
+        if ( parameter_key ) {
+            let pars = parameter_key.replace("_params<","").replace(">","").split(",")
+            for ( let par of pars ) {
+                if ( typeof param_descr.tree[par] === "object" ) {
+                    let pdescr = param_descr.tree[par]
+                    if ( typeof pdescr.tree === "object" ) {
+                        this.go_deep(pdescr)
+                    } else {
+                        if ( pdescr.recursive ) {
+console.log("par with recursive",par)
+                        } else {
+                            console.log("par with value",par)
+                        }
                     }
                 }
             }
