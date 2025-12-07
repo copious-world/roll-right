@@ -1883,9 +1883,15 @@ console.log("NOT HANDLED YET: ",step_entry)
             if ( val && (typeof val === "string") && val.length > 0 ) {
                 replacer = cond.positive_exec.pos
                 replacer = parse_util.subst(replacer,vform,val)
+                if ( cond.positive_exec.file && cond.positive_exec.file[0].data ) {
+                    replacer = cond.positive_exec.file[0].data
+                }
             } else {
                 replacer = cond.negative_exec.neg
                 replacer = parse_util.subst(replacer,vform,val)
+                if ( cond.negative_exec.file && cond.negative_exec.file[0].data ) {
+                    replacer = cond.negative_exec.file[0].data
+                }
             }
             //
             let a_reduction = {
@@ -1908,7 +1914,7 @@ console.log("NOT HANDLED YET: ",step_entry)
 //<@el>
 // </@el>
 
-    map_to_substs(data,subst_list,index_var) {
+    list_map_to_substs(data,subst_list,index_var) {
         //
         let loop_start_len = index_var.length + "<@>".length
         let loop_body_start = data.indexOf(`<@${index_var}>`) + loop_start_len
@@ -1935,6 +1941,44 @@ console.log("NOT HANDLED YET: ",step_entry)
         
     }
 
+
+    map_to_substs(data,subst_list) {
+        //
+        for ( let asubst of subst_list ) {
+            //
+            let params = asubst.params_def
+            let conds = asubst.conds
+
+    console.dir(asubst)
+            //
+            let changed_data = "" + data
+            //
+            for ( let acond of conds ) {
+                changed_data = parse_util.subst(changed_data,acond.replace,acond.replacer)
+            }
+            for ( let param in params ) {
+                let var_form = `@{${param}}`
+                let val = params[param]
+                changed_data = parse_util.subst(changed_data,var_form,val)
+            }
+            //
+            asubst.data = changed_data        
+        }
+    }
+
+
+    join_executables(pdescr) {
+        let reductions = pdescr.subst_recursive
+        if ( reductions && Array.isArray(reductions) ) {
+            let data_only = reductions.map((red) => {
+                let next_data = red.data
+                if ( !next_data || (typeof next_data !== 'string')) return ""
+                else return next_data
+            })
+            return data_only.join("\n")
+        }
+        return ""
+    }
 
 
     /**
@@ -1972,7 +2016,7 @@ console.log("NOT HANDLED YET: ",step_entry)
                             }
                             let data = entry.data
                             entry.backup_data = "" + data
-                            this.map_to_substs(data,entry.subst_recursive,entry.recursive.params_def._var_name)
+                            this.list_map_to_substs(data,entry.subst_recursive,entry.recursive.params_def._var_name)
                         } else {
                             continue
                         }
@@ -1980,10 +2024,14 @@ console.log("NOT HANDLED YET: ",step_entry)
                     if ( parameter_key ) {
                         let pars = parameter_key.replace("_params<","").replace(">","").split(",")
                         for ( let par of pars ) {
-                            if ( typeof desciptor[par].tree === "object" ) {
-                                this.go_deep(desciptor[par])
-                            } else {
-                                console.log("par with value",par)
+                            let pdescr = desciptor[par]
+                            if ( typeof pdescr.tree === "object" ) {
+                                this.go_deep(entry_ky,pdescr)
+                            }
+                            if ( pdescr.recursive ) {
+                                this.executable_condition_processing(pdescr)
+                                this.tree_conditional_reduction(pdescr)
+                                pdescr.data = this.join_executables(pdescr)
                             }
                         }
                     }
@@ -1994,7 +2042,7 @@ console.log("NOT HANDLED YET: ",step_entry)
 
 
 
-    go_deep(param_descr) {
+    go_deep(entry_ky,param_descr) {
         //
         param_descr.backup_data = "" + param_descr.data
         //console.dir(param_descr.tree)
@@ -2017,12 +2065,11 @@ console.log("NOT HANDLED YET: ",step_entry)
                     let pdescr = param_descr.tree[par]
                     if ( typeof pdescr.tree === "object" ) {
                         this.go_deep(pdescr)
-                    } else {
-                        if ( pdescr.recursive ) {
-console.log("par with recursive",par)
-                        } else {
-                            console.log("par with value",par)
-                        }
+                    }
+                    if ( pdescr.recursive ) {
+                        this.executable_condition_processing(pdescr)
+                        this.tree_conditional_reduction(pdescr)
+                        pdescr.data = this.join_executables(pdescr)
                     }
                 }
             }
@@ -2051,6 +2098,32 @@ console.log("par with recursive",par)
     }
 
 
+    executable_condition_processing(entry) {
+        let par_src = entry.recursive.params_def
+        entry.subst_recursive = []
+        // 
+        let subst_vals = Object.assign({},par_src)
+        //
+        entry.subst_recursive.push({ "params_def" : subst_vals })
+        entry.conds = this.find_conditionals(entry.recursive.executables.execs)
+    }
+
+
+
+    tree_conditional_reduction(entry) {
+        if ( entry.subst_recursive && entry.conds ) {
+            for ( let evalr of entry.subst_recursive ) {
+                let params = evalr.params_def
+                evalr.conds = this.conds_reduction(entry.conds,params)
+            }
+            let data = entry.data
+            entry.backup_data = "" + data
+            this.map_to_substs(data,entry.subst_recursive)
+        }
+
+    }
+
+
 
     list_to_skeletal_variable_assignment(transformed) {
         for ( let [sk_name,skel] of Object.entries(transformed) ) {
@@ -2074,12 +2147,12 @@ console.log("list_to_skeletal_variable_assignment",entry.recursive.params_def)
                         } else {
                             continue
                         }
-                        let par_src = entry.recursive.params_def
-                        entry.subst_recursive = []
                         let el_var = list_key.replace("_type<","").replace(">","").trim()
                         if ( desciptor[el_var] === "list" ) {
                             let alist = desciptor[list_key]
                             if ( Array.isArray(alist) ) {
+                                let par_src = entry.recursive.params_def
+                                entry.subst_recursive = []
                                 for ( let var_vals of alist ) {
                                     // entry.subst_recursive
                                     let subst_vals = {}
