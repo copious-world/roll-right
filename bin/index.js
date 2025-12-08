@@ -17,6 +17,7 @@ const TESTING = true
 
 const {base_patterns_mod} = require('../lib/html_directives')
 const crypto = require('crypto')
+const { type } = require('os')
 
 
 // needs module
@@ -86,7 +87,24 @@ let parse_util = {
         let var_up = str.substring(str.indexOf('@{') + 2)
         let vname = var_up.substring(0,var_up.indexOf('}'))
         return vname
+    },
+
+    has_parameter_block : (data)  => {
+        return data.indexOf("@params<{") >= 0
+    },
+
+    remove_parameter_block : (data)  => {
+        data = data.trim()
+        let front_split = data.split("@params<{")
+        let front = front_split[0]
+        let rest = front_split[1]
+
+        let end_block = rest.indexOf("}>")
+        rest = rest.substring(end_block+2).trim()
+        data = front + rest
+        return data.trim()
     }
+
 }
 //
 
@@ -517,7 +535,7 @@ class SkelToTemplate {
                     let extracted_var = check[1]
                     let the_file = check[2]
                     //
-                    easy_access_parse[extracted_var] = "file"
+                    easy_access_parse[extracted_var] = "%file%"
                     //
                     let data = ""
                     let parts_of_key = part_key.split('::')
@@ -1849,6 +1867,10 @@ console.log("NOT HANDLED YET: ",step_entry)
     }
 
 
+    /**
+     * 
+     * @param {*} name_to_data 
+     */
     evaluate_delayed_queue(name_to_data) {
         let q = this.delay_file_loading_queue
         if ( q && q.length ) {
@@ -1872,6 +1894,8 @@ console.log("NOT HANDLED YET: ",step_entry)
      * @returns {Array}
      */
     conds_reduction(conds,params) {
+        //
+//console.log("conds_reduction",params)        
         //
         let reduced_conds = []
         for ( let cond of conds ) {
@@ -1941,7 +1965,12 @@ console.log("NOT HANDLED YET: ",step_entry)
         
     }
 
-
+    /**
+     * map_to_substs
+     * 
+     * @param {string} data 
+     * @param {Array} subst_list 
+     */
     map_to_substs(data,subst_list) {
         //
         for ( let asubst of subst_list ) {
@@ -1949,7 +1978,7 @@ console.log("NOT HANDLED YET: ",step_entry)
             let params = asubst.params_def
             let conds = asubst.conds
 
-    console.dir(asubst)
+    //console.dir(asubst)
             //
             let changed_data = "" + data
             //
@@ -1962,18 +1991,27 @@ console.log("NOT HANDLED YET: ",step_entry)
                 changed_data = parse_util.subst(changed_data,var_form,val)
             }
             //
+//console.log(changed_data)
+            if ( parse_util.has_parameter_block(changed_data) ) {
+                changed_data = parse_util.remove_parameter_block(changed_data)
+            }
+
             asubst.data = changed_data        
         }
     }
 
-
+    /**
+     * 
+     * @param {object} pdescr 
+     * @returns {string}
+     */
     join_executables(pdescr) {
         let reductions = pdescr.subst_recursive
         if ( reductions && Array.isArray(reductions) ) {
             let data_only = reductions.map((red) => {
                 let next_data = red.data
                 if ( !next_data || (typeof next_data !== 'string')) return ""
-                else return next_data
+                else return next_data.trim()
             })
             return data_only.join("\n")
         }
@@ -2042,6 +2080,11 @@ console.log("NOT HANDLED YET: ",step_entry)
 
 
 
+    /**
+     * 
+     * @param {string} entry_ky 
+     * @param {object} param_descr 
+     */
     go_deep(entry_ky,param_descr) {
         //
         param_descr.backup_data = "" + param_descr.data
@@ -2098,6 +2141,10 @@ console.log("NOT HANDLED YET: ",step_entry)
     }
 
 
+    /**
+     * 
+     * @param {object} entry 
+     */
     executable_condition_processing(entry) {
         let par_src = entry.recursive.params_def
         entry.subst_recursive = []
@@ -2110,6 +2157,10 @@ console.log("NOT HANDLED YET: ",step_entry)
 
 
 
+    /**
+     * 
+     * @param {object} entry 
+     */
     tree_conditional_reduction(entry) {
         if ( entry.subst_recursive && entry.conds ) {
             for ( let evalr of entry.subst_recursive ) {
@@ -2120,11 +2171,116 @@ console.log("NOT HANDLED YET: ",step_entry)
             entry.backup_data = "" + data
             this.map_to_substs(data,entry.subst_recursive)
         }
+    }
 
+
+    /**
+     * 
+     * @param {string} ptype 
+     */
+    is_tree_type(ptype) {
+        if ( ptype[0] === '%' ) {
+            if ( ptype === "%file%" ) {
+                return true
+            }
+        }
+        return false
+    }
+
+    /**
+     * 
+     * @param {object} skel 
+     * @param {string} entry_ky 
+     * @param {string} pname 
+     * @returns {string}
+     */
+    data_from_parameter(skel,entry_ky,pname) {
+        let p_entry = skel.parameterized[entry_ky]
+        let will_return_data = ""
+        if ( p_entry ) {
+            let p_def = p_entry[pname]
+            let data = p_def.data
+            if ( typeof data === "string" ) {
+                if ( p_def.tree ) {
+                    let rec = p_def.recursive
+                    if ( rec ) {
+                        let dst_pars = rec.params_def
+                        if ( dst_pars ) {
+                            for ( let par in dst_pars ) {
+                                if ( !(p_def.tree[par].tree) && (p_def.tree[par].recursive === undefined) ) {
+                                    dst_pars[par] = p_def.tree[par].data
+                                } else {
+                                    if ( typeof p_def.tree[par].recursive === "object" ) {
+                                        let pdescr = p_def.tree[par]
+                                        this.executable_condition_processing(pdescr)
+                                        this.tree_conditional_reduction(pdescr)
+                                        pdescr.data = this.join_executables(pdescr)
+                                        dst_pars[par] = pdescr.data
+                                    }
+                                }
+                            }
+                        }
+                        if ( rec.executables ) {
+                            let pdescr = p_def
+                            this.executable_condition_processing(pdescr)
+                            this.tree_conditional_reduction(pdescr)
+                            pdescr.data = this.join_executables(pdescr)
+                        }
+                        will_return_data = p_def.data
+                    }
+                } else {
+                    will_return_data = data
+                }
+            }
+        }
+        if ( parse_util.has_parameter_block(will_return_data) ) {
+            will_return_data = parse_util.remove_parameter_block(will_return_data)
+        }
+        return will_return_data
+    }
+
+    /**
+     * 
+     * @param {object} transformed 
+     */
+    up_prop_data_to_vars(transformed) {
+        for ( let [sk_name,skel] of Object.entries(transformed) ) {
+            let sk_map = skel.skeleton_map
+            if ( typeof sk_map !== "object" ) continue
+            for ( let [entry_ky,desciptor] of Object.entries(sk_map) ) {
+                if ( desciptor.recursive ) {
+                    let rec = desciptor.recursive
+                    desciptor.backup_data = "" + desciptor.data
+                    if ( rec.params_def ) {
+                        //
+                        for ( let [pname,ptype] of Object.entries(rec.params_def) ) {
+                            if ( this.is_tree_type(ptype) ) {
+                                let pdat = this.data_from_parameter(skel,entry_ky,pname)
+                                rec.params_def[pname] = pdat
+                            }
+                        }
+                    }
+                    if ( rec.executables ) {
+                        let pdescr = desciptor
+                        this.executable_condition_processing(pdescr)
+                        this.tree_conditional_reduction(pdescr)
+                        let ddat = this.join_executables(pdescr)
+                        if ( parse_util.has_parameter_block(ddat) ) {
+                            ddat = parse_util.remove_parameter_block(ddat)
+                        }
+                        desciptor.data = ddat
+                    }
+                }
+            }
+        }
     }
 
 
 
+    /**
+     * 
+     * @param {object} transformed 
+     */
     list_to_skeletal_variable_assignment(transformed) {
         for ( let [sk_name,skel] of Object.entries(transformed) ) {
             let sk_map = skel.skeleton_map
@@ -2143,7 +2299,7 @@ console.log("NOT HANDLED YET: ",step_entry)
                     if ( list_key ) {
                         let entry = sk_map[entry_ky]
                         if ( entry.recursive ) {
-console.log("list_to_skeletal_variable_assignment",entry.recursive.params_def)
+//console.log("list_to_skeletal_variable_assignment",entry.recursive.params_def)
                         } else {
                             continue
                         }
@@ -2236,6 +2392,8 @@ console.log("list_to_skeletal_variable_assignment",entry.recursive.params_def)
         this.incremental_evaluations(transform_1)
 
         this.list_to_skeletal_variable_assignment(transform_1)
+
+        this.up_prop_data_to_vars(transform_1)
 
         this.conditional_evaluations(transform_1)
 
