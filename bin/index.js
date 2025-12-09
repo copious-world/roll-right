@@ -17,7 +17,6 @@ const TESTING = true
 
 const {base_patterns_mod} = require('../lib/html_directives')
 const crypto = require('crypto')
-const { type } = require('os')
 
 
 // needs module
@@ -299,10 +298,11 @@ class SkelToTemplate {
         this.start_of_list = new RegExp(/^\@list\<(\w+)\>\<\{/)
 
         this.ternary_check = new RegExp(/^(.+)\?(.+)\:(.*)/)
-        this.var_pattern = new RegExp(/\@\{(\w+)\}/g)
+        this.var_pattern = new RegExp(/\@\{([\w\%]+)\}/g)
         this.var_set_expr_pattern = new RegExp(/\{([\w\=\+\-\d]+)\}/)
 
         this.basic_function_call_match = new RegExp(/f\@(\w[\w\d]*)\{(\w[\w\d]*)\}/)
+        this.import_entry_match = new RegExp(/\$\$(\w+)\:\:.+\.\w+\<\</)
 
         this.entry_remap_map = {
             "files" : { "source" : "html", "type" : "tmplt"},
@@ -1153,7 +1153,12 @@ class SkelToTemplate {
         //
         if ( occurrences.length ) {
             for ( let occur of occurrences ) {
-                eve_results[occur] = ""
+                let atype = ""
+                if ( occur.indexOf('%') > 0 ) {
+                    atype = occur.split('%')[1]
+                    atype = '%' + atype + '%'
+                }
+                eve_results[occur] = atype
             }
             if ( !params_def ) {
                 params_def = eve_results
@@ -1966,6 +1971,50 @@ console.log("NOT HANDLED YET: ",step_entry)
     }
 
     /**
+     * 
+     * @param {string} val 
+     */
+    value_is_custom_type(val) {
+        if ( val === '%config%' ) {
+            return true
+        }
+        return false
+    }
+
+    /**
+     * 
+     * @param {string} var_form 
+     * @param {string} val 
+     * @returns {string}
+     */
+    value_from_custom_source(var_form,val) {
+        if ( this.global_variable_values ) {
+            if ( val === '%config%' ) {
+                let global_conf_map = this.global_variable_values.var_to_value
+                let vky = var_form.replace(val,"").replace("@{","").replace("}","")
+                val = global_conf_map[vky]
+                return val
+            }
+        }
+        return "TESTVAL"
+    }
+
+/*
+"var_to_value" : {
+    "AUTHOR" : "R. Leddy"
+},
+"by_concern" : {
+    "copious" : {},
+    "popsong" : {},
+    "villa-family" : {},
+    "bakersfield-robots": {},
+    "docs.copious.world": {},
+    "shops.copious.world": {},
+    "shops.for-humans.net": {}
+}
+*/
+
+    /**
      * map_to_substs
      * 
      * @param {string} data 
@@ -1988,6 +2037,9 @@ console.log("NOT HANDLED YET: ",step_entry)
             for ( let param in params ) {
                 let var_form = `@{${param}}`
                 let val = params[param]
+                if ( this.value_is_custom_type(val) ) {
+                    val = this.value_from_custom_source(var_form,val)
+                }
                 changed_data = parse_util.subst(changed_data,var_form,val)
             }
             //
@@ -2078,6 +2130,60 @@ console.log("NOT HANDLED YET: ",step_entry)
         }
     }
 
+
+
+    has_import_def(data) {
+        let match_def = this.import_entry_match.exec(data)
+        if ( match_def ) {
+            return match_def[1]
+        }
+        return false
+    }
+
+/*
+{
+    "replace": "$$icons::mushroom-menu-icon.svg<<",
+    "type": "icons",
+    "file": "mushroom-menu-icon.svg",
+    "path_finder": "icons",
+    "data": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"24\" height=\"24\">\n\t<path class=\"heroicon-ui\" d=\"M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z\"/>\n</svg>"
+}
+*/
+
+    /**
+     * 
+     * @param {object} transformed 
+     */
+    lift_remaining_imports(transformed) {
+        //
+        for ( let [sk_name,skel] of Object.entries(transformed) ) {
+            let sk_map = skel.skeleton_map
+            if ( typeof sk_map !== "object" ) continue
+            for ( let [step_entry,entry] of Object.entries(sk_map) ) {
+                let data = entry.data
+                if ( typeof data === "string" ) {
+                    let import_type = this.has_import_def(data)
+                    if ( typeof import_type === "string" ) {
+                        //
+                        if ( entry.recursive && entry.recursive.executables && entry.recursive.executables.imports ) {
+                            let imps = entry.recursive.executables.imports
+console.log("lift_remaining_imports",import_type)
+                            for ( let imp of imps ) {
+                                let repl = imp.replace
+                                let value = imp.data            // should already be loaded
+                                //
+                                data = parse_util.subst(data,repl,value)
+                                //
+                            }
+                            entry.data = data
+                        }
+                        //
+                    }
+                }
+            }
+        }
+        //
+    }
 
 
     /**
@@ -2396,6 +2502,8 @@ console.log("NOT HANDLED YET: ",step_entry)
         this.up_prop_data_to_vars(transform_1)
 
         this.conditional_evaluations(transform_1)
+
+        this.lift_remaining_imports(transform_1)
 
         let str = JSON.stringify(transform_1,null,4)
         await fos.write_out_string(this.top_level_parsed,str)
