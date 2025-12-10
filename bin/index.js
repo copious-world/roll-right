@@ -17,6 +17,7 @@ const TESTING = true
 
 const {base_patterns_mod} = require('../lib/html_directives')
 const crypto = require('crypto')
+const { parse } = require('handlebars/runtime')
 
 
 // needs module
@@ -102,6 +103,19 @@ let parse_util = {
         rest = rest.substring(end_block+2).trim()
         data = front + rest
         return data.trim()
+    },
+
+    reverse_map : (skeletons)  => {
+        let robj = {}
+        for ( let [ky,val] of Object.entries(skeletons) ) {
+            let obj = robj[val]
+            if ( !obj ) {
+                obj = {}
+                robj[val] = obj
+            }
+            obj[ky] = ""
+        }
+        return robj
     }
 
 }
@@ -230,6 +244,7 @@ class SkelToTemplate {
         //
         this.global_variable_values = conf.global_variable_values ? conf.global_variable_values : {}
         this.vars_unset_in_run = {}
+        this.app_skel_vars = conf.app_skel_vars ? conf.app_skel_vars : {}
         //
         this.top_level_parsed = conf.top_level_parsed
         //
@@ -773,6 +788,23 @@ class SkelToTemplate {
                     defaults = parse_util.clear_comments(defaults).trim()
                     defaults = JSON.parse(defaults.substring("defs:".length))
                 }
+                if ( typeof defaults.uses_config_vars === "string" ) {
+                    let vars = this.app_skel_vars[defaults.uses_config_vars]
+                    for ( let vname in vars ) {
+                        let value = vars[vname]
+                        if ( typeof value !== "string" ) {
+                            value = JSON.stringify(value)
+                        }
+                        let finder = `@!{${vname}}`
+
+                        data_parts = data_parts.map((el) => {
+                            if ( el.indexOf(finder) > 0 ) {
+                                el = el.replace(finder,value)
+                            }
+                            return el
+                        })
+                    }
+                }
 
                 data_parts = data_parts.map((el) => { return parse_util.clear_comments(el.trim()).trim() })
 
@@ -793,6 +825,10 @@ class SkelToTemplate {
             //
             section_data[ky] = {
                 "defaults" : defaults,
+                "final" : {
+                    "markup" : false,
+                    "scripts" : false
+                },
                 "skeleton" : data_parts,
                 "files" : files,
                 "scripts" : scripts,
@@ -1189,6 +1225,7 @@ class SkelToTemplate {
 
         let params_def = false
         let carrier = {}
+        let _is_loop = false
 
         let lines = []
         if ( data.startsWith("@params<") ) {
@@ -1247,6 +1284,7 @@ class SkelToTemplate {
                 params_def = JSON.parse(var_defs)
             } catch(e) {}
             //
+            _is_loop = true
             params_def._var_name = carrier.var
             //
         } else {
@@ -1263,7 +1301,7 @@ class SkelToTemplate {
             executables = this.extract_excecutables(rest)
         }
         //
-        return { params_def, executables }
+        return { _is_loop, params_def, executables }
     }
 
 
@@ -1999,20 +2037,6 @@ console.log("NOT HANDLED YET: ",step_entry)
         return "TESTVAL"
     }
 
-/*
-"var_to_value" : {
-    "AUTHOR" : "R. Leddy"
-},
-"by_concern" : {
-    "copious" : {},
-    "popsong" : {},
-    "villa-family" : {},
-    "bakersfield-robots": {},
-    "docs.copious.world": {},
-    "shops.copious.world": {},
-    "shops.for-humans.net": {}
-}
-*/
 
     /**
      * map_to_substs
@@ -2140,16 +2164,6 @@ console.log("NOT HANDLED YET: ",step_entry)
         return false
     }
 
-/*
-{
-    "replace": "$$icons::mushroom-menu-icon.svg<<",
-    "type": "icons",
-    "file": "mushroom-menu-icon.svg",
-    "path_finder": "icons",
-    "data": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"24\" height=\"24\">\n\t<path class=\"heroicon-ui\" d=\"M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z\"/>\n</svg>"
-}
-*/
-
     /**
      * 
      * @param {object} transformed 
@@ -2167,7 +2181,6 @@ console.log("NOT HANDLED YET: ",step_entry)
                         //
                         if ( entry.recursive && entry.recursive.executables && entry.recursive.executables.imports ) {
                             let imps = entry.recursive.executables.imports
-console.log("lift_remaining_imports",import_type)
                             for ( let imp of imps ) {
                                 let repl = imp.replace
                                 let value = imp.data            // should already be loaded
@@ -2176,6 +2189,65 @@ console.log("lift_remaining_imports",import_type)
                                 //
                             }
                             entry.data = data
+                        }
+                        //
+                    }
+                }
+            }
+        }
+        //
+    }
+
+
+    entry_is_list(entry,data) {
+        if ( entry.recursive && entry.recursive._is_loop ) {
+            return true
+        }
+        let found_loop = data.startsWith("@list<")
+        return found_loop
+    }
+
+    remove_loop_header(data,ref) {
+        let stop_marker = `<@${ref}>`
+        let stop_point = data.indexOf(stop_marker)
+        if ( stop_point > 0 ) {
+            let update_data = data.substring(stop_point + stop_marker.length)
+            let end_marker = `</@${ref}>`
+            update_data = update_data.replace(end_marker,"")
+            return update_data
+        }
+
+        return data
+    }
+
+    loop_finalization(transformed) {
+        //
+        for ( let [sk_name,skel] of Object.entries(transformed) ) {
+            let sk_map = skel.skeleton_map
+            if ( typeof sk_map !== "object" ) continue
+            for ( let [step_entry,entry] of Object.entries(sk_map) ) {
+                let data = entry.data
+                if ( typeof data === "string" ) {
+                    if ( this.entry_is_list(entry,data) && skel.parameterized ) {
+                        //
+                        let skel_loop_vars = skel.parameterized[step_entry]
+                        let itr_name = entry.recursive.params_def._var_name
+                        let ref = skel_loop_vars[itr_name]
+                        if ( ref === "list" ) {
+                            let list_ky = `_type<${itr_name}>`
+                            let loop_list = skel_loop_vars[list_ky]
+                            let dat_tmplt = this.remove_loop_header(data,itr_name)
+                            let total_data = ""
+                            for ( let el of loop_list ) {
+                                let el_data = "" + dat_tmplt
+                                for ( let ky in el ) {
+                                    let value = el[ky]
+                                    let finder = entry.recursive.params_def[ky]
+                                    el_data = parse_util.subst(el_data,finder,value)
+                                }
+                                total_data += el_data
+                            }
+                            entry.data = total_data
                         }
                         //
                     }
@@ -2467,6 +2539,25 @@ console.log("lift_remaining_imports",import_type)
     }
 
 
+    finalize_markup(transformed) {
+        for ( let [sk_name,skel] of Object.entries(transformed) ) {
+            let sk_map = skel.skeleton_map
+            if ( typeof sk_map !== "object" ) continue
+            let fdata = ""
+            for ( let [entry_ky,desciptor] of Object.entries(sk_map) ) {
+                if ( entry_ky.indexOf("script::") >= 0 ) continue
+                if ( typeof desciptor === "string" ) {
+                    fdata += desciptor
+                } else if ( typeof desciptor === "object" ) {
+                    fdata += desciptor.data ? desciptor.data : ""
+                }
+            }
+
+            skel.final.markup = fdata
+        }
+    }
+
+
     /**
      * section_parsing(all_skeletons)
      * The one parameter `all_skeletons` is a map from file names to skeleton ascii.
@@ -2505,8 +2596,14 @@ console.log("lift_remaining_imports",import_type)
 
         this.lift_remaining_imports(transform_1)
 
+        this.loop_finalization(transform_1)
+
+        this.finalize_markup(transform_1)
+
         let str = JSON.stringify(transform_1,null,4)
         await fos.write_out_string(this.top_level_parsed,str)
+
+        return transform_1
     }
 
 
@@ -2514,14 +2611,94 @@ console.log("lift_remaining_imports",import_type)
 
     // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
+    /**
+     * 
+     * @param {object} skel_matrix 
+     */
+    collect_concerns(skel_matrix) {
+        let concerns_map = {}
+        for ( let skel_use of skel_matrix ) {
+            let concerns = skel_use.targets.concerns
+            for ( let concern of concerns ) {
+                let mapped_c = concerns_map[concern]
+                if ( !mapped_c ) {
+                    mapped_c = {}
+                    concerns_map[concern] = mapped_c
+                }
+                let skeletons = skel_use.skeletons
+                skeletons = parse_util.reverse_map(skeletons)
+                for ( let skeleton in skeletons ) {
+                    if ( mapped_c[skeleton] === undefined ) mapped_c[skeleton] = {}
+                    mapped_c[skeleton] = Object.assign(mapped_c[skeleton],skeletons[skeleton])
+                }
+            }
+        }
+
+        return concerns_map
+
+    }
+
+
 
     /**
      * 
      */
-    async generate_all_concerns_templates() {
+    async generate_all_concerns_templates(parsed_skels) {
+        let concerns = this.collect_concerns(this.outputs)
 
+        let data = ""
+        for ( let [concern,skels] of Object.entries(concerns) ) {
+            for ( let skel_ky in skels ) {
+                let skel_uses = skels[skel_ky]
+                let pskel = parsed_skels[skel_ky]
+                if ( pskel ) {
+                    let final_forms = pskel.final
+                    if ( typeof final_forms === "object" ) {
+                        data = final_forms.markup
+                    }
+                    for ( let uky in skel_uses ) {
+                        skel_uses[uky] = "" + data
+                    }
+                }
+            } 
+        }
+
+        this.write_templates(concerns)
     }
 
+
+    /**
+     * makes sure that directories receiving the generated assets exists 
+     * and are structure according to the configuration.
+     * 
+     * 
+    */
+    async write_templates(conserns_to_files) {
+        //
+        let outputs = this.outputs
+        for ( let ogroup of outputs ) {
+            let targets = ogroup.targets // targets
+            let dir_form = targets.dir_form
+            //
+            dir_form = dir_form.replace("@target",this.created_dir)
+            for ( let concern in conserns_to_files ) {
+                //
+                let top_out_dir = dir_form.replace("@concern",concern)
+                let out_map = Object.values(conserns_to_files[concern])
+
+                let promises = []
+                for ( let opairs of out_map ) {
+                    for ( let tfile of Object.keys(opairs) ) {
+                        let template = opairs[tfile]
+                        let t_output_path = `${top_out_dir}${tfile}`
+                        let t_path = this.paths.compile_one_path(t_output_path)
+                        promises.push(fos.write_out_string(t_path,template))
+                    }    
+                }
+                await Promise.all(promises)
+            }
+        }
+    }
 
 
 
@@ -2711,8 +2888,10 @@ console.log("lift_remaining_imports",import_type)
 
         await this.load_name_drops_db()
         //
-        await this.skeleton_parsing(all_skeletons)
+        let parsed_skels = await this.skeleton_parsing(all_skeletons)
         await this.name_parameters_output()
+
+        return parsed_skels
     }
 
 
@@ -2747,8 +2926,8 @@ async function command_line_operations_new(args) {
                     conf.top_level_parsed = parsed
                     let to_templates = new SkelToTemplate(conf)
                     await to_templates.prepare_directories()
-                    await to_templates.skeleton_unification()
-                    //await to_templates.generate_all_concerns_templates()
+                    let parsed_skels = await to_templates.skeleton_unification()
+                    await to_templates.generate_all_concerns_templates(parsed_skels)
                 }
                 break
             }
