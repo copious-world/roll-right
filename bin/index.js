@@ -4,7 +4,6 @@ const fos = require('extra-file-class')()
 const {PathManager} = require('extra-file-class')
 
 const {transfer_node_module_browser_version} = require('../lib/rr_utils')
-const {transfer_github_browser_version} = require('../lib/rr_utils')
 const {transfer_local_directory_browser_version} = require('../lib/rr_utils')
 const {port_modules} = require('../lib/mod_utils')
 
@@ -17,114 +16,19 @@ const TESTING = true
 
 const {base_patterns_mod} = require('../lib/html_directives')
 const crypto = require('crypto')
-const { parse } = require('handlebars/runtime')
 
 
-// needs module
-let parse_util = {
-    clear_comments : (str) => {
-        if ( str.indexOf("verbatim::") === 0 ) {
-            let check_end = str.lastIndexOf('}')
-            //
-            if ( check_end > 0 ) {
-                let front = str.substring(0,check_end+1)
-                return front
-            }
-        } else {
-            if ( str.indexOf("//") >= 0 ) {
-                let lines = str.split('\n')
-                let n = lines.length
-                for ( let i = 0; i < n; i++ ) {
-                    let line = lines[i]
-                    line = line.trim()
-                    if ( line.length && (line.indexOf('//') === 0) ) {
-                        lines[i] = ""
-                    } else if ( line.length && (line.indexOf('//') > 0) ) {
-                        line = line.substring(0,(line.indexOf('//'))).trim()
-                        lines[i] = line
-                    }
-                }
-                lines = lines.filter((line) => {
-                    return line.length > 0
-                })
-                return lines.join("\n")
-            }
-        }
-        return str.trim()
-    },
-    remove_spaces: (str)=> {
-        let strs = str.split(' ')
-        strs = strs.filter((sub) => {
-            return sub.length > 0
-        })
-        return strs.join('')
-    },
-    remove_white: (str)=> {
-        str = str.replace(/\s+/g,'')
-        return str
-    },
-    flatten : (data_parts) => {
-        let flattened = []
-        for ( let part of data_parts ) {
-            if ( typeof part === "string" ) {
-                flattened.push(part)
-            } else {
-                let parted = parse_util.flatten(part)
-                for ( let p of parted ) {
-                    flattened.push(p)
-                }
-            }
-        }
-        return flattened
-    },
-    subst : (str,ky,val) => {
-        while ( str.indexOf(ky) >= 0 ) {
-            str = str.replace(ky,val)
-        }
-        return str
-    },
-    extract_var : (str) => {
-        let var_up = str.substring(str.indexOf('@{') + 2)
-        let vname = var_up.substring(0,var_up.indexOf('}'))
-        return vname
-    },
+let ParseUtils = require('../lib/utils')
 
-    has_parameter_block : (data)  => {
-        return data.indexOf("@params<{") >= 0
-    },
+let parse_util = new ParseUtils()
 
-    remove_parameter_block : (data)  => {
-        data = data.trim()
-        let front_split = data.split("@params<{")
-        let front = front_split[0]
-        let rest = front_split[1]
 
-        let end_block = rest.indexOf("}>")
-        rest = rest.substring(end_block+2).trim()
-        data = front + rest
-        return data.trim()
-    },
-
-    reverse_map : (skeletons)  => {
-        let robj = {}
-        for ( let [ky,val] of Object.entries(skeletons) ) {
-            let obj = robj[val]
-            if ( !obj ) {
-                obj = {}
-                robj[val] = obj
-            }
-            obj[ky] = ""
-        }
-        return robj
-    }
-
-}
-//
-
+// Minimist is a command line parsing package.
 var g_argv = require('minimist')(process.argv.slice(2));
 
 //
 //
+
 async function load_config(cf_name) {
     let path = g_source_dir + '/' + cf_name
     return await fos.load_json_data_at_path(path)
@@ -622,6 +526,8 @@ class SkelToTemplate {
         }
     }
 
+
+    
     /**
      * 
      * @param {string} rest 
@@ -686,6 +592,7 @@ class SkelToTemplate {
                     }
                 }
             }
+            //
             return a_part
         })
         data_parts = parse_util.flatten(data_parts)
@@ -1170,6 +1077,7 @@ class SkelToTemplate {
         return false
     }
 
+
     /**
      * 
      * @param {object | boolean} params_def 
@@ -1210,6 +1118,7 @@ class SkelToTemplate {
         //
         return undefined
     }
+
 
     /**
      * 
@@ -1313,8 +1222,6 @@ class SkelToTemplate {
      * @returns {boolean}
      */
     ternary_conditional(parseable,exec_report) {
-
-//console.log("ternary_conditional",parseable)
 
         let ternary = this.ternary_check.exec(parseable)
         if ( ternary ) {
@@ -1545,7 +1452,8 @@ class SkelToTemplate {
         for ( let fcall of Object.values(entry_data.key_values) ) {
             if ( (fcall === "f@incr{$}") || (fcall === "f@init{$}") ) {
                 continue
-            }
+            }        //
+
             let parse_call = this.basic_function_call_match.exec(fcall)
             if ( parse_call ) {
                 return true
@@ -1617,33 +1525,6 @@ class SkelToTemplate {
         }
     }
 
-
-    /**
-     * 
-     * @param {port_modules} entry_data 
-     * @returns {boolean}
-     */
-    conditionless_evaluations_substitution(entry_data) {
-        let data = entry_data.data
-
-        if ( !data ) return false
-        if ( data.indexOf("?") > 0 ) {
-            if ( this.ternary_check.test(data) ) {
-                return false
-            }
-        }
-        
-        let evals = entry_data.evaluations
-
-        if ( (typeof evals === "object") && Object.keys(evals).length ) {
-            for ( let [vky, vval]  of Object.entries(evals) ) {
-                let var_form = `@{${vky}}`
-                data = parse_util.subst(data,var_form,vval)
-            }
-            entry_data.data = data
-        }
-        return true
-    }
 
 
     /**
@@ -1910,9 +1791,50 @@ console.log("NOT HANDLED YET: ",step_entry)
     }
 
 
+
     /**
+     * Support (helper) for evaluating the delayed queue.
+     * (see delayed queue documentation)
      * 
-     * @param {*} name_to_data 
+     * Handles simple subsitutions that can be done with reducing forms.
+     * 
+     * @param {object} entry_data 
+     * @returns {boolean}
+     */
+    conditionless_evaluations_substitution(entry_data) {
+        let data = entry_data.data
+
+        if ( !data ) return false
+        if ( data.indexOf("?") > 0 ) {
+            if ( this.ternary_check.test(data) ) {
+                return false
+            }evaluate_delayed_queue
+        }
+        
+        let evals = entry_data.evaluations
+
+        if ( (typeof evals === "object") && Object.keys(evals).length ) {
+            for ( let [vky, vval]  of Object.entries(evals) ) {
+                let var_form = `@{${vky}}`
+                data = parse_util.subst(data,var_form,vval)
+            }
+            entry_data.data = data
+        }
+        return true
+    }
+
+
+
+    /**
+     * Goes through the delayed file queue looking for evaluations that
+     * can be substituted into the data.
+     * 
+     * Makes a backup copy of the substitution form. The backup will be made if there are previously
+     * analyzed recursions or if there are reductions.
+     * 
+     * If there are evaluations, the `conditionless_evaluations_substitution` will be applied.
+     * 
+     * @param {object} name_to_data 
      */
     evaluate_delayed_queue(name_to_data) {
         let q = this.delay_file_loading_queue
@@ -1930,7 +1852,12 @@ console.log("NOT HANDLED YET: ",step_entry)
     }
 
 
+
     /**
+     * Given a list of conditions and variable evaluations, 
+     * this method selects a branch of the condition's
+     * antecedant to be used as the substitution for the condition's test variable
+     * in the data of the containing element.
      * 
      * @param {Array} conds 
      * @param {object} params 
@@ -1938,7 +1865,6 @@ console.log("NOT HANDLED YET: ",step_entry)
      */
     conds_reduction(conds,params) {
         //
-//console.log("conds_reduction",params)        
         //
         let reduced_conds = []
         for ( let cond of conds ) {
@@ -1978,9 +1904,6 @@ console.log("NOT HANDLED YET: ",step_entry)
      * @param {Array} subst_list 
      * @param {string} index_var 
      */
-//<@el>
-// </@el>
-
     list_map_to_substs(data,subst_list,index_var) {
         //
         let loop_start_len = index_var.length + "<@>".length
@@ -2050,8 +1973,6 @@ console.log("NOT HANDLED YET: ",step_entry)
             //
             let params = asubst.params_def
             let conds = asubst.conds
-
-    //console.dir(asubst)
             //
             let changed_data = "" + data
             //
@@ -2067,13 +1988,13 @@ console.log("NOT HANDLED YET: ",step_entry)
                 changed_data = parse_util.subst(changed_data,var_form,val)
             }
             //
-//console.log(changed_data)
             if ( parse_util.has_parameter_block(changed_data) ) {
                 changed_data = parse_util.remove_parameter_block(changed_data)
             }
-
+            //
             asubst.data = changed_data        
         }
+        //
     }
 
     /**
@@ -2156,6 +2077,11 @@ console.log("NOT HANDLED YET: ",step_entry)
 
 
 
+    /**
+     * 
+     * @param {string} data 
+     * @returns 
+     */
     has_import_def(data) {
         let match_def = this.import_entry_match.exec(data)
         if ( match_def ) {
@@ -2199,6 +2125,12 @@ console.log("NOT HANDLED YET: ",step_entry)
     }
 
 
+    /**
+     * 
+     * @param {*} entry 
+     * @param {*} data 
+     * @returns 
+     */
     entry_is_list(entry,data) {
         if ( entry.recursive && entry.recursive._is_loop ) {
             return true
@@ -2207,6 +2139,12 @@ console.log("NOT HANDLED YET: ",step_entry)
         return found_loop
     }
 
+    /**
+     * 
+     * @param {*} data 
+     * @param {*} ref 
+     * @returns 
+     */
     remove_loop_header(data,ref) {
         let stop_marker = `<@${ref}>`
         let stop_point = data.indexOf(stop_marker)
@@ -2220,6 +2158,10 @@ console.log("NOT HANDLED YET: ",step_entry)
         return data
     }
 
+    /**
+     * 
+     * @param {object} transformed 
+     */
     loop_finalization(transformed) {
         //
         for ( let [sk_name,skel] of Object.entries(transformed) ) {
@@ -2539,6 +2481,10 @@ console.log("NOT HANDLED YET: ",step_entry)
     }
 
 
+    /**
+     * 
+     * @param {object} transformed 
+     */
     finalize_markup(transformed) {
         for ( let [sk_name,skel] of Object.entries(transformed) ) {
             let sk_map = skel.skeleton_map
@@ -2612,6 +2558,7 @@ console.log("NOT HANDLED YET: ",step_entry)
     // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
     /**
+     * This method needs the outputs stored in the configuration file.
      * 
      * @param {object} skel_matrix 
      */
@@ -2642,6 +2589,7 @@ console.log("NOT HANDLED YET: ",step_entry)
 
     /**
      * 
+     * @param {object} parsed_skels 
      */
     async generate_all_concerns_templates(parsed_skels) {
         let concerns = this.collect_concerns(this.outputs)
@@ -2660,10 +2608,11 @@ console.log("NOT HANDLED YET: ",step_entry)
                         skel_uses[uky] = "" + data
                     }
                 }
-            } 
+            }
         }
 
-        this.write_templates(concerns)
+        await this.write_templates(concerns)
+        return concerns
     }
 
 
@@ -2671,14 +2620,19 @@ console.log("NOT HANDLED YET: ",step_entry)
      * makes sure that directories receiving the generated assets exists 
      * and are structure according to the configuration.
      * 
-     * 
-    */
+     * @param {object} conserns_to_files 
+     */
     async write_templates(conserns_to_files) {
+        //
+        let concerns_file = `[websites]/template-configs/conserns_to_files.json`
+        concerns_file = this.paths.compile_one_path(concerns_file)
+        await fos.write_out_pretty_json(concerns_file,conserns_to_files,4)
         //
         let outputs = this.outputs
         for ( let ogroup of outputs ) {
             let targets = ogroup.targets // targets
             let dir_form = targets.dir_form
+            //
             //
             dir_form = dir_form.replace("@target",this.created_dir)
             for ( let concern in conserns_to_files ) {
@@ -2704,9 +2658,9 @@ console.log("NOT HANDLED YET: ",step_entry)
 
     /**
      * 
-     * @param {*} el_var_map - var name and types
-     * @param {*} el        - var name and values
-     * @param {*} target_data 
+     * @param {object} el_var_map - var name and types
+     * @param {object} el        - var name and values
+     * @param {string} target_data 
      * @return {string}
      * 
      */
@@ -2899,6 +2853,195 @@ console.log("NOT HANDLED YET: ",step_entry)
 
 
 
+class TemplatesToPreStaging extends SkelToTemplate {
+
+    constructor(conf) {
+        super(conf)
+    }
+
+
+    find_substituions_vars(data) {
+        let found_vars = {}
+
+        let var_starts = data.split("{{")
+        var_starts.shift()
+        for ( let dstart of var_starts ) {
+            let add_brace = dstart[0] === "{" ? 1 : 0
+            let a_var = dstart.substring(0,dstart.indexOf("}}") + add_brace)
+            a_var = parse_util.remove_white(a_var)
+            found_vars[a_var] = ""
+        }
+        return found_vars
+    }
+
+
+    async prepare_files_and_subsitutions(concerns) {
+        let all_c_vars = {}
+        for ( let concern in concerns ) {
+            let concerns_dir = `[websites]/${concern}/`
+            concerns_dir = this.paths.compile_one_path(concerns_dir)
+            let targeted_files = Object.values(concerns[concern])
+            let concerns_vars = {}
+            for ( let pair of targeted_files ) {
+//console.log(pair)
+                let keys = Object.keys(pair)
+                for ( let ky of keys ) {
+                    let afile = `${concerns_dir}/${this.created_dir}${ky}`
+                    //
+                    let data = pair[ky]
+                    let data_vars = this.find_substituions_vars(data)
+//console.dir(data_vars)
+
+                    concerns_vars = Object.assign(concerns_vars,data_vars)
+                    //
+                    let subst_src = `${concerns_dir}/static`
+
+
+                    let subst_file = `${subst_src}/${concern}.subst`
+                    let ofile = `${concerns_dir}/pre-staging/${ky}`
+                    ofile = ofile.replace(".tmplt",".html")
+
+                    await fos.ensure_directories(afile,false,true)
+                    await fos.ensure_directories(subst_file,false,true)
+                    await fos.ensure_directories(subst_src)
+
+                }
+            }
+            all_c_vars[concern] = concerns_vars
+        }
+        return all_c_vars
+    }
+
+    async process_files(concerns) {
+        for ( let concern in concerns ) {
+            let concerns_dir = `[websites]/${concern}/`
+            concerns_dir = this.paths.compile_one_path(concerns_dir)
+            let targeted_files = Object.values(concerns[concern])
+            for ( let pair of targeted_files ) {
+                let keys = Object.keys(pair)
+                for ( let ky of keys ) {
+                    let afile = `${concerns_dir}/${this.created_dir}${ky}`
+                    let subst_src = `${concerns_dir}/static`
+                    let subst_file = `${subst_src}/${concern}.subst`
+                    let ofile = `${concerns_dir}/pre-staging/${ky}`
+                    ofile = ofile.replace(".tmplt",".html")
+
+console.log(afile,"==>\n",ofile,"\n",subst_file)
+                }
+            }
+        }
+    }
+
+
+/*
+
+{
+  copious: {
+    canonical: '',
+    pageTitle: '',
+    pageDescription: '',
+    '{svgLogo.content}': '',
+    'relatedAsset.link': '',
+    'relatedAsset.name': '',
+    '{relatedAsset.content}': '',
+    '{svgBannerFrame.content}': '',
+    conversation: '',
+    '{chat.button.content}': '',
+    '{public_content_access.content}': '',
+    '{login_button.button.content}': '',
+    '{logout_button.button.content}': '',
+    copyRightYear: '',
+    companyShortLink: '',
+    '{contact_box.content}': '',
+    '{about_box.content}': '',
+    '{thankyou_box.content}': '',
+    '{topicBox_1.content}': '',
+    '{topicBox_2.content}': '',
+    '{topicBox_3.content}': '',
+    '{register.content}': '',
+    '{login.content}': '',
+    '{advertPopups.content}': '',
+    '{yourProileLinks.content}': '',
+    '{yourDashboardLinks.content}': '',
+    '{intergalactic.content}': ''
+  },
+  popsong: {
+  }    
+}
+
+
+*/
+    async publish_subs_defs(subst_defs) {
+        //
+console.log("publish_subs_defs",subst_defs)
+        //
+        for ( let concern in subst_defs ) {
+            let var_set = subst_defs[concern]
+            let subst_obj = {}
+            for ( let avar in var_set ) {
+                if ( (avar[0] === '{') || (avar.indexOf(".") > 0) ) {
+                    let var_base = (avar[0] === '{') ? avar.replace('{','').replace('}','') : avar
+                    //
+                    let subkeys = false
+                    if ( avar.indexOf(".") > 0 ) {
+                        let vpars = var_base.split('.')
+                        var_base = vpars.shift()
+                        subkeys = vpars
+                        //
+                        if ( subst_obj[var_base] === undefined ) {
+                            subst_obj[var_base] = {}
+                        }
+                    }
+                    //
+                    let rec = subst_obj[var_base]
+                    if ( (typeof rec === "object") && subkeys.length ) {
+                        let namer = ""
+                        let actor = ""
+                        let file = var_base
+                        while ( subkeys.length ) {
+                            let ky = subkeys.shift()
+                            let maybe_rec = rec[ky]
+                            namer = actor
+                            actor = file 
+                            file = ky
+                            if ( maybe_rec === undefined ) {
+                                maybe_rec = ""
+                                if ( subkeys.length ) {
+                                    maybe_rec = {}
+                                }
+                            }
+                            rec[ky] = maybe_rec
+                            rec = maybe_rec
+                        }
+
+            
+console.log(namer,actor,file)
+
+                        if ( namer.length && actor.length && file.length ) {
+                            rec = subst_obj[namer]
+                            rec.name = namer
+                            if ( namer.indexOf(actor) > 0 ){
+                                actor = ""
+                            }
+                            actor = parse_util.capitalize(actor)
+                            rec.file = `${namer}${actor}.txt`
+                        }
+
+                    }
+                } else {
+                    subst_obj[avar] = var_set[avar]
+                }
+            }
+            let concerns_dir = `[websites]/${concern}/${this.created_dir}`
+            concerns_dir = this.paths.compile_one_path(concerns_dir)
+            let file_path = `${concerns_dir}/${concern}.subst`
+console.log(file_path)
+            await fos.write_out_pretty_json(file_path,subst_obj,4)
+        }
+    }
+}
+
+
 /**
  * 
  * @param {object} args 
@@ -2937,23 +3080,51 @@ async function command_line_operations_new(args) {
                 let generator = args.generator  // a string
                 generator = `${project_dir}/${generator}`
                 console.log("Using input configuration from generation:\t\t",generator)
-
+                //
                 let parsed = args.structure
                 parsed = `${project_dir}/${parsed}`
                 console.log("Using input configuration for template formation:\t\t",parsed)
+                let conf = await fos.load_json_data_at_path(generator)
+                if ( conf ) {
+                    let to_templates = new SkelToTemplate(conf)
+                    await to_templates.prepare_directories()        // needed even when loading previously parsed data.
+                    let parsed_skels = await fos.load_json_data_at_path(parsed)
+                    let concerns = false
+                    if ( parsed_skels ) {
+                        concerns = await to_templates.generate_all_concerns_templates(parsed_skels)
+                    } else {
+                        console.log("did not load " + parsed)
+                    }
 
-                //await to_templates.generate_all_concerns_templates()
+                    if ( concerns ) {
+                        let to_staging = new TemplatesToPreStaging(conf)
+                        let subst_defs = await to_staging.prepare_files_and_subsitutions(concerns)
+                        await to_staging.publish_subs_defs(subst_defs)
+                    }
+                    
+                }
                 break
             }
             case "page"   :
             case "assign" :
             case 3: {
+                //
                 let project_dir = args.sources
                 let substitutions = args.values
                 substitutions = `${project_dir}/${substitutions}`
                 console.log("Using input configuration for assignments:\t\t",substitutions)
-                 //
-                await generate_all_templated_website_and_apps(substitutions)
+                //
+                let conf = await fos.load_json_data_at_path(substitutions)
+                if ( conf ) {
+                    //
+                    let to_staging = new TemplatesToPreStaging(conf)
+                    //
+                    let concerns_file = `[websites]/template-configs/conserns_to_files.json`
+                    concerns_file = to_staging.paths.compile_one_path(concerns_file)
+                    let concerns = await fos.load_json_data_at_path(concerns_file)
+                    await to_staging.process_files(concerns)
+                    //
+                }
                 //
                 break
             }
