@@ -2613,7 +2613,6 @@ console.log("NOT HANDLED YET: ",step_entry)
         }
 
         return concerns_map
-
     }
 
 
@@ -2711,7 +2710,9 @@ console.log("NOT HANDLED YET: ",step_entry)
         return saved_track_map
     }
 
+
     /**
+     * 
      * makes sure that directories receiving the generated assets exists 
      * and are structure according to the configuration.
      * 
@@ -2723,6 +2724,11 @@ console.log("NOT HANDLED YET: ",step_entry)
         concerns_file = this.paths.compile_one_path(concerns_file)
         await fos.write_out_pretty_json(concerns_file,conserns_to_files,4)
         //
+        let db_locations = concerns_file.replace("conserns_to_files.json","conserns_named.db")
+        let concerns_db_files = {}
+        parse_util.copy_keys(concerns_db_files,conserns_to_files,"object")
+        //
+        //
         let outputs = this.outputs
         for ( let ogroup of outputs ) {
             let targets = ogroup.targets // targets
@@ -2731,8 +2737,10 @@ console.log("NOT HANDLED YET: ",step_entry)
             dir_form = dir_form.replace("@target",this.created_dir)
             for ( let concern in conserns_to_files ) {
                 //
+                let db_output = concerns_db_files[concern]
+                //
                 let top_out_dir = dir_form.replace("@concern",concern)
-
+                //
                 let sk_maps = conserns_to_files[concern]
                 let promises = []
                 for ( let sk in sk_maps ) {
@@ -2753,6 +2761,7 @@ console.log("NOT HANDLED YET: ",step_entry)
                                 track_map = this.update_tracker_with_new(track_map,tracker)
                             }
                             promises.push(fos.write_out_pretty_json(calc_tracking_file,track_map,4))
+                            db_output[calc_tracking_file] = 1
                         }
                    }    
                 }
@@ -2760,6 +2769,11 @@ console.log("NOT HANDLED YET: ",step_entry)
                 await Promise.all(promises)
             }
         }
+        //
+        if ( Object.keys(this.tracking_skel_calc_usage).length ) {
+            await fos.write_out_pretty_json(db_locations,concerns_db_files,4)
+        }
+        //
     }
 
 
@@ -2999,12 +3013,39 @@ class TemplatesToPreStaging extends SkelToTemplate {
 
 
     /**
+     *
+     */
+    async load_concerns_namer_dbs() {
+        //
+        let db_locations = `[websites]/template-configs/conserns_named.db`
+        db_locations = this.paths.compile_one_path(db_locations)
+        //
+        let all_concerns_db = await fos.load_json_data_at_path(db_locations)
+
+        for ( let files of Object.values(all_concerns_db) ) {
+            for ( let file in files ) {
+                files[file] = await fos.load_json_data_at_path(file)
+            }
+        }
+        this.all_concerns_namer_db = all_concerns_db
+    }
+
+
+    /**
+     * Phase 2 operation...
+     * 
+     * Analyze data (files) top find variables. 
+     * 
+     * Create variable to value objects associated with the files that a concern will 
+     * require. Make sure the directories that will hold the subst file will exists 
+     * before the files are created in an ensuing method call.
      * 
      * @param {object} concerns 
      * @returns {object}
      */
     async prepare_files_and_substitutions(concerns) {
         let all_c_vars = {}
+        await this.load_concerns_namer_dbs()
         for ( let concern in concerns ) {
             let concerns_dir = `[websites]/${concern}/`
             concerns_dir = this.paths.compile_one_path(concerns_dir)
@@ -3027,17 +3068,20 @@ class TemplatesToPreStaging extends SkelToTemplate {
                     let subst_file = `${subst_src}/${concern}.subst`
                     let ofile = `${concerns_dir}/pre-staging/${ky}`
                     ofile = ofile.replace(".tmplt",".html")
-
+                    //
                     concerns_files[ky] = {
                         "subst" : subst_file,
                         "output" : ofile,
                         "source_dir" : subst_src,
                         "variables" : data_vars
                     }
-
+                    //
                     await fos.ensure_directories(afile,false,true)
                     await fos.ensure_directories(subst_file,false,true)
                     await fos.ensure_directories(subst_src)
+                    //
+                    // load the namer db's generated for each file during phase 1.
+                    // It is expected by this time.
 
                 }
             }
@@ -3050,29 +3094,42 @@ class TemplatesToPreStaging extends SkelToTemplate {
     }
 
 
-
-    get_subst_vars(concern,var_set) {
+    /**
+     * 
+     * Given all the variables found in a file, for a concern,
+     * this method creates JSON structured files (`.subst`)
+     * A subst file is created for each file that a concern needs
+     * for basic static pages and framework pages.
+     * 
+     * Called by `publish_subs_defs`. 
+     * 
+     * 
+     * @param {string} concern 
+     * @param {object} var_set 
+     * @returns {object}
+     */
+    get_subst_vars(concern,var_set,var_src_file) {
         let subst_obj = {}
         for ( let avar in var_set ) {
             if ( (avar[0] === '{') || (avar.indexOf(".") > 0) ) {
-                let var_base = (avar[0] === '{') ? avar.replace('{','').replace('}','') : avar
+                let base_var_name = (avar[0] === '{') ? avar.replace('{','').replace('}','') : avar
                 //
                 let subkeys = false
                 if ( avar.indexOf(".") > 0 ) {
-                    let vpars = var_base.split('.')
-                    var_base = vpars.shift()
+                    let vpars = base_var_name.split('.')
+                    base_var_name = vpars.shift()
                     subkeys = vpars
                     //
-                    if ( subst_obj[var_base] === undefined ) {
-                        subst_obj[var_base] = {}
+                    if ( subst_obj[base_var_name] === undefined ) {
+                        subst_obj[base_var_name] = {}
                     }
                 }
                 //
-                let rec = subst_obj[var_base]
+                let rec = subst_obj[base_var_name]
                 if ( (typeof rec === "object") && subkeys.length ) {
                     let namer = ""
                     let actor = ""
-                    let file = var_base
+                    let file = base_var_name
                     while ( subkeys.length ) {
                         let ky = subkeys.shift()
                         let maybe_rec = rec[ky]
@@ -3099,12 +3156,12 @@ class TemplatesToPreStaging extends SkelToTemplate {
                         actor = parse_util.capitalize(actor)
                         rec.file = `${namer}${actor}.txt`
                         //
-                    } else if ( this.namer_in_name_db(var_base) ) {
-                        let [found_name,ftype] = this.lookup_app_assignement(concern,var_base)
-                        subst_obj[var_base] = {
+                    } else if ( this.namer_in_name_db(concern,base_var_name,var_src_file) ) {
+                        let [found_name,ftype] = this.lookup_app_assignement(concern,base_var_name,var_src_file)
+                        subst_obj[base_var_name] = {
                             "name" : found_name
                         }
-                        subst_obj[var_base][actor] = {
+                        subst_obj[base_var_name][actor] = {
                             "file" : `./${found_name}.${ftype}`
                         }
                     }
@@ -3142,7 +3199,7 @@ console.log(file_path)
                 let file_focus = files_output[file]
                 //
                 let var_set = file_focus.variables
-                let subst_obj = this.get_subst_vars(concern,var_set)
+                let subst_obj = this.get_subst_vars(concern,var_set,file)
                 let file_path = file_focus.output
                 file_path = file_path.replace('.html','_html.subst')
                 //
@@ -3153,60 +3210,71 @@ console.log(file_path)
         }
     }
 
-
-/*
-subst: '/home/richard/GitHub/alphas/websites/shops.for-humans.net/static/shops.for-humans.net.subst',
-output: '/home/richard/GitHub/alphas/websites/shops.for-humans.net/pre-staging/index.html',
-source_dir: '/home/richard/GitHub/alphas/websites/shops.for-humans.net/static',
-vars: {
-    canonical: '',
-    pageTitle: '',
-    pageDescription: '',
-    '{svgLogo.content}': '',
-    'relatedAsset.link': '',
-    'relatedAsset.name': '',
-    '{relatedAsset.content}': '',
-    '{intergalactic.content}': '',
-    'custom-logout-styles': '',
-    docs_styles: '',
-    '{shop_docs}': '',
-    iframe_docs_styles: '',
-    blog_styles: '',
-    '{shop_blog}': '',
-    iframe_blog_styles: '',
-    search_styles: '',
-    '{shop_search}': '',
-    iframe_search_styles: '',
-    '{svgBannerFrame.content}': '',
-    conversation: '',
-    '{chat.button.content}': '',
-    '{public_content_access.content}': '',
-    '{login_button.button.content}': '',
-    '{logout_button.button.content}': '',
-    copyRightYear: '',
-    companyShortLink: '',
-    '{contact_box.content}': '',
-    '{about_box.content}': '',
-    '{thankyou_box.content}': '',
-    '{topicBox_1.content}': '',
-    '{topicBox_2.content}': '',
-    '{topicBox_3.content}': '',
-    '{register.content}': '',
-    '{login.content}': '',
-    '{advertPopups.content}': ''
-}
-
-*/
-
-
-    namer_in_name_db(namer) {
-        return true
+    /**
+     * namer is a variable found in the file.
+     * namer may be in the namer db of a concern, providing 
+     * a calculation or a file description that will be kept with in a subst file.
+     * 
+     * 
+     * @param {string} namer 
+     * @returns 
+     */
+    namer_in_name_db(concern,namer,file) {
+        if ( file ) {
+            let file_prober = file.replace(".tmplt","_calc.db")
+            for ( let ky of Object.keys(this.all_concerns_namer_db[concern]) ) {
+                if ( ky.indexOf(file_prober) > 0 ) {
+                    if ( namer in this.all_concerns_namer_db[concern][ky] ) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
     }
 
-    lookup_app_assignement(concern,var_base) {
+    /**
+     * 
+     * @param {string} concern 
+     * @param {object} namer 
+     * @returns {pair}
+     */
+    lookup_app_assignement(concern,namer,file) {
+        if ( file ) {
+            let file_prober = file.replace(".tmplt","_calc.db")
+            for ( let ky of Object.keys(this.all_concerns_namer_db[concern]) ) {
+                if ( ky.indexOf(file_prober) > 0 ) {
+                    if ( namer in this.all_concerns_namer_db[concern][ky] ) {
+                        let defs = this.all_concerns_namer_db[concern][ky][namer]
+                        return [defs.name, defs.content.type]
+                    }
+                }
+            }
+        }
         return["test","html"]
     }
 
+}
+
+
+
+
+
+/**
+ * @class PreStagingToStaging
+ * 
+ * This class extends SkelToTemplate with operations specific to phase 3.
+ * 
+ */
+class PreStagingToStaging extends TemplatesToPreStaging {
+
+    /**
+     * 
+     * @param {object} conf 
+     */
+    constructor(conf) {
+        super(conf)
+    }
 
 
     /**
@@ -3233,28 +3301,6 @@ console.log(afile,"==>\n",ofile,"\n",subst_file)
                 }
             }
         }
-    }
-
-}
-
-
-
-
-
-/**
- * @class PreStagingToStaging
- * 
- * This class extends SkelToTemplate with operations specific to phase 3.
- * 
- */
-class PreStagingToStaging extends TemplatesToPreStaging {
-
-    /**
-     * 
-     * @param {object} conf 
-     */
-    constructor(conf) {
-        super(conf)
     }
 
 }
