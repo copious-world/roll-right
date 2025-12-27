@@ -788,6 +788,7 @@ class SkelToTemplate {
                                 }
                             }
                         }
+                        output = this.paths.resolve(output)
                         await fos.write_out_pretty_json(output,value_object,4)
                     }
                 }
@@ -2681,8 +2682,16 @@ console.log("NOT HANDLED YET: ",step_entry)
     
 
     /**
+     * If a user has already created a `_calc.db` file,
+     * this method will inform the caller if that is the case and also 
+     * if the `_track_control` structure has an `edited` field set to true.
      * 
-     * @param {*} calc_tracking_file 
+     * As such, this affects the user's work process. A user wishing to keep edits must 
+     * set the `edited` field to true. Otherwise, the file may be overwritten, which is usually
+     * not desirable, except occasionally. As such, the user should be able to toggle this field 
+     * in any application that manages this sort of file.
+     * 
+     * @param {string} calc_tracking_file -- a path to a concerns calc DB file. 
      * @returns {boolean}
      */
     async existing_calc_track(calc_tracking_file) {
@@ -2697,6 +2706,9 @@ console.log("NOT HANDLED YET: ",step_entry)
     
 
     /**
+     * This method takes an existing tracking file contents for a `_calc.db` region
+     * and includes it in, and overwrites, the generic `_calc.db` found in the alpha directories
+     * provided the user (admin).
      * 
      * @param {object} new_tracking 
      * @param {object} saved_track_map 
@@ -2716,6 +2728,19 @@ console.log("NOT HANDLED YET: ",step_entry)
      * makes sure that directories receiving the generated assets exists 
      * and are structure according to the configuration.
      * 
+     * Writes out template files each with a '.tmplt' suffix.
+     * Writes out a manifest to these files, conserns_to_files.json. 
+     * 
+     * Writes out db files for calculated regions. Outputs a file for each template. 
+     * The DB files can be used later to override the generic database stored in the alpha.
+     * 
+     * Creates one top level file to keep track of the individual, template associated, files.
+     * That is `conserns_named.db`
+     * 
+     * All of the individual template and DB files can be output to the 'template' directories of the concerns.
+     * The top level file can be output to the directory commanding all concerns, typically "template-configs"
+     * in `[websites]` directory.
+     * 
      * @param {object} conserns_to_files 
      */
     async write_templates(conserns_to_files) {
@@ -2724,6 +2749,7 @@ console.log("NOT HANDLED YET: ",step_entry)
         concerns_file = this.paths.compile_one_path(concerns_file)
         await fos.write_out_pretty_json(concerns_file,conserns_to_files,4)
         //
+        // get the name of the type level file 
         let db_locations = concerns_file.replace("conserns_to_files.json","conserns_named.db")
         let concerns_db_files = {}
         parse_util.copy_keys(concerns_db_files,conserns_to_files,"object")
@@ -2757,11 +2783,14 @@ console.log("NOT HANDLED YET: ",step_entry)
                             this.update_calc_tracking(concern,track_map)
                             calc_tracking_file = calc_tracking_file.replace('.tmplt',`_calc.db`)
                             let tracker = false
+                            // Checks to see if there are custom definitions set by the user.
                             if ( tracker = await this.existing_calc_track(calc_tracking_file) ) {
+                                // Given there are such definition, use them.
                                 track_map = this.update_tracker_with_new(track_map,tracker)
                             }
+                            // output the cacluation sections DB for each top level file.
                             promises.push(fos.write_out_pretty_json(calc_tracking_file,track_map,4))
-                            db_output[calc_tracking_file] = 1
+                            db_output[calc_tracking_file] = 1  // add to the high level manifest pointing to these files
                         }
                    }    
                 }
@@ -2770,6 +2799,8 @@ console.log("NOT HANDLED YET: ",step_entry)
             }
         }
         //
+        // output the top level file used to find the DBs 
+        // this is a map of concerns to db files
         if ( Object.keys(this.tracking_skel_calc_usage).length ) {
             await fos.write_out_pretty_json(db_locations,concerns_db_files,4)
         }
@@ -2858,8 +2889,6 @@ console.log("NOT HANDLED YET: ",step_entry)
      * This is supposed to be the starting point got calling variable instantiation
      * on the blocks at the skeleton level. The level_1_parameterized_file parameter 
      * should be the expansion that is the value keyed by the file name in the skeleton map.
-     * 
-     * 
      * 
      * @param {string} file_key 
      * @param {object} level_1_parameterized_file 
@@ -3013,6 +3042,10 @@ class TemplatesToPreStaging extends SkelToTemplate {
 
 
     /**
+     * 
+     * Loads the top level file concerns named DB, mapping concerns to DB files associated with each template.
+     * 
+     * This method continues on to load all the DB file mentioned in the `conserns_named.db` file.
      *
      */
     async load_concerns_namer_dbs() {
@@ -3040,6 +3073,17 @@ class TemplatesToPreStaging extends SkelToTemplate {
      * require. Make sure the directories that will hold the subst file will exists 
      * before the files are created in an ensuing method call.
      * 
+     * The following applies to the entries of the map that is returned:
+     * 
+        // Prepares an entry for each file in a subdirectory of the concern.
+        // A set of variables found in the file will be identified and listed in 
+        // the *variables* field. The output file is the file to be found in staging.
+        // The source directory will likely be the *static* directory which will hold
+        // assets used in the site/app pages of the concern. The subst file, containing
+        // values and substitution maps for the file to be output will be named here as 
+        // the 'subst' file. 
+
+     * 
      * @param {object} concerns 
      * @returns {object}
      */
@@ -3054,13 +3098,14 @@ class TemplatesToPreStaging extends SkelToTemplate {
             let concerns_files = {}
             for ( let pair of targeted_files ) {
                 let keys = Object.keys(pair)
-//console.log(keys)
+                //
                 for ( let ky of keys ) {
+                    //
                     let afile = `${concerns_dir}/${this.created_dir}${ky}`
                     //
                     let data = pair[ky]
                     let data_vars = this.find_substitutions_vars(data)
-//console.dir(data_vars)
+                    // keep adding to the concerns vars, gathering from all the files.
                     concerns_vars = Object.assign(concerns_vars,data_vars)
                     //
                     let subst_src = `${concerns_dir}/static`
@@ -3069,6 +3114,14 @@ class TemplatesToPreStaging extends SkelToTemplate {
                     let ofile = `${concerns_dir}/pre-staging/${ky}`
                     ofile = ofile.replace(".tmplt",".html")
                     //
+                    // Prepares an entry for each file in a subdirectory of the concern.
+                    // A set of variables found in the file will be identified and listed in 
+                    // the *variables* field. The output file is the file to be found in staging.
+                    // The source directory will likely be the *static* directory which will hold
+                    // assets used in the site/app pages of the concern. The subst file, containing
+                    // values and substitution maps for the file to be output will be named here as 
+                    // the 'subst' file. 
+                    // 
                     concerns_files[ky] = {
                         "subst" : subst_file,
                         "output" : ofile,
@@ -3082,9 +3135,11 @@ class TemplatesToPreStaging extends SkelToTemplate {
                     //
                     // load the namer db's generated for each file during phase 1.
                     // It is expected by this time.
-
                 }
             }
+            // this is the high level directive for substitution on the file.
+            // Each concern will map the individual files and will track all the
+            // subsitution variables required by the site.
             all_c_vars[concern] = {
                 "variables" : concerns_vars,
                 "files" : concerns_files
@@ -3176,24 +3231,37 @@ class TemplatesToPreStaging extends SkelToTemplate {
 
 
     /**
+     * Makes all the pre-staging subsitution maps needed in order to generate 
+     * website/app files to be used in production.
+     * 
+     * EXISTING FILES CAN BE USED HERE...
      * 
      * @param {object} subst_defs 
      */
     async publish_subs_defs(subst_defs) {
         //
-console.log("publish_subs_defs-----------------------------------------------------------------------------")
-console.dir(subst_defs,{depth: 4})
+        let concerns_subst_map = {}  // each concern will have an entry here.
         //
         for ( let concern in subst_defs ) {
-            let var_set = subst_defs[concern].variables
+            // set up the map object for the concern
+            concerns_subst_map[concern] = {
+            }
+            //
+            let var_set = subst_defs[concern].variables     // get the set of variables in use
             let subst_obj = this.get_subst_vars(concern,var_set)
             //
             let concerns_dir = `[websites]/${concern}/${this.created_dir}`
             concerns_dir = this.paths.compile_one_path(concerns_dir)
             let file_path = `${concerns_dir}/${concern}.subst`
+            //
+            //
+            concerns_subst_map[concern][concern] = {  // this is the top level entry if specific files don't have one.
+                "path" : file_path,
+                "vars" : Object.keys(var_set)
+            }
 console.log(file_path)
             await fos.write_out_pretty_json(file_path,subst_obj,4)
-
+            //
             let files_output = subst_defs[concern].files
             for ( let file in files_output ) {
                 let file_focus = files_output[file]
@@ -3206,15 +3274,24 @@ console.log(file_path)
                 file_path = await fos.ensure_directories(file_path,'',true)
                 //
                 await fos.write_out_pretty_json(file_path,subst_obj,4)
+                //
+                concerns_subst_map[concern][file] = {
+                    "path" : file_path,
+                    "vars" : Object.keys(var_set)
+                }
             }
         }
+
+        let subst_map_file = `[websites]/template-configs/conserns_to_subst_files.json`
+        subst_map_file = this.paths.compile_one_path(subst_map_file)
+        await fos.write_out_pretty_json(subst_map_file,concerns_subst_map,4)
     }
+
 
     /**
      * namer is a variable found in the file.
      * namer may be in the namer db of a concern, providing 
      * a calculation or a file description that will be kept with in a subst file.
-     * 
      * 
      * @param {string} namer 
      * @returns 
@@ -3233,11 +3310,20 @@ console.log(file_path)
         return false
     }
 
+
     /**
      * 
-     * @param {string} concern 
-     * @param {object} namer 
-     * @returns {pair}
+     * Looks in all the calc section DBs for a given concern.
+     * Within the map of files to sections DBs, this finds the first match for a file name 
+     * that would hold the a DB key, **namer**. If the file and the object can be found
+     * by the sequence of keys, this will return the calc section name (given by an application)
+     * and a file type (given by the applications)
+     * 
+     * This method is used by methods generating subtitution maps to be used during phase 3.
+     * 
+     * @param {string} concern -- the name of a concern such as a url or a business name/token
+     * @param {string} namer -- a field in the a calc section db, e.g. `about_box`
+     * @returns {pair} -- returns the application selected name and file type.
      */
     lookup_app_assignement(concern,namer,file) {
         if ( file ) {
@@ -3355,11 +3441,15 @@ async function command_line_operations_new(args) {
                     let parsed_skels = await fos.load_json_data_at_path(parsed)
                     let concerns = false
                     if ( parsed_skels ) {
+                        // regenerates with changes provided by custom settings developed after the prepare 
+                        // stage of the processing. This will be out of the way before any substitution 
+                        // objects are created.
                         concerns = await to_templates.generate_all_concerns_templates(parsed_skels)
                     } else {
                         console.log("did not load " + parsed)
                     }
-                    //
+                    // If the customized regeneration process has succeeded, then create susbtitution 
+                    // objects. 
                     if ( concerns ) {
                         let to_staging = new TemplatesToPreStaging(conf)
                         let subst_defs = await to_staging.prepare_files_and_substitutions(concerns)
