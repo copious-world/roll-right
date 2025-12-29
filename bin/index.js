@@ -821,30 +821,9 @@ class SkelToTemplate {
     }
 
 
-    /**
-     * 
-     * @param {object} script_stats 
-     * @param {number} threshold 
-     * @returns {object}
-     */
-    partition(script_stats) {
+    partition_stats(sorted_stats) {
         let partitions = []
-
-        let keys = Object.keys(script_stats)
-        keys.sort((k1,k2) => {
-            let v1 = script_stats[k1]
-            let v2 = script_stats[k2]
-            return v1 - v2
-        })
-
-        let sorted_stats = {}
-        for ( let ky of keys ) {
-            sorted_stats[ky] = script_stats[ky]
-        }
-
-        console.log("sorted_stats")
-        console.dir(sorted_stats)
-
+        //
         let bdiff = Object.values(sorted_stats)
         let n = bdiff.length
         let diffs = []
@@ -853,9 +832,6 @@ class SkelToTemplate {
             let v1 = bdiff[i+1]
             diffs.push(v1-v0)
         }
-
-        console.dir(diffs)
-
         let last_big_diff = 0
         partitions.push([])
         let p_index = 0
@@ -870,18 +846,76 @@ class SkelToTemplate {
             partitions[p_index].push(skeys[i])
         }
         partitions[p_index].push(skeys[n-1])
-
-
-
-        // for ( let [file,value] of Object.entries(script_stats) ) {
-        //     if ( value >= threshold ) {
-        //         partitions.above.push(file)
-        //     } else {
-        //         partitions.below.push(file)
-        //     }
-        // }
-
         return partitions
+    }
+
+    /**
+     * 
+     * @param {object} script_stats 
+     * @param {number} threshold 
+     * @returns {object}
+     */
+    partition(script_stats) {
+
+        let sorted_stats = {}
+        //
+        console.log("sorted_stats")
+        // sort by key prefix to get a grouping of functional parts
+        sorted_stats = parse_util.key_sort(script_stats,(ky) => {
+            let slash = ky.indexOf('/')
+            if ( slash > 0 ) {
+                let tester = ky.substring(0,ky.indexOf('/'));
+                return tester
+            } else return ky
+        })
+        console.dir(sorted_stats)
+        //
+
+        // now put common prefixes into buckets
+        let prefix_buckets = {}
+        let bucket_keys = Object.keys(sorted_stats)
+        for ( let ky of bucket_keys ) {
+            if ( ky[0] === '[' ) {
+                let bucket_ky = ky.substring(0,ky.indexOf('/'))
+                let bucket = prefix_buckets[bucket_ky]
+                if ( bucket === undefined ) {
+                    bucket = {}
+                    prefix_buckets[bucket_ky] = bucket
+                }
+                bucket[ky] = sorted_stats[ky]
+            } else {
+                let bucket = prefix_buckets["<<"]
+                if ( bucket === undefined ) {
+                    bucket = {}
+                    prefix_buckets["<<"] = bucket
+                }
+                bucket[ky] = sorted_stats[ky]
+            }
+        }
+        // before partitioning the sorted stats buckets, 
+        // make sure they are sorted by score
+
+console.dir(prefix_buckets)
+        let nested_partitions = {}
+
+        for ( let [ky,bucket] of Object.entries(prefix_buckets) ) {
+            //
+            let keys = Object.keys(bucket)
+            keys.sort((k1,k2) => {
+                let v1 = script_stats[k1]
+                let v2 = script_stats[k2]
+                return v1 - v2
+            })
+            let sorted_bucket = {}
+            for ( let bky of keys ) {
+                sorted_bucket[bky] = bucket[bky]
+            }
+            //
+            nested_partitions[ky] = this.partition_stats(sorted_bucket)
+        }
+        //
+
+        return nested_partitions
     }
 
 
@@ -2557,6 +2591,7 @@ console.log("NOT HANDLED YET: ",step_entry)
         this.update_script_stats_usage(transform_1,script_stats)
 
         let occurence_partition = this.partition(script_stats)
+console.dir(occurence_partition)
 
         await this.leaf_hmtl_directives(transform_1)
 
@@ -3230,6 +3265,35 @@ class TemplatesToPreStaging extends SkelToTemplate {
     }
 
 
+
+    /**
+     * This method uses specific merge rules that fravor the existing data from previous website 
+     * renditions.
+     * 
+     * @param {object} subst_obj 
+     * @param {object} existing_subst 
+     */
+    merge_existing_subst(subst_obj,existing_subst) {
+        for ( let ky in existing_subst ) {
+            if ( subst_obj[ky] === undefined ) {
+                subst_obj[ky] = existing_subst[ky]
+            } else {
+                if ( (typeof existing_subst[ky] === "object") && (typeof subst_obj[ky] === "object") ) {
+                    this.merge_existing_subst(subst_obj[ky],existing_subst[ky])
+                } else if ( (typeof existing_subst[ky] === "object") && (typeof subst_obj[ky] !== "object") ) {
+                    subst_obj[ky] = existing_subst[ky]
+                } else if ( (typeof existing_subst[ky] === "string") && (typeof subst_obj[ky] === "string") ) {
+                    if ( existing_subst[ky].length > 0 ) {
+                        subst_obj[ky] = existing_subst[ky]
+                    }
+                } else if ( (typeof existing_subst[ky] === "string") && (typeof subst_obj[ky] === "object") ) {
+                    subst_obj[ky].content =  existing_subst[ky]
+                }
+            }
+        }
+    }
+
+
     /**
      * Makes all the pre-staging subsitution maps needed in order to generate 
      * website/app files to be used in production.
@@ -3254,12 +3318,22 @@ class TemplatesToPreStaging extends SkelToTemplate {
             concerns_dir = this.paths.compile_one_path(concerns_dir)
             let file_path = `${concerns_dir}/${concern}.subst`
             //
+            let static_src = `[websites]/${concern}/static/${concern}.subst`
+            static_src = this.paths.compile_one_path(static_src)
+            let existing_subst = false
+            if ( fos.pathExists(static_src) ) {
+                existing_subst = await fos.load_json_data_at_path(static_src)
+                if ( existing_subst !== false ) {
+                    this.merge_existing_subst(subst_obj,existing_subst)
+                }
+            }
             //
-            concerns_subst_map[concern][concern] = {  // this is the top level entry if specific files don't have one.
+            // The file containing sitewide variable mappings
+            // this is the top level entry if specific files don't have one.
+            concerns_subst_map[concern][concern] = {
                 "path" : file_path,
                 "vars" : Object.keys(var_set)
             }
-console.log(file_path)
             await fos.write_out_pretty_json(file_path,subst_obj,4)
             //
             let files_output = subst_defs[concern].files
@@ -3270,6 +3344,10 @@ console.log(file_path)
                 let subst_obj = this.get_subst_vars(concern,var_set,file)
                 let file_path = file_focus.output
                 file_path = file_path.replace('.html','_html.subst')
+                //
+                if ( existing_subst !== false ) {
+                    this.merge_existing_subst(subst_obj,existing_subst)
+                }
                 //
                 file_path = await fos.ensure_directories(file_path,'',true)
                 //
