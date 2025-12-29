@@ -235,6 +235,11 @@ class SkelToTemplate {
     }
 
 
+    set_project_directory(project_dir) {
+        this.project_dir = project_dir
+    }
+
+
     /**
      * 
      * @param {string} entry_directive 
@@ -821,6 +826,11 @@ class SkelToTemplate {
     }
 
 
+    /**
+     * 
+     * @param {object} sorted_stats 
+     * @returns {object}
+     */
     partition_stats(sorted_stats) {
         let partitions = []
         //
@@ -849,6 +859,7 @@ class SkelToTemplate {
         return partitions
     }
 
+
     /**
      * 
      * @param {object} script_stats 
@@ -859,7 +870,6 @@ class SkelToTemplate {
 
         let sorted_stats = {}
         //
-        console.log("sorted_stats")
         // sort by key prefix to get a grouping of functional parts
         sorted_stats = parse_util.key_sort(script_stats,(ky) => {
             let slash = ky.indexOf('/')
@@ -868,7 +878,7 @@ class SkelToTemplate {
                 return tester
             } else return ky
         })
-        console.dir(sorted_stats)
+        // console.dir(sorted_stats)
         //
 
         // now put common prefixes into buckets
@@ -884,32 +894,34 @@ class SkelToTemplate {
                 }
                 bucket[ky] = sorted_stats[ky]
             } else {
-                let bucket = prefix_buckets["<<"]
+                let bucket = prefix_buckets["[script]"]
                 if ( bucket === undefined ) {
                     bucket = {}
-                    prefix_buckets["<<"] = bucket
+                    prefix_buckets["[script]"] = bucket
                 }
                 bucket[ky] = sorted_stats[ky]
             }
         }
         // before partitioning the sorted stats buckets, 
         // make sure they are sorted by score
-
-console.dir(prefix_buckets)
+        //
+console.log("sorted_stats")
         let nested_partitions = {}
 
         for ( let [ky,bucket] of Object.entries(prefix_buckets) ) {
             //
             let keys = Object.keys(bucket)
             keys.sort((k1,k2) => {
-                let v1 = script_stats[k1]
-                let v2 = script_stats[k2]
+                let v1 = bucket[k1]
+                let v2 = bucket[k2]
                 return v1 - v2
             })
             let sorted_bucket = {}
             for ( let bky of keys ) {
                 sorted_bucket[bky] = bucket[bky]
             }
+//console.log(ky)
+//console.dir(sorted_bucket)
             //
             nested_partitions[ky] = this.partition_stats(sorted_bucket)
         }
@@ -918,6 +930,46 @@ console.dir(prefix_buckets)
         return nested_partitions
     }
 
+
+    /**
+     * 
+     * @param {object} partitions 
+     */
+    async prep_script_directories(partitions) {
+
+        for ( let pky in partitions ) {
+            console.log("prep_script_directories",pky)
+            if ( pky.indexOf(">") > 1 ) {
+console.log("\tskipping")
+            } else {
+console.log("DATA")
+                let bare_ky = pky.replace('[','').replace(']','')
+                let script_src_dir = this.top_dir_locations[bare_ky]
+                console.log("script source:  ",script_src_dir)
+                let script_grouping_dir = `${this.project_dir}bundle_src/${bare_ky}`
+                script_grouping_dir = this.paths.resolve(script_grouping_dir)
+                console.log("script output: ", script_grouping_dir)
+                await fos.ensure_directories(script_grouping_dir)
+                let subdr = 'A'
+                for ( let file_list of partitions[pky] ) {
+                    if ( file_list.length ) {
+                        let part_dir = `${script_grouping_dir}/${subdr}`
+                        await fos.ensure_directories(part_dir)
+                        for ( let file of file_list ) {
+                            file = file.replace(`${pky}/`,'').replace('<<','')
+                            let fpath = `${part_dir}/${file}`
+                            let spath = `${script_src_dir}/${file}`
+                            console.log(spath)
+                            console.log(fpath)
+                            await fos.file_copier(spath,fpath)
+                        }
+                        subdr = parse_util.next_char(subdr)
+                    }
+                }
+            }
+        }
+
+    }
 
     /**
      * 
@@ -2592,6 +2644,7 @@ console.log("NOT HANDLED YET: ",step_entry)
 
         let occurence_partition = this.partition(script_stats)
 console.dir(occurence_partition)
+        await this.prep_script_directories(occurence_partition)
 
         await this.leaf_hmtl_directives(transform_1)
 
@@ -2780,7 +2833,7 @@ console.dir(occurence_partition)
      */
     async write_templates(conserns_to_files) {
         //
-        let concerns_file = `[websites]/template-configs/conserns_to_files.json`
+        let concerns_file = `[websites]/${this.project_dir}/conserns_to_files.json`
         concerns_file = this.paths.compile_one_path(concerns_file)
         await fos.write_out_pretty_json(concerns_file,conserns_to_files,4)
         //
@@ -3085,7 +3138,7 @@ class TemplatesToPreStaging extends SkelToTemplate {
      */
     async load_concerns_namer_dbs() {
         //
-        let db_locations = `[websites]/template-configs/conserns_named.db`
+        let db_locations = `[websites]/${this.project_dir}/conserns_named.db`
         db_locations = this.paths.compile_one_path(db_locations)
         //
         let all_concerns_db = await fos.load_json_data_at_path(db_locations)
@@ -3360,7 +3413,7 @@ class TemplatesToPreStaging extends SkelToTemplate {
             }
         }
 
-        let subst_map_file = `[websites]/template-configs/conserns_to_subst_files.json`
+        let subst_map_file = `[websites]/${this.project_dir}/conserns_to_subst_files.json`
         subst_map_file = this.paths.compile_one_path(subst_map_file)
         await fos.write_out_pretty_json(subst_map_file,concerns_subst_map,4)
     }
@@ -3485,17 +3538,18 @@ async function command_line_operations_new(args) {
             case 1: {                       /// creates templates
                 let project_dir = args.sources
                 let generator = args.generator  // a string
-                generator = `${project_dir}/${generator}`
+                generator = `${project_dir}${generator}`
                 console.log("Using input configuration for generator:\t\t",generator)
                 //
                 let parsed = args.structure
-                parsed = `${project_dir}/${parsed}`
+                parsed = `${project_dir}${parsed}`
                 console.log("Using output to configuration for template formation:\t\t",parsed)
 
                 let conf = await fos.load_json_data_at_path(generator)
                 if ( conf ) {
                     conf.top_level_parsed = parsed
                     let to_templates = new SkelToTemplate(conf)
+                    to_templates.set_project_directory(project_dir)
                     await to_templates.prepare_directories()
                     let parsed_skels = await to_templates.skeleton_unification()
                     await to_templates.generate_all_concerns_templates(parsed_skels)
@@ -3506,15 +3560,16 @@ async function command_line_operations_new(args) {
             case 2: {
                 let project_dir = args.sources
                 let generator = args.generator  // a string
-                generator = `${project_dir}/${generator}`
+                generator = `${project_dir}${generator}`
                 console.log("Using input configuration from generation:\t\t",generator)
                 //
                 let parsed = args.structure
-                parsed = `${project_dir}/${parsed}`
+                parsed = `${project_dir}${parsed}`
                 console.log("Using input configuration for template formation:\t\t",parsed)
                 let conf = await fos.load_json_data_at_path(generator)
                 if ( conf ) {
                     let to_templates = new SkelToTemplate(conf)
+                    to_templates.set_project_directory(project_dir)
                     await to_templates.prepare_directories()        // needed even when loading previously parsed data.
                     let parsed_skels = await fos.load_json_data_at_path(parsed)
                     let concerns = false
@@ -3530,6 +3585,7 @@ async function command_line_operations_new(args) {
                     // objects. 
                     if ( concerns ) {
                         let to_staging = new TemplatesToPreStaging(conf)
+                        to_staging.set_project_directory(project_dir)
                         let subst_defs = await to_staging.prepare_files_and_substitutions(concerns)
                         await to_staging.publish_subs_defs(subst_defs)
                     }
@@ -3543,7 +3599,7 @@ async function command_line_operations_new(args) {
                 //
                 let project_dir = args.sources
                 let substitutions = args.values
-                substitutions = `${project_dir}/${substitutions}`
+                substitutions = `${project_dir}${substitutions}`
                 console.log("Using input configuration for assignments:\t\t",substitutions)
                 //
                 let conf = await fos.load_json_data_at_path(substitutions)
@@ -3551,7 +3607,7 @@ async function command_line_operations_new(args) {
                     //
                     let to_staging = new TemplatesToPreStaging(conf)
                     //
-                    let concerns_file = `[websites]/template-configs/conserns_to_files.json`
+                    let concerns_file = `[websites]/${this.project_dir}/conserns_to_files.json`
                     concerns_file = to_staging.paths.compile_one_path(concerns_file)
                     let concerns = await fos.load_json_data_at_path(concerns_file)
                     await to_staging.process_files(concerns)
