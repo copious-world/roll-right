@@ -2817,30 +2817,30 @@ console.dir(occurence_partition)
      * and are structure according to the configuration.
      * 
      * Writes out template files each with a '.tmplt' suffix.
-     * Writes out a manifest to these files, conserns_to_files.json. 
+     * Writes out a manifest to these files, concerns_to_files.json. 
      * 
      * Writes out db files for calculated regions. Outputs a file for each template. 
      * The DB files can be used later to override the generic database stored in the alpha.
      * 
      * Creates one top level file to keep track of the individual, template associated, files.
-     * That is `conserns_named.db`
+     * That is `concerns_named.db`
      * 
      * All of the individual template and DB files can be output to the 'template' directories of the concerns.
      * The top level file can be output to the directory commanding all concerns, typically "template-configs"
      * in `[websites]` directory.
      * 
-     * @param {object} conserns_to_files 
+     * @param {object} concerns_to_files 
      */
-    async write_templates(conserns_to_files) {
+    async write_templates(concerns_to_files) {
         //
-        let concerns_file = `[websites]/${this.project_dir}/conserns_to_files.json`
+        let concerns_file = `[websites]/${this.project_dir}/concerns_to_files.json`
         concerns_file = this.paths.compile_one_path(concerns_file)
-        await fos.write_out_pretty_json(concerns_file,conserns_to_files,4)
+        await fos.write_out_pretty_json(concerns_file,concerns_to_files,4)
         //
         // get the name of the type level file 
-        let db_locations = concerns_file.replace("conserns_to_files.json","conserns_named.db")
+        let db_locations = concerns_file.replace("concerns_to_files.json","concerns_named.db")
         let concerns_db_files = {}
-        parse_util.copy_keys(concerns_db_files,conserns_to_files,"object")
+        parse_util.copy_keys(concerns_db_files,concerns_to_files,"object")
         //
         //
         let outputs = this.outputs
@@ -2849,13 +2849,13 @@ console.dir(occurence_partition)
             let dir_form = targets.dir_form
             //
             dir_form = dir_form.replace("@target",this.created_dir)
-            for ( let concern in conserns_to_files ) {
+            for ( let concern in concerns_to_files ) {
                 //
                 let db_output = concerns_db_files[concern]
                 //
                 let top_out_dir = dir_form.replace("@concern",concern)
                 //
-                let sk_maps = conserns_to_files[concern]
+                let sk_maps = concerns_to_files[concern]
                 let promises = []
                 for ( let sk in sk_maps ) {
                     let opairs = sk_maps[sk]
@@ -3133,12 +3133,12 @@ class TemplatesToPreStaging extends SkelToTemplate {
      * 
      * Loads the top level file concerns named DB, mapping concerns to DB files associated with each template.
      * 
-     * This method continues on to load all the DB file mentioned in the `conserns_named.db` file.
+     * This method continues on to load all the DB file mentioned in the `concerns_named.db` file.
      *
      */
     async load_concerns_namer_dbs() {
         //
-        let db_locations = `[websites]/${this.project_dir}/conserns_named.db`
+        let db_locations = `[websites]/${this.project_dir}/concerns_named.db`
         db_locations = this.paths.compile_one_path(db_locations)
         //
         let all_concerns_db = await fos.load_json_data_at_path(db_locations)
@@ -3413,7 +3413,7 @@ class TemplatesToPreStaging extends SkelToTemplate {
             }
         }
 
-        let subst_map_file = `[websites]/${this.project_dir}/conserns_to_subst_files.json`
+        let subst_map_file = `[websites]/${this.project_dir}/concerns_to_subst_files.json`
         subst_map_file = this.paths.compile_one_path(subst_map_file)
         await fos.write_out_pretty_json(subst_map_file,concerns_subst_map,4)
     }
@@ -3607,7 +3607,7 @@ async function command_line_operations_new(args) {
                     //
                     let to_staging = new TemplatesToPreStaging(conf)
                     //
-                    let concerns_file = `[websites]/${this.project_dir}/conserns_to_files.json`
+                    let concerns_file = `[websites]/${this.project_dir}/concerns_to_files.json`
                     concerns_file = to_staging.paths.compile_one_path(concerns_file)
                     let concerns = await fos.load_json_data_at_path(concerns_file)
                     await to_staging.process_files(concerns)
