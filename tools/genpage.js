@@ -33,6 +33,13 @@ function reset_svg_height_width(svg_txt, output_width, output_height) {
 
 
 
+/**
+ * Returns true if this object passed has fields specifying a file to be read.
+ * 
+ * 
+ * @param {object} descr 
+ * @returns {boolean}
+ */
 function is_file_source(descr) {
     return ((typeof descr === 'object') && ( descr.file || ( descr.content && descr.content.file ) || ( descr.button && descr.button.file ) ))
 }
@@ -40,8 +47,14 @@ function is_file_source(descr) {
 
 
 var g_compiler_schedule = []
-
-function  process_sub_content(datObj,descr) {
+/**
+ * Given a descriptor of a file to load and read, this function reads the 
+ * file, and provides the descriptor with the data for later compilation and substitution.
+ * 
+ * @param {object} datObj 
+ * @param {object} descr 
+ */
+function process_sub_content(datObj,descr) {
     let src_file = descr.file ? descr.file : ( descr.content ? descr.content.file : descr.button.file );
     try {
         if ( src_file[0] === '.' ) {
@@ -72,11 +85,22 @@ function  process_sub_content(datObj,descr) {
 
 
 var g_forgotten_files = []
+/**
+ * Takes in a substitution descriptor and a source to apply it to.
+ * It pushes the parmeters onto a stack of substitution directives, the compiler schedule.
+ * Then, it looks in the substitution descriptor to find files that might be processed before
+ * being placed into the final substitution yielding the output.
+ * 
+ * The order is important, most specific to least specific, that being the contents of the output file.
+ * 
+ * @param {object} datObj 
+ * @param {string} src 
+ */
 function load_source_data(datObj,src) {
-    g_compiler_schedule.unshift({ 'data' : datObj, 'source' : src })
+    g_compiler_schedule.unshift({ 'data' : datObj, 'source' : src })  // recall this is push
     for ( let field in datObj ) {
         let descr = datObj[field]
-        if ( (typeof descr === 'object') && descr.length ) {
+        if ( (typeof descr === 'object') &&  Array.isArray(descr) ) {
             descr.forEach(element => {
                 if ( is_file_source(element) ) {
                     process_sub_content(datObj,element)
@@ -89,25 +113,24 @@ function load_source_data(datObj,src) {
 }
 
 
-
-
-
 // STARTS HERE...
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-var data_file = process.argv[2]
-var source_file = process.argv[3]
-var output = process.argv[4]
+let data_file = process.argv[2]  // a subst file
+let source_file = process.argv[3]   // a template file file
+let output = process.argv[4]        // an html file 
+let static_dir = process.argv[5]
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
 console.log("SOURCE FILE: " + source_file)
+console.log("STATIC DIR: " + static_dir)
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 var data = fs.readFileSync(data_file,'ascii').toString()
 var confObj = JSON.parse(data)
 //
-confObj.srcPath = path.dirname(data_file)
+confObj.srcPath = static_dir
 var source = fs.readFileSync(source_file,'utf8').toString()
 load_source_data(confObj,source)
 

@@ -19,8 +19,11 @@ const crypto = require('crypto')
 
 
 let ParseUtils = require('../lib/utils')
-
+let SysUtils = require('../lib/sys_utils')
 let parse_util = new ParseUtils()
+let sys_utils = new SysUtils({
+    "tools_directory" : "./tools"
+})
 
 
 // Minimist is a command line parsing package.
@@ -3483,7 +3486,7 @@ class TemplatesToPreStaging extends SkelToTemplate {
  * This class extends SkelToTemplate with operations specific to phase 3.
  * 
  */
-class PreStagingToStaging extends TemplatesToPreStaging {
+class PreStagingSubsitutions extends TemplatesToPreStaging {
 
     /**
      * 
@@ -3508,13 +3511,15 @@ class PreStagingToStaging extends TemplatesToPreStaging {
             for ( let pair of targeted_files ) {
                 let keys = Object.keys(pair)
                 for ( let ky of keys ) {
+                    //
+                    let static_dir = `${concerns_dir}/static`
                     let afile = `${concerns_dir}/${this.created_dir}${ky}`
-                    let subst_src = `${concerns_dir}/static`
-                    let subst_file = `${subst_src}/${concern}.subst`
-                    let ofile = `${concerns_dir}/pre-staging/${ky}`
-                    ofile = ofile.replace(".tmplt",".html")
+                    let subst_form = ky.replace(".tmplt","_html.subst")
+                    let subst_file = `${concerns_dir}/pre-staging/${subst_form}`
+                    let ofile = subst_file.replace("_html.subst",".html")
 
-console.log(afile,"==>\n",ofile,"\n",subst_file)
+console.log(afile,"-\n",subst_file,"==>\n",ofile)
+                    sys_utils.spawn_generator(subst_file,afile,ofile,static_dir)
                 }
             }
         }
@@ -3584,10 +3589,10 @@ async function command_line_operations_new(args) {
                     // If the customized regeneration process has succeeded, then create susbtitution 
                     // objects. 
                     if ( concerns ) {
-                        let to_staging = new TemplatesToPreStaging(conf)
-                        to_staging.set_project_directory(project_dir)
-                        let subst_defs = await to_staging.prepare_files_and_substitutions(concerns)
-                        await to_staging.publish_subs_defs(subst_defs)
+                        let to_pre_staging = new TemplatesToPreStaging(conf)
+                        to_pre_staging.set_project_directory(project_dir)
+                        let subst_defs = await to_pre_staging.prepare_files_and_substitutions(concerns)
+                        await to_pre_staging.publish_subs_defs(subst_defs)
                     }
                     //
                 }
@@ -3605,12 +3610,13 @@ async function command_line_operations_new(args) {
                 let conf = await fos.load_json_data_at_path(substitutions)
                 if ( conf ) {
                     //
-                    let to_staging = new TemplatesToPreStaging(conf)
-                    //
-                    let concerns_file = `[websites]/${this.project_dir}/concerns_to_files.json`
-                    concerns_file = to_staging.paths.compile_one_path(concerns_file)
+                    let to_pre_staging = new PreStagingSubsitutions(conf)
+                    to_pre_staging.set_project_directory(project_dir)
+console.log(to_pre_staging.project_dir)
+                    let concerns_file = `${to_pre_staging.project_dir}/concerns_to_files.json`
+console.log("concerns file",concerns_file)
                     let concerns = await fos.load_json_data_at_path(concerns_file)
-                    await to_staging.process_files(concerns)
+                    await to_pre_staging.process_files(concerns)
                     //
                 }
                 //
