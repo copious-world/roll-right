@@ -238,6 +238,10 @@ class SkelToTemplate {
     }
 
 
+    /**
+     * 
+     * @param {string} project_dir 
+     */
     set_project_directory(project_dir) {
         this.project_dir = project_dir
     }
