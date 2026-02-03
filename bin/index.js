@@ -123,8 +123,13 @@ async function command_line_operations() {
 /**
  * This class is made for organizing the code in this utility.
  * 
+ * This class has to do with phase 1 operations.
  * 
- * 
+ * Using the direction of an input file, such as generate.json in [websites]/template-configs/,
+ * this method will read skeleton files describing the structure of web pages and output templates.
+ * It will also attempt to move javascript files into collections for rollup into bundles to be loaded
+ * via deferred loading into a browser like contexts.
+ *
  */
 class SkelToTemplate {
 
@@ -939,6 +944,15 @@ console.log("sorted_stats")
 
 
     /**
+     * Partitions files into directories for later use in putting code into 
+     * bundles, which will be requested in headers.
+     * 
+     * prep_script_directories is one of the first operations in skeleton skeleton_parsing.
+     * 
+     * Each skeleton lists a number of scripts that make resulting applications work in general.
+     * 
+     * Previously, all of the scripts were placed into the HTML file. But, that results in inefficient loading
+     * and management.
      * 
      * @param {object} partitions 
      */
@@ -2630,7 +2644,8 @@ console.log("NOT HANDLED YET: ",step_entry)
 
 
     /**
-     * section_parsing(all_skeletons)
+     * 
+     * for the call tosection_parsing(all_skeletons)
      * The one parameter `all_skeletons` is a map from file names to skeleton ascii.
      * 
      * This method parses the skeleton ascii, managing the document structure, 
@@ -3103,6 +3118,14 @@ console.dir(occurence_partition)
  * 
  * This class extends SkelToTemplate with operations specific to phase 2.
  * 
+ * This is mostly about creating substitution files and merging them with existing susbt files.
+ * 
+ * Also, the .db files, which are used to make subst file entries, are loaded from specialized 
+ * templates for the concerns.
+ * 
+ * This phase may regenerate templates after taking into consideration the customization of the db.
+ * 
+ * 
  */
 class TemplatesToPreStaging extends SkelToTemplate {
 
@@ -3488,6 +3511,11 @@ class TemplatesToPreStaging extends SkelToTemplate {
  * @class PreStagingToStaging
  * 
  * This class extends SkelToTemplate with operations specific to phase 3.
+ * 
+ * This is the page stage. All pages for all concerns are generated, using 
+ * previously generated and edited substitutions and templates. 
+ * 
+ * The final results will be in the pre-staging directory for each concern.
  * 
  */
 class PreStagingSubsitutions extends TemplatesToPreStaging {
