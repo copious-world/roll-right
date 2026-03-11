@@ -11,10 +11,24 @@ const Phase1 = require('../lib/phase1')
 const Phase2 = require('../lib/phase2')
 //
 
+// @target -- concern's directory for receiving templates
+// @concern -- the business, app, tool, or other that is receiving a code asset into it's template, pre-staging, or staging directories
+// @kernel  -- in script processing -- e.g. [app<scripts>]/file.js   -- as special code for a concern -- here, kenerl is 'scripts'
+// @<type> -- a type specification 
+// @params< -- the intake parameter descriptions for a sub-template file -- might be of type ".smplt"
+// @list< -- parameter breakout for list entities 
+// @nothing -- allows for a conditional to create empty lines for either positive or negative conditions
+// @{}  -- configuration substitutions done before parsing a skeleton
+//
 
 const TESTING = true
 
 const {base_patterns_mod} = require('../lib/html_directives')
+const {bundle_inclusion_transform} = require('../lib/bundle_directives')
+
+let page_or_worker_context = {}   // maps skeletons "skeleton_src" to contexts for links in hmtl or javascript inclusion mechanisms
+
+
 const crypto = require('crypto')
 
 
@@ -268,6 +282,8 @@ class SkelToTemplate {
 
 
     /**
+     * For each concern, makes sure that the output directory exists under the directory for the concern
+     * determined by the scheme estabished by the target's 'dir_form'
      * 
      * @param {object} targets - a set of directory 
      * @param {object} skeletons - a map of skeletons path names to skeleton forms to be expanded
@@ -303,8 +319,21 @@ class SkelToTemplate {
 
     /**
      * makes sure that directories receiving the generated assets exists 
-     * and are structure according to the configuration.
+     * and are structured according to the configuration.
      * 
+     * The configuration loaded from a file such as "generate.json" has fields describing directories
+     * and concerns and global variables. Global variables reflect the specialization for a run on skeletons.
+     * 
+     * There is one field "outputs" which describes directories where templates and final renditions will be stored
+     * for different concern/file pairings. Each element of the outputs has three main fields for grouping 
+     * this information:
+     * 
+     * targets - description of output directory schemes and a list of a concerns (webstites/apps) that will use the outputs
+     * skeletons - a map of out template names to 
+     * name_parameters  -- variations on skeletal structure from a database of these structures, with defintions for 
+     * final substitutions 
+     * 
+     * this method makes use of targets and skeletons
      * 
     */
     async prepare_directories() {
@@ -690,6 +719,11 @@ class SkelToTemplate {
 
     /**
      * 
+     * Walks through the map of all loaded skeletons. 
+     * This map is skel file to file contents.
+     * 
+     * 
+     * 
      * @param {object} all_skeletons 
      */
     async section_parsing(all_skeletons) {
@@ -698,16 +732,16 @@ class SkelToTemplate {
             this.test_html = {}
         }
         for ( let [ky,data] of Object.entries(all_skeletons) ) {
-            let data_parts = data.split('$$')
+            let data_parts = data.split('$$')   // all sectional definitions start with $$
             let defaults = data_parts[1]
-            data_parts.shift()
+            data_parts.shift()      // this first part is a replication of configuration usually.
             //
             let files = []
             let scripts = []
             let maybe_params = {}
             // for testing
 
-            if ( defaults ) {
+            if ( defaults ) {   // The defaults can update the basic skeleton structure prior to skeleton processing (parsing, evaluating)
                 defaults = defaults.trim()
                 if ( defaults.indexOf("defs:") === 0 ) {
                     data_parts.shift()
@@ -715,7 +749,7 @@ class SkelToTemplate {
                     defaults = JSON.parse(defaults.substring("defs:".length))
                 }
                 if ( typeof defaults.uses_config_vars === "string" ) {
-                    let vars = this.app_skel_vars[defaults.uses_config_vars]
+                    let vars = this.app_skel_vars[defaults.uses_config_vars]  // a single key `uses_config_vars` from the header identifies the variable/value group for the particular skeleton
                     for ( let vname in vars ) {
                         let value = vars[vname]
                         if ( typeof value !== "string" ) {
@@ -734,11 +768,13 @@ class SkelToTemplate {
 
                 data_parts = data_parts.map((el) => { return parse_util.clear_comments(el.trim()).trim() })
 
+                // structure expansions of parts that will be replicated 
                 data_parts = await this.sequence_expansion(data_parts,maybe_params)
+                // structure selected by operating on parameters specifically evaluated by configuration assignments
                 data_parts = await this.capture_parameters(data_parts,maybe_params)
 
-                files = this.pull_out_files(data_parts)
-                scripts = this.pull_out_script(data_parts)
+                files = this.pull_out_files(data_parts)  // look for the files that will be expanded beneath the top skeleton
+                scripts = this.pull_out_script(data_parts) // pull out script files (remaining after bundle preparation)
                 // for testing
                 if ( TESTING ) {
                     let htmls = this.pull_out_html_directives(data_parts)
@@ -748,7 +784,7 @@ class SkelToTemplate {
                     }
                 }
             }
-            //
+            //  Each file gets a table entry of the expanded and parsed skeleton
             section_data[ky] = {
                 "defaults" : defaults,
                 "final" : {
@@ -765,7 +801,7 @@ class SkelToTemplate {
         console.log("OUTPUT TEST HTML")
         console.dir(this.test_html)
 
-        return section_data
+        return section_data  // return the whole table
     }
 
 
@@ -1231,6 +1267,13 @@ console.log("DATA")
 
 
     /**
+     * Handles the inclusion of recursive scripts call by skeletons and templates or s-templates
+     * Some sub files may start with parameter definitions or element definitions
+     * Others may have executables
+     * 
+     * This method pulls out the definitions which must be associated with values, structures or basic values.
+     * The final roster of executable, variables, parameter defs, list element defs, are returned in a structure
+     * which will be used later during an evaluation phase.
      * 
      * @param {string} step_entry 
      * @param {string} data 
@@ -1247,7 +1290,7 @@ console.log("DATA")
         let _is_loop = false
 
         let lines = []
-        if ( data.startsWith("@params<") ) {
+        if ( data.startsWith("@params<") ) {   // will be at the top of a file (parameter defs for matching calling skeleton)
             //
             lines = data.split("\n")
             let first_line = lines.shift()
@@ -1278,7 +1321,7 @@ console.log("DATA")
                 params_def = JSON.parse(var_defs)
             } catch(e) {}
             //
-        } else if ( this.list_start(data,carrier) ) {
+        } else if ( this.list_start(data,carrier) ) {  // will be at the top of file for matching list element components (one at a time)
             //
             lines = data.split("\n")
             let first_line = lines.shift()
@@ -1307,11 +1350,16 @@ console.log("DATA")
             params_def._var_name = carrier.var
             //
         } else {
+            // no parameter or list defs, so just pull in any variables, schemes and the like 
+            // that may be needed to decide on final structure or explicit values 
+            // when a template is being generated
             let executables = this.extract_excecutables(data)
             params_def = this.errant_variable_extraction(params_def,data)
             return {params_def, executables}
         }
 
+        // parameters or loop assignments have been found, so 
+        // finish the collection of variables and possible executable operations.
         params_def = this.errant_variable_extraction(params_def,data)
         //
         let executables = []
@@ -1319,14 +1367,18 @@ console.log("DATA")
             let rest = lines.join('\n')
             executables = this.extract_excecutables(rest)
         }
-        //
+        // 
         return { _is_loop, params_def, executables }
     }
 
 
 
     /**
-     * 
+     * A ternary conditional is a type of executable 
+     * with a means for picking a particular path of construction.
+     * This method creates the structure that evaluation may use
+     * to yield a particular structure given the setting of 
+     * configuration variables.
      * @param {string} parseable 
      * @param {object} exec_report 
      * @returns {boolean}
@@ -1473,6 +1525,9 @@ console.log("DATA")
 
     /**
      * extract_excecutables
+     * 
+     * builds up the lists of executables and imports that are called out in a file.
+     * 
      * 
      * @param {string} data_form 
      * @returns {object}
@@ -1717,9 +1772,6 @@ console.log("DATA")
     }
 
 
-
-
-
     /**
      * 
      * @param {string} sk_key 
@@ -1742,65 +1794,146 @@ console.log("DATA")
 
     /**
      * 
+     * This method parses a skeleton file, creating as a result a data structure that captures the intent of 
+     * structural defition which may be some sort of markup (e.g. HTML).  The output of this method may be
+     * used subsequently by methods that prepare a template in the markup language.
+     * 
+     * Need to add $$bundle section
+     * 
+     * A skeleton file is broken down into sections. Each section is demarcated by a start of section token
+     * which indicates section type as well as some parameters that may go into the calculation of the section 
+     * structure.
+     * 
+     * A section starts with syntactic separator `$$`.
+     * The '$$' symbol must be followed by a type directive, which is then followed by one or two ':' (colons).
+     * One colon indicates a named element of the chosen markup language which will be substituted by the tool.
+     * Two colons indicates that the type directive and information in the section will be part of some calculation 
+     * specified by the section that is used to generate the final template markup. In many cases, the calculation 
+     * indicates that a file should be loaded, where the file is a pre-template which will structurally expanded 
+     * according to the section parameters.
+     * 
+     * Following colons are further speciations of the section indicating parametarization and actions. 
+     * Each of these has a type name and may be followed by colons as well. The final specifier must be followed by 
+     * the syntactic indicator `<<`. This is an end of directive indicator. This line terminator may be followed by 
+     * more information encapsulated within braces '{','}'
+     * 
+     * The information in braces may specify calculations, parameter substitutions, or loop calculations.
+     * 
+     * Information after the final top level brace '}' and the start of the next section '$$' is likely to be ignored 
+     * or treated as comments.
+     * 
+     * 
+     * Here are the type of sections supported by the program to date:
+     * 
+     * $$defs::         -- These are variable definitions and overrides relative to the configuration for the run
+     * $$bundle::       -- One of these indicates a bundled script that needs to be included in the header as a deferred file.
+     * $$html:          -- These are HTML markups indicating start of larger sections such as hearders, bodies, scripts, style, etc.
+     * $$css::          -- The file name following this is a css file stored in the css directory of the alphas
+     * $$files::        -- These are files to be found in the directory for the markup, e.g. html for HTML
+     * $$files<*>::     -- These are files of a different type than the markup by in the same directory. For instance '*' may be replace with 'js' 
+     * $$script::       -- These are files in the scripting language. Files that remain in a skeleton after preprocessing for bundling will be written into the template.
+     * $$verbatim::     -- A section that will be left alone and included precisely as is
+     * $$template::     -- Similar to verbatim, but it expected to contain variables for use in substitutions, some of which may be files loaded recursively
+     * $$icon::
+     * 
+     * The $$files:: section may either be a simple directive indicating a file to put into the place of the file, or it may be 
+     * a directive indicating how a file will be used:
+     * 
+     * $$files::|file path|<<
+     * $$files::params::|file path|<<{|parameter descriptor|}
+     * 
+     * $$files::calc::|file path|<<${|calculation code|}
+     * $$files::calc::|file path|<<${|calculation code|}
+     * 
+     * $$files::calc::contact_box<<${box_i=100}  -- this is an example of a calculation that initializes a variable
+     * $$files::calc::another_box<<${box_i++}  -- this is an example of a calculation that advances a variable
+     * 
+     * $$files::loop:: -- Loops cause sections of markup to be generated in number, sequentially and may be iterates of a loop index of lists of elements
+     * 
+     * $$files::loop::elements::|file path with an element indicator, e.g. '<el>' |<<${|an expression itemizing loop elements|}
+     * $$files::loop::calc::|file path with an index range, e.g. '<start,stop>'|><<${ a calculation advancing the loop index }
+     * 
+     * $$javascript:start_worker<<
+     * $$javascript:end_worker<<
+     * 
      * @param {string} skeleton_src 
      */
-    async leaf_hmtl_directives(skeleton_src) {
+    async leaf_hmtl_directives(skeleton_src) {   // map: file name -> structured skeleton information
 
         this.shared_entries = {}
 
+        // `skeleton_src` -- previously loaded `sk_key` is the file name, `skel_def` is the file contents (structured)
+
+        // adding an `sk_map` to each `sk_def` 
         for ( let [sk_key, skel_def ] of Object.entries(skeleton_src) ) {
             let sk_map = {}
-            let incrementer_set = {}
+            let incrementer_set = {}  // keep track of the variables used to increment repeated sections
             let lang_spec_count = 0
             let skeleton = skel_def.skeleton
             for ( let step_entry of skeleton ) {
                 step_entry = step_entry.replace('<<','')
                 // now get its value depending on its tyle
-                if ( step_entry.startsWith('html:') ) {
+                // HTML
+                if ( step_entry.startsWith('html:') ) {  // handle the import of html snippets that start parts of the file
                     lang_spec_count++
                     let html_map = base_patterns_mod['html:']
                     let ky = step_entry.substring('html:'.length)
                     step_entry = step_entry.replace('html:',`html(${lang_spec_count}):`)
                     sk_map[step_entry] = html_map[ky]
-                } else if ( this.is_language_section_control(step_entry) ) {  // a generalization for later
+                // OTHER THAN HTML
+                } else if ( this.is_language_section_control(step_entry) ) {  // a generalization of html: for later
                     lang_spec_count++
                     let lang_key = this.extract_lang_controller_key(step_entry)
                     let lang_map = base_patterns_mod[lang_key]
                     let ky = step_entry.substring(lang_key.length)
                     step_entry = step_entry.replace(lang_key,`${lang_key}(${lang_spec_count}):`)
                     sk_map[step_entry] = lang_map[ky]
-                } else if ( step_entry.startsWith('verbatim::') ) {
+                // BUNDLE - a link definition (CDN connection perhaps)
+                } else if ( step_entry.startsWith('bundle::') ) {     // a bundled file -- used to generate the <link deferred... construct
+                    let str = step_entry.substring(('bundle::').length)
+                    let hashed = crypto.hash('sha1',str)        // cryp]==to
+                    sk_map[`bundle::${hashed}`] = bundle_inclusion_transform(str,page_or_worker_context[skeleton_src])
+                // JAVASCRIPT -- sepcial directives for JavaScript in special modules, workers, etc.
+                } else if ( step_entry.startsWith('javascript:')) {
+                    let str = step_entry.substring(('bundle::').length)
+                    sk_map[str] = ""   // for now they just disappear
+                // VERBATIM -- text does not change
+                } else if ( step_entry.startsWith('verbatim::') ) {     // parts of the file to leave alone and include in the final
                     let str = step_entry.substring(('verbatim::').length)
-                    let hashed = crypto.hash('sha1',str)        // cryptos
+                    let hashed = crypto.hash('sha1',str)        // crypto
                     sk_map[`verbatim::${hashed}`] = str
+                // ELSE
                 } else {
                     let entry = this.shared_entries[step_entry]
-                    if ( entry && typeof entry === "object" ) {
-                        sk_map[step_entry] = Object.assign({},entry)
+                    if ( entry && typeof entry === "object" ) {     // previously created informaton -- just copy it
+                        sk_map[step_entry] =  structuredClone(entry)
                     } else {
+                        // FILES with operations -- resulting in targeted markdown in template files
                         if ( step_entry.startsWith('files::') || step_entry.startsWith('files<') ||step_entry.startsWith('css::') ) {
+                            // FILES::CALC - custom calculation for file use
                             if ( step_entry.startsWith('files::calc::') ) {
                                 sk_map[step_entry] = "name"
-                                if ( step_entry.indexOf("_<") < 0 ) {
+                                if ( step_entry.indexOf("_<") < 0 ) {  // looking for a specific syntax associated with a file name
+                                    // this syntax tells processing that a range will be used in replicating a region
                                     let var_set_expr = ""
-                                    let db = this.name_drops_db
+                                    let db = this.name_drops_db  // handle the syntax (specific to this rep here) for variable management
                                     let db_ky = step_entry.substring("files::calc::".length)
-                                    if ( db_ky.indexOf("$") > 0 ) {
+                                    if ( db_ky.indexOf("$") > 0 ) {  // says that there is an incrementer variable perhaps previously defined
                                         let db_ky_parts = db_ky.split("$")
                                         db_ky = db_ky_parts[0]
-                                        var_set_expr = db_ky_parts[1]
+                                        var_set_expr = db_ky_parts[1]       // get the variable update expressions
                                     }
-                                    let entry_data = db[db_ky]
+                                    let entry_data = db[db_ky]   // the db stores operational characteristics of named skeletal parts
                                     let back_ref_ky = db_ky
-                                    if ( typeof entry_data === "object" ) {
+                                    if ( typeof entry_data === "object" ) {  // In the db the key may be vanilla like the one in use
                                         sk_map[step_entry] = Object.assign({},entry_data)
                                     } else {
-                                        back_ref_ky = db_ky
+                                        back_ref_ky = db_ky     // otherwise, it may indicate an abstraction of the range.
                                         db_ky = db_ky.substring(0,db_ky.lastIndexOf('_') + 1)
                                         entry_data = db[db_ky]
                                         sk_map[step_entry] = Object.assign({},entry_data)
                                     }
-                                    //
+                                    //  add a tracker for this calculator, which may be used in other steps
                                     this.add_tracking_for_calc(sk_key,step_entry)
                                     //
                                     entry_data = sk_map[step_entry]
@@ -1808,13 +1941,14 @@ console.log("DATA")
                                         entry_data.path_finder = "html"
                                         this.delay_file_loading_queue.push(entry_data)
                                     }
-                                    if ( this.has_incrementer(entry_data) ) {
+                                    // makes a link between the structure generation operations and incrementer operations
+                                    if ( this.has_incrementer(entry_data) ) {  // keep structures of incrementers for updates
                                         this.add_to_incrementers(incrementer_set,entry_data,var_set_expr)
                                     }
-                                    //
+                                    // calculations taken from the DB provide operations more complex than increment
                                     if ( this.has_calc(entry_data) ) {
-                                        let calls = this.gather_calculations(entry_data)
-                                        for ( let a_call of calls ) {
+                                        let calls = this.gather_calculations(entry_data)   // gets parameters and op components together
+                                        for ( let a_call of calls ) {  // for this skeletal step make all the calls gathered -- uses local data
                                             this.make_call(entry_data,a_call,back_ref_ky)
                                         }
                                     }
@@ -1822,34 +1956,48 @@ console.log("DATA")
                                 }
                                //
                                 //
+                            // FILES::PARAMS - load files taking parameters 
+                            // CSS::PARAMS
                             } else if ( step_entry.startsWith('files::params::') || step_entry.startsWith('css::params::') ) {
                                 let loadable_entry = step_entry.replace("::params","")
                                 sk_map[step_entry] = await this.entry_loading(loadable_entry)
-//console.log("NEED PARAMS HANDLING")
+                            // FILES::ELEMENTS - files operating on lists of elements
+                            // CSS::ELEMENTS
                             } else if ( step_entry.startsWith('files::elements::') || step_entry.startsWith('css::elements::') ) {
                                 let loadable_entry = step_entry.replace("::elements","")
                                 sk_map[step_entry] = await this.entry_loading(loadable_entry)
-//console.log("NEED ELEMENTS HANDLING")
+                            // FILES
+                            // CSS -- nothing special = copy and paste
                             } else {
                                 sk_map[step_entry] = await this.entry_loading(step_entry)
                             }
+                        // TEMPLATE 
                         } else if ( step_entry.startsWith('template::') ) {
+                            // similar to verbatim in that the script won't be changed much.
+                            // however, templates may be loaded recursively, resulting in a tree for future assembly
                             let data = step_entry.substring(('template::').length)
                             data = data.trim()
                             let brace_i = data.indexOf('{')
                             let brace_n = data.lastIndexOf('}')
                             data = data.substring(brace_i,brace_n-1)
-                            data = parse_util.clear_comments(data)
+                            data = parse_util.clear_comments(data)      // take out this human readable info that interferes with machine processing
                             //
                             sk_map[step_entry] = {
                                 "type" : "template",
                                 "data" : data
                             }
-                            if ( this.check_recursive_data(data) ) {
-                                sk_map[step_entry].recursive = await this.get_files_and_vars(step_entry,data)
+                            if ( this.check_recursive_data(data) ) {        // handle recursion  -- build tree
+                                sk_map[step_entry].recursive = await this.get_files_and_vars(step_entry,data)  // subfile processing
                             }
-                        } else if ( step_entry.startsWith('script::') ) {
-                            let script_spec =  await this.entry_loading(step_entry)
+                        // SCRIPT
+                        } else if ( step_entry.startsWith('script::') ) {   // parse out the script section
+                            // scripts are preprocessed for bundling 
+                            // bundled scripts will be removed from the skeleton and the bundle line will be added 
+                            // for each bundle created from the scripts of the current skeleton
+                            // remaining scripts will be added to the template files generated from the skeleton
+                            // Scripts that remain may contain variables for customization and final substitution
+                            // 
+                            let script_spec =  await this.entry_loading(step_entry)   // load the script (it may be output in the template)
                             let data_form = script_spec.data
                             if ( typeof script_spec.kernel !== "undefined" ) {
                                 let sk_c = Object.assign({},this.skel_to_concerns[sk_key].concerns)
@@ -1888,7 +2036,7 @@ console.log("NOT HANDLED YET: ",step_entry)
     /**
      * Called after other processing during the preparation phase, but before writing out the results of preparation.
      * 
-     * There is queue, `delay_file_loading_queue`, that hold structures with empty data components and with file names. 
+     * There is a queue, `delay_file_loading_queue`, that hold structures with empty data components and with file names. 
      * The elements of the queue were processed during synchronous analysis of text and time was not alloted to 
      * loading the data. 
      * 
@@ -2659,15 +2807,22 @@ console.log("NOT HANDLED YET: ",step_entry)
      * @param {object} all_skeletons
      */
     async skeleton_parsing(all_skeletons) {
+        // expand and parse all skeletons being parsed in the batch
         let transform_1 = await this.section_parsing(all_skeletons)
 
-        let script_stats = this.coalesce_scripts(transform_1)
+        // This script parsing may be obsolete after a short stay here.
+        // preprocessing the skeletons has worked better.
+        // this may still be good for shared scripts that may be better embedded. But, some handling of multiple uses may help 
+        let script_stats = this.coalesce_scripts(transform_1)   // keeping track of scripts that are parsed and may be requested by any number of skeletons
         this.update_script_stats_usage(transform_1,script_stats)
 
         let occurence_partition = this.partition(script_stats)
 console.dir(occurence_partition)
         await this.prep_script_directories(occurence_partition)
 
+        // 
+
+        // Now, get ready for operating on the html inclusions specified by a skeleton.
         await this.leaf_hmtl_directives(transform_1)
 
         let name_to_data = await this.delay_file_loading()
@@ -3099,12 +3254,13 @@ console.dir(occurence_partition)
      */ 
     async skeleton_unification() {
         //
-        let all_skeletons = await this.load_skeletons()
-
-        await this.load_name_drops_db()
+        // load relevant files (identified by the configuration)
+        let all_skeletons = await this.load_skeletons()  // get the files and create `skel_to_concerns` map
+        await this.load_name_drops_db() // loads this db only
         //
-        let parsed_skels = await this.skeleton_parsing(all_skeletons)
-        await this.name_parameters_output()
+        let parsed_skels = await this.skeleton_parsing(all_skeletons)  // injest structure of all skeletons in this map
+        await this.name_parameters_output() // after parsing deal with the database entries for each skeleton and make 
+                                            // a version of the DB which may be customized before taking the next step (phase 2)
 
         return parsed_skels
     }
@@ -3573,8 +3729,8 @@ async function command_line_operations_new(args) {
         switch ( g_argv.phase ) {
             case "prepare" :
             case 1: {                       /// creates templates
-                let project_dir = args.sources
-                let generator = args.generator  // a string
+                let project_dir = args.sources  // for instance [website]/template-configs
+                let generator = args.generator  // a string ... for instance generate.json
                 generator = `${project_dir}${generator}`
                 console.log("Using input configuration for generator:\t\t",generator)
                 //
@@ -3582,14 +3738,15 @@ async function command_line_operations_new(args) {
                 parsed = `${project_dir}${parsed}`
                 console.log("Using output to configuration for template formation:\t\t",parsed)
 
+                // only works if there is a configuration file
                 let conf = await fos.load_json_data_at_path(generator)
                 if ( conf ) {
-                    conf.top_level_parsed = parsed
+                    conf.top_level_parsed = parsed    // path to output in the template configuration directory (use globally)
                     let to_templates = new SkelToTemplate(conf)
                     to_templates.set_project_directory(project_dir)
-                    await to_templates.prepare_directories()
-                    let parsed_skels = await to_templates.skeleton_unification()
-                    await to_templates.generate_all_concerns_templates(parsed_skels)
+                    await to_templates.prepare_directories()  // makes sure the output directories exists (in any case)
+                    let parsed_skels = await to_templates.skeleton_unification()        // parsing and primary evaluations
+                    await to_templates.generate_all_concerns_templates(parsed_skels)    // generate template HTML
                 }
                 break
             }
