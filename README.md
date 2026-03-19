@@ -1,15 +1,33 @@
 # roll-right
 
-***A tool that helps generate HTML pages, or other types of pages.***
+***A tool that helps generate HTML pages, or other types of pages such as PWA components.***
 
-This project started out as something to help save time.  Sometimes it did, sometimes work on the output progressed
-faster. But, there is a need to propagate improvements. So, there is a need to take snippets from edge-of-the-envelope textual artifacts back into the pool of snippets this project reads, and then use this tool again to change/upgrade all textual artifacts using the snippet repository.
 
-So, this project is being upgraded to make the process easier.
+## install it
+
+```
+npm install -g roll-right
+```
+
+
+## run it
+
+```
+roll-right --phase prepare <website-identifier> <directory including config>
+```
+
+```
+roll-right --phase template <website-identifier> <directory including config>
+```
+
+```
+roll-right --phase page <website-identifier> <directory including config>
+```
+
 
 ## purpose
 
-> The aim of this project is to make a tool that generates web pages and packages for a numnber of websites.
+> The aim of this project is to make a tool that helps to generate web pages and packages for a numnber of websites.
 
 The idea is that there should be a repository of snippets and skeletons of output pages. The process requires configuration files relfecting choices made by the user of the program. The tool is used in several phases. Each phase generates outputs and configurations for use in the next phase, until the final outputs are placed into a "staging" directory. In the end, the
 staging directory should be something that can be copied to a server directory where a web server looks for web pages and code pages.
@@ -32,6 +50,13 @@ This tool mainly puts together snippets into final forms, files, directories. It
 
 ***This tool is good at making templates that then get customization, personalization, etc. via a substitution process.***
 
+## Background
+
+This project started out as something to help save time.  Sometimes it did, sometimes work on the output progressed
+faster. But, there is a need to propagate improvements. So, there is a need to take snippets from edge-of-the-envelope textual artifacts back into the pool of snippets this project reads, and then use this tool again to change/upgrade all textual artifacts using the snippet repository.
+
+So, this project is being upgraded to make the process easier.
+
 
 ## Differences Compared to Bundlers
 
@@ -49,7 +74,7 @@ This tool mainly puts together snippets into final forms, files, directories. It
 
 * The ***page*** phase will take in a template file and a value file (`.subst`) and run *Mustache* on the template in order to produce HTML. There will likley be a `.subst` file for each business page or application page provided by a website. 
 
-> Some of the JavaScript required for immediate appearance (as opposed to wen app function) will be included in the HTML outpout. 
+> Some of the JavaScript required for immediate appearance (as opposed to web app function) will be included in the HTML outpout. 
 
 * Bundlers will usually help package JavaScript into a single file to be linked into the web page.
 
@@ -75,27 +100,6 @@ This tool mainly puts together snippets into final forms, files, directories. It
 It is possible that command line call of the tool can be done once if the user is willing to accept defaults and
 have all the resource directories ready. Generally, however, the command line tool will be called once for each phase for each initial configuration file. 
 
-
-## install it
-
-```
-npm install -g roll-right
-```
-
-
-## run it
-
-```
-roll-right --phase prepare <website-identifier> <directory including config>
-```
-
-```
-roll-right --phase template <website-identifier> <directory including config>
-```
-
-```
-roll-right --phase page <website-identifier> <directory including config>
-```
 
 
 ## reverse it

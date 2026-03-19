@@ -14,7 +14,7 @@
     "test": "node tests/index.js",
     "prepare" : "node bin/index.js --phase prepare --sources ../websites/template-configs/  --generator generate.json --structure parsed.json",
     "templates" : "node bin/index.js --phase template --sources ../websites/template-configs/ --generator generate.json --structure parsed.json",
-    "assignments" : "node bin/index.js --phase assign --sources ../websites/template-configs/ --values assignments.json"
+    "page" : "node bin/index.js --phase page --sources ../websites/template-configs/ --values assignments.json"
   },
   "dependencies": {
     "byte-base64": "^1.1.0",
