@@ -5,14 +5,29 @@
 // papa.browser_code()
 
 
+let ParseUtils = require('../lib/utils')
 
-let p = { 
-    "dirt" : "thing"
-}
 
-let q = null
-let r = undefined
+let putils = new ParseUtils()
 
-console.log(p?.dirt)
-console.log(q?.dirt)
-console.log(r?.dirt)
+putils.clear_block_comments("")
+
+
+let commented = 
+`----/* ****
+
+This is a test and it shoul be something you can't see.
+
+*
+
+*/
+I like living in my house.
+-------------------------
+/* ****
+This is a test and it shoul be something you can't see.
+*
+*/1234`
+
+let oput = putils.clear_block_comments(commented)
+
+console.log(oput)
