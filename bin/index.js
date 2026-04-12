@@ -100,8 +100,8 @@ async function command_line_operations_new(args) {
                     let to_templates = new SkelToTemplate(conf)
                     to_templates.set_project_directory(project_dir)
                     await to_templates.prepare_directories()  // makes sure the output directories exists (in any case)
-                    let parsed_skels = await to_templates.skeleton_unification()        // parsing and primary evaluations
-                    await to_templates.generate_all_concerns_templates(parsed_skels)    // generate template HTML
+                    await to_templates.skeleton_unification()        // parsing and primary evaluations
+                    await to_templates.write_templates_op_data()    // generate db files and parse data structure and output update
                 }
                 break
             }
@@ -120,6 +120,7 @@ async function command_line_operations_new(args) {
                     let to_templates = new SkelToTemplate(conf)
                     to_templates.set_project_directory(project_dir)
                     await to_templates.prepare_directories()        // needed even when loading previously parsed data.
+                    await to_templates.load_ogroups_intermediate_files()
                     let parsed_skels = await fos.load_json_data_at_path(parsed)
                     let concerns = false
                     if ( parsed_skels ) {
