@@ -1,0 +1,3885 @@
+
+> roll-right@0.1.4 prepare
+> node bin/index.js --phase prepare --sources ../websites/template-configs/  --generator generate.json --structure parsed.json
+
+-------------------------------------------------------------
+roll-right static content management and module publication
+-------------------------------------------------------------
+Operating phase:					 prepare
+Using input configuration for generator:		 ../websites/template-configs/generate.json
+Using output to configuration for template formation:		 ../websites/template-configs/parsed.json
+script::params::[alt-script]/pin_and_scroll_vars.tjs
+{
+  type: 'script',
+  file: '/home/richard/GitHub/alphas/alpha-copious/script/pin_and_scroll_vars.tjs',
+  data: '@params<{scroll_section_count : %number%}>\n' +
+    '\n' +
+    'window.scroll_section_count = @{scroll_section_count}',
+  recursive: {
+    _is_loop: false,
+    params_def: { scroll_section_count: '%number%' },
+    executables: { execs: [], imports: false }
+  }
+}
+script::params::[alt-script]/pin_and_scroll_vars.tjs
+{
+  type: 'script',
+  file: '/home/richard/GitHub/alphas/alpha-copious/script/pin_and_scroll_vars.tjs',
+  data: '@params<{scroll_section_count : %number%}>\n' +
+    '\n' +
+    'window.scroll_section_count = @{scroll_section_count}',
+  recursive: {
+    _is_loop: false,
+    params_def: { scroll_section_count: '%number%' },
+    executables: { execs: [], imports: false }
+  }
+}
+lift_remaining_imports -------  /home/richard/GitHub/alphas/alpha-copious/pre-template/shop-kiosk.skel script::params::[alt-script]/pin_and_scroll_vars.tjs
+{
+  type: 'script',
+  file: '/home/richard/GitHub/alphas/alpha-copious/script/pin_and_scroll_vars.tjs',
+  data: 'window.scroll_section_count = 3',
+  recursive: {
+    _is_loop: false,
+    params_def: { scroll_section_count: '%number%' },
+    executables: { execs: [], imports: false }
+  },
+  backup_data: '@params<{scroll_section_count : %number%}>\n' +
+    '\n' +
+    'window.scroll_section_count = @{scroll_section_count}',
+  evaluations: { scroll_section_count: '3' }
+}
+====================================================
+lift_remaining_imports -------  /home/richard/GitHub/alphas/alpha-copious/pre-template/shop-kiosk.skel script::params::[alt-script]/pin_and_scroll_vars.tjs
+{
+  type: 'script',
+  file: '/home/richard/GitHub/alphas/alpha-copious/script/pin_and_scroll_vars.tjs',
+  data: 'window.scroll_section_count = 3',
+  recursive: {
+    _is_loop: false,
+    params_def: { scroll_section_count: '%number%' },
+    executables: { execs: [], imports: false }
+  },
+  backup_data: '@params<{scroll_section_count : %number%}>\n' +
+    '\n' +
+    'window.scroll_section_count = @{scroll_section_count}',
+  evaluations: { scroll_section_count: '3' }
+}
+====================================================
+{
+  '/home/richard/GitHub/alphas/alpha-copious/pre-template/shop-kiosk.skel': {
+    defaults: {
+      defaults: {
+        top_level: true,
+        uses_config_vars: 'shops',
+        path_abreviations: {
+          '[alpha-copious]': '[github]/alphas/alpha-copious',
+          '[github]': '~/GitHub',
+          '[websites]': '[alphas]/websites'
+        },
+        ext_default_dir: {
+          tmplt: '[alpha-copious]/html',
+          js: '[alpha-copious]/client',
+          svg: '[alpha-copious]/icons',
+          css: '[alpha-copious]/css'
+        },
+        top_dir_location: {
+          script: '[alpha-copious]/client',
+          'for-humans': '[alpha-copious]/for-humans',
+          files: '[alpha-copious]/html'
+        }
+      },
+      final: { markup: false, scripts: false },
+      skeleton: [
+        'html:start_doc_head<<',
+        'files::header.tmplt<<',
+        'bundle::bundle_13.js',
+        'bundle::shop-kiosk_bundle.js',
+        'link<css>::shared_styles.css<<',
+        'html:end_head<<',
+        'html:start_style<<',
+        'css::quick_view.css<<',
+        'html:end_style<<',
+        'html:start_script<<',
+        'files<js>::top_vars<<',
+        'html:end_script<<',
+        'html:start_body<<',
+        'files::params::nav_bar_V.smplt',
+        'files::MAP-sections_frame.smplt',
+        'files::flexy_items_A-main.tmplt<<',
+        'files::footer_A.tmplt<<',
+        'verbatim::{\n<!-- start dynamic content -->\n}',
+        'files::squashable_menu_A.tmplt<<',
+        'files::calc::contact_box<<${start=100}',
+        'files::calc::about_box<<${start++}',
+        'files::calc::thankyou_box<<${start++}',
+        'files::calc::topicBox_1<<${start++}',
+        'files::calc::topicBox_2<<${start++}',
+        'files::calc::topicBox_3<<${start++}',
+        'files::calc::register<<${start++}',
+        'files::calc::login<<${start++}',
+        'files::intergalactic-explain.tmplt<<',
+        'template::{\n    {{{advertPopups.content}}}\n}',
+        'html:end_body_html<<',
+        'html:start_script<<',
+        'verbatim::{\n' +
+          '//  === ---------------------------------------  === ---------------------------------------  === --------------------------------------\n' +
+          '// APPLICATIONS\n' +
+          '// -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --\n' +
+          '}',
+        'script::[alt-script]/floating_window_controls.js<<',
+        'script::params::[alt-script]/pin_and_scroll_vars.tjs',
+        'script::[alt-script]/section_scrolling.js<<',
+        'html:end_script<<'
+      ],
+      files: [
+        'header.tmplt<<',
+        'params::nav_bar_V.smplt',
+        'MAP-sections_frame.smplt',
+        'flexy_items_A-main.tmplt<<',
+        'footer_A.tmplt<<',
+        'squashable_menu_A.tmplt<<',
+        'calc::contact_box<<${start=100}',
+        'calc::about_box<<${start++}',
+        'calc::thankyou_box<<${start++}',
+        'calc::topicBox_1<<${start++}',
+        'calc::topicBox_2<<${start++}',
+        'calc::topicBox_3<<${start++}',
+        'calc::register<<${start++}',
+        'calc::login<<${start++}',
+        'intergalactic-explain.tmplt<<'
+      ],
+      css: [ 'quick_view.css<<' ],
+      scripts: [
+        '[alt-script]/floating_window_controls.js<<',
+        'params::[alt-script]/pin_and_scroll_vars.tjs',
+        '[alt-script]/section_scrolling.js<<'
+      ],
+      bundles: [ 'bundle_13.js', 'shop-kiosk_bundle.js' ],
+      parameterized: {
+        'files::MAP-sections_frame.smplt': {
+          el: 'list',
+          '_type<el>': [
+            {
+              group_name: 'docs',
+              'SOURCE-LINK': '{{{shop_docs}}}',
+              'FRAME-ACTIONS': "onclick=''"
+            },
+            {
+              group_name: 'blog',
+              'SOURCE-LINK': '{{{shop_blog}}}',
+              'FRAME-ACTIONS': "onclick=''"
+            },
+            {
+              group_name: 'search',
+              'SOURCE-LINK': '{{{shop_search}}}',
+              'FRAME-ACTIONS': "onclick=''"
+            }
+          ]
+        },
+        'script::params::[alt-script]/pin_and_scroll_vars.tjs': {
+          scroll_section_count: { file: false, tree: false, data: '3' },
+          '_params<scroll_section_count>': { scroll_section_count: '%number%' }
+        },
+        'files::params::nav_bar_V.smplt': {
+          lr_div: {
+            file: 'left-right-div.smplt',
+            tree: {
+              logo: {
+                file: 'logo.tmplt',
+                tree: false,
+                data: '\n' +
+                  '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '    {{{svgLogo.content}}}\n' +
+                  '</a>\n' +
+                  '\n'
+              },
+              spacer: {
+                file: 'spacer.tmplt',
+                tree: false,
+                data: '\n' +
+                  '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                  '    {{{relatedAsset.content}}}\n' +
+                  '</a>\n'
+              },
+              menu: {
+                file: 'shroom.tmplt',
+                tree: {
+                  mushroom: {
+                    file: 'mushroom-menu-icon.svg',
+                    tree: false,
+                    data: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                      '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                      '</svg>'
+                  },
+                  '_params<>': {}
+                },
+                data: '<li id="squashMenu"\n' +
+                  '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                  '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                  '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                  '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                  '</svg>\n' +
+                  '</li>',
+                recursive: {
+                  _is_loop: false,
+                  params_def: { mushroom: '' },
+                  executables: {
+                    execs: [
+                      {
+                        replace: '>>@{mushroom} ? @{mushroom} : $$icons::mushroom-menu-icon.svg<<<<',
+                        condition: { cond: '@{mushroom}', variable: 'mushroom' },
+                        positive_exec: { pos: '@{mushroom}' },
+                        negative_exec: {
+                          neg: '$$icons::mushroom-menu-icon.svg<<',
+                          replace: '$$icons::mushroom-menu-icon.svg<<',
+                          file: [
+                            {
+                              replace: '$$icons::mushroom-menu-icon.svg<<',
+                              type: 'icons',
+                              file: 'mushroom-menu-icon.svg',
+                              path_finder: 'icons',
+                              data: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                                '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                                '</svg>'
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    imports: [
+                      {
+                        replace: undefined,
+                        type: 'icons',
+                        file: 'mushroom-menu-icon.svg',
+                        path_finder: 'icons',
+                        data: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                          '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                          '</svg>'
+                      }
+                    ]
+                  }
+                },
+                subst_recursive: [
+                  {
+                    params_def: { mushroom: '' },
+                    conds: [
+                      {
+                        replace: '>>@{mushroom} ? @{mushroom} : $$icons::mushroom-menu-icon.svg<<<<',
+                        replacer: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                          '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                          '</svg>'
+                      }
+                    ],
+                    data: '<li id="squashMenu"\n' +
+                      '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                      '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                      '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                      '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                      '</svg>\n' +
+                      '</li>\n'
+                  }
+                ],
+                conds: [
+                  {
+                    replace: '>>@{mushroom} ? @{mushroom} : $$icons::mushroom-menu-icon.svg<<<<',
+                    condition: { cond: '@{mushroom}', variable: 'mushroom' },
+                    positive_exec: { pos: '@{mushroom}' },
+                    negative_exec: {
+                      neg: '$$icons::mushroom-menu-icon.svg<<',
+                      replace: '$$icons::mushroom-menu-icon.svg<<',
+                      file: [
+                        {
+                          replace: '$$icons::mushroom-menu-icon.svg<<',
+                          type: 'icons',
+                          file: 'mushroom-menu-icon.svg',
+                          path_finder: 'icons',
+                          data: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                            '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                            '</svg>'
+                        }
+                      ]
+                    }
+                  }
+                ],
+                backup_data: '<li id="squashMenu"\n' +
+                  '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                  '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                  '    >>@{mushroom} ? @{mushroom} : $$icons::mushroom-menu-icon.svg<<<<\n' +
+                  '</li>\n'
+              },
+              '_params<logo,spacer,menu>': { logo: '%file%', spacer: '%file%', menu: '%file%' }
+            },
+            data: '//\n' +
+              '<div style="width:100%;height:fit-content">\n' +
+              '<table style="width:100%">\n' +
+              '    <tr>\n' +
+              '        <td style="width:62;height:63">\n' +
+              '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+              '                // here a logo may be put in place very early on (sgv, png)\n' +
+              '                // otherwise the result is a final stage substitution\n' +
+              '                \n' +
+              '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+              '    {{{svgLogo.content}}}\n' +
+              '</a>\n' +
+              '\n' +
+              '\n' +
+              '            </a>\n' +
+              '        </td>\n' +
+              '        <td>\n' +
+              '            <ul class="navbar-nav">\n' +
+              '                <li class="nav-item">\n' +
+              '                    \n' +
+              '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+              '    {{{relatedAsset.content}}}\n' +
+              '</a>\n' +
+              '\n' +
+              '                </li>\n' +
+              '                <li id="squashMenu"\n' +
+              '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+              '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+              '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+              '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+              '</svg>\n' +
+              '</li>\n' +
+              '            </ul>\n' +
+              '        </td>\n' +
+              '        <td style="text-align: center;">\n' +
+              '            <h2>{{{intergalactic.content}}}</h2> \n' +
+              '        </td>\n' +
+              '        <td>\n' +
+              '            &nbsp;\n' +
+              '        </td>\n' +
+              '    </tr>\n' +
+              '</table>\n' +
+              '</div>\n' +
+              '//',
+            recursive: {
+              _is_loop: false,
+              params_def: {
+                logo: '\n' +
+                  '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '    {{{svgLogo.content}}}\n' +
+                  '</a>\n' +
+                  '\n',
+                spacer: '\n' +
+                  '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                  '    {{{relatedAsset.content}}}\n' +
+                  '</a>\n',
+                menu: '<li id="squashMenu"\n' +
+                  '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                  '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                  '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                  '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                  '</svg>\n' +
+                  '</li>'
+              },
+              executables: {
+                execs: [
+                  {
+                    replace: '>>@{logo} ? @{logo} : {{{svgLogo.content}}}<<',
+                    condition: { cond: '@{logo}', variable: 'logo' },
+                    positive_exec: { pos: '@{logo}' },
+                    negative_exec: { neg: '{{{svgLogo.content}}}' }
+                  },
+                  {
+                    replace: '>>@{menu} ? @{menu} : @nothing<<',
+                    condition: { cond: '@{menu}', variable: 'menu' },
+                    positive_exec: { pos: '@{menu}' },
+                    negative_exec: { neg: '' }
+                  }
+                ],
+                imports: []
+              }
+            },
+            subst_recursive: [
+              {
+                params_def: {
+                  logo: '\n' +
+                    '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                    '    {{{svgLogo.content}}}\n' +
+                    '</a>\n' +
+                    '\n',
+                  spacer: '\n' +
+                    '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                    '    {{{relatedAsset.content}}}\n' +
+                    '</a>\n',
+                  menu: '<li id="squashMenu"\n' +
+                    '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                    '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                    '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                    '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                    '</svg>\n' +
+                    '</li>'
+                },
+                conds: [
+                  {
+                    replace: '>>@{logo} ? @{logo} : {{{svgLogo.content}}}<<',
+                    replacer: '\n' +
+                      '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                      '    {{{svgLogo.content}}}\n' +
+                      '</a>\n' +
+                      '\n'
+                  },
+                  {
+                    replace: '>>@{menu} ? @{menu} : @nothing<<',
+                    replacer: '<li id="squashMenu"\n' +
+                      '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                      '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                      '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                      '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                      '</svg>\n' +
+                      '</li>'
+                  }
+                ],
+                data: '//\n' +
+                  '<div style="width:100%;height:fit-content">\n' +
+                  '<table style="width:100%">\n' +
+                  '    <tr>\n' +
+                  '        <td style="width:62;height:63">\n' +
+                  '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '                // here a logo may be put in place very early on (sgv, png)\n' +
+                  '                // otherwise the result is a final stage substitution\n' +
+                  '                \n' +
+                  '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '    {{{svgLogo.content}}}\n' +
+                  '</a>\n' +
+                  '\n' +
+                  '\n' +
+                  '            </a>\n' +
+                  '        </td>\n' +
+                  '        <td>\n' +
+                  '            <ul class="navbar-nav">\n' +
+                  '                <li class="nav-item">\n' +
+                  '                    \n' +
+                  '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                  '    {{{relatedAsset.content}}}\n' +
+                  '</a>\n' +
+                  '\n' +
+                  '                </li>\n' +
+                  '                <li id="squashMenu"\n' +
+                  '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                  '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                  '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                  '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                  '</svg>\n' +
+                  '</li>\n' +
+                  '            </ul>\n' +
+                  '        </td>\n' +
+                  '        <td style="text-align: center;">\n' +
+                  '            <h2>{{{intergalactic.content}}}</h2> \n' +
+                  '        </td>\n' +
+                  '        <td>\n' +
+                  '            &nbsp;\n' +
+                  '        </td>\n' +
+                  '    </tr>\n' +
+                  '</table>\n' +
+                  '</div>\n' +
+                  '//'
+              }
+            ],
+            conds: [
+              {
+                replace: '>>@{logo} ? @{logo} : {{{svgLogo.content}}}<<',
+                condition: { cond: '@{logo}', variable: 'logo' },
+                positive_exec: { pos: '@{logo}' },
+                negative_exec: { neg: '{{{svgLogo.content}}}' }
+              },
+              {
+                replace: '>>@{menu} ? @{menu} : @nothing<<',
+                condition: { cond: '@{menu}', variable: 'menu' },
+                positive_exec: { pos: '@{menu}' },
+                negative_exec: { neg: '' }
+              }
+            ],
+            backup_data: '@params<{ logo : %file%, spacer : %file%, menu : %file% }>\n' +
+              '//\n' +
+              '<div style="width:100%;height:fit-content">\n' +
+              '<table style="width:100%">\n' +
+              '    <tr>\n' +
+              '        <td style="width:62;height:63">\n' +
+              '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+              '                // here a logo may be put in place very early on (sgv, png)\n' +
+              '                // otherwise the result is a final stage substitution\n' +
+              '                >>@{logo} ? @{logo} : {{{svgLogo.content}}}<<\n' +
+              '            </a>\n' +
+              '        </td>\n' +
+              '        <td>\n' +
+              '            <ul class="navbar-nav">\n' +
+              '                <li class="nav-item">\n' +
+              '                    @{spacer}\n' +
+              '                </li>\n' +
+              '                >>@{menu} ? @{menu} : @nothing<<\n' +
+              '            </ul>\n' +
+              '        </td>\n' +
+              '        <td style="text-align: center;">\n' +
+              '            <h2>{{{intergalactic.content}}}</h2> \n' +
+              '        </td>\n' +
+              '        <td>\n' +
+              '            &nbsp;\n' +
+              '        </td>\n' +
+              '    </tr>\n' +
+              '</table>\n' +
+              '</div>\n' +
+              '//\n'
+          },
+          logout: {
+            file: 'logout.tmplt',
+            tree: false,
+            data: '\n<button class="mini">logout</button>'
+          },
+          '_params<lr_div,logout>': { lr_div: '%file%', logout: '%file%' }
+        }
+      },
+      skeleton_map: {
+        'html(1):start_doc_head': '\n<!doctype html>\n<html>\n<head>\n',
+        'files::header.tmplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/header.tmplt',
+          data: '<meta charset="utf-8">\n' +
+            '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">\n' +
+            '<meta name="author" content="R. Leddy" />\n' +
+            '<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">\n' +
+            '<meta id="theme-color" name="theme-color" content="#452770">\n' +
+            '\n' +
+            '<link rel="canonical" href="{{canonical}}">\n' +
+            '\n' +
+            '<title>{{pageTitle}}</title>\n' +
+            '<meta name="description" content="{{pageDescription}}">\n' +
+            '\n' +
+            '\n' +
+            "<script defer src='{{primary_bundle}}'></script>",
+          recursive: {
+            _is_loop: false,
+            params_def: { 'AUTHOR%config%': '%config%' },
+            executables: { execs: [], imports: false }
+          },
+          backup_data: '<meta charset="utf-8">\n' +
+            '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">\n' +
+            '<meta name="author" content="@{AUTHOR%config%}" />\n' +
+            '<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">\n' +
+            '<meta id="theme-color" name="theme-color" content="#452770">\n' +
+            '\n' +
+            '<link rel="canonical" href="{{canonical}}">\n' +
+            '\n' +
+            '<title>{{pageTitle}}</title>\n' +
+            '<meta name="description" content="{{pageDescription}}">\n' +
+            '\n' +
+            '\n' +
+            "<script defer src='{{primary_bundle}}'></script>",
+          subst_recursive: [
+            {
+              params_def: { 'AUTHOR%config%': '%config%' },
+              conds: [],
+              data: '<meta charset="utf-8">\n' +
+                '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">\n' +
+                '<meta name="author" content="R. Leddy" />\n' +
+                '<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">\n' +
+                '<meta id="theme-color" name="theme-color" content="#452770">\n' +
+                '\n' +
+                '<link rel="canonical" href="{{canonical}}">\n' +
+                '\n' +
+                '<title>{{pageTitle}}</title>\n' +
+                '<meta name="description" content="{{pageDescription}}">\n' +
+                '\n' +
+                '\n' +
+                "<script defer src='{{primary_bundle}}'></script>"
+            }
+          ],
+          conds: []
+        },
+        'bundle::44b9d596dbddaeaabc88f15f0bd790a29199451d': "\n<script defer src='bundle_13.js'></script>\n",
+        'bundle::6f7aafc1e2bbfbdc29741059414bff35a51e9891': "\n<script defer src='shop-kiosk_bundle.js'></script>\n",
+        'link::53408966b15c9e09f6566162fe7605b6a4c8783b': "\n<link rel='stylesheet' href='shared_styles.css'>\n",
+        'html(2):end_head': '\n</head>\n',
+        'html(3):start_style': '\n<style>\n',
+        'css::quick_view.css': {
+          type: 'css',
+          file: '/home/richard/GitHub/alphas/alpha-copious/css/quick_view.css',
+          data: 'a {\n    text-decoration: none;\n}'
+        },
+        'html(4):end_style': '\n</style>\n',
+        'html(5):start_script': '\n<script lang="JavaScript" >\n',
+        'files<js>::top_vars': {
+          type: 'script',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/top_vars.js',
+          data: 'var g_siteURL = window.location.host;\n' +
+            'var g_finalizers = []\n' +
+            'var g_loginStateViewHolders = {}\n' +
+            'var g_loginValueViews = {}\n' +
+            'var g_LoggedIn = false\n' +
+            'var g_global_web3_public_identity = false'
+        },
+        'html(6):end_script': '\n</script>\n',
+        'html(7):start_body': '\n<body>\n',
+        'files::params::nav_bar_V.smplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/nav_bar_V.smplt',
+          data: '<nav id="mainNav">\n' +
+            '\t//\n' +
+            '<div style="width:100%;height:fit-content">\n' +
+            '<table style="width:100%">\n' +
+            '    <tr>\n' +
+            '        <td style="width:62;height:63">\n' +
+            '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+            '                // here a logo may be put in place very early on (sgv, png)\n' +
+            '                // otherwise the result is a final stage substitution\n' +
+            '                \n' +
+            '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+            '    {{{svgLogo.content}}}\n' +
+            '</a>\n' +
+            '\n' +
+            '\n' +
+            '            </a>\n' +
+            '        </td>\n' +
+            '        <td>\n' +
+            '            <ul class="navbar-nav">\n' +
+            '                <li class="nav-item">\n' +
+            '                    \n' +
+            '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+            '    {{{relatedAsset.content}}}\n' +
+            '</a>\n' +
+            '\n' +
+            '                </li>\n' +
+            '                <li id="squashMenu"\n' +
+            '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+            '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+            '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+            '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+            '</svg>\n' +
+            '</li>\n' +
+            '            </ul>\n' +
+            '        </td>\n' +
+            '        <td style="text-align: center;">\n' +
+            '            <h2>{{{intergalactic.content}}}</h2> \n' +
+            '        </td>\n' +
+            '        <td>\n' +
+            '            &nbsp;\n' +
+            '        </td>\n' +
+            '    </tr>\n' +
+            '</table>\n' +
+            '</div>\n' +
+            '//\n' +
+            '\t<div class="very-short conditional-hide" {{custom-logout-styles}}>\n' +
+            '<button class="mini">logout</button></div>\n' +
+            '</nav>',
+          recursive: {
+            _is_loop: false,
+            params_def: {
+              lr_div: '//\n' +
+                '<div style="width:100%;height:fit-content">\n' +
+                '<table style="width:100%">\n' +
+                '    <tr>\n' +
+                '        <td style="width:62;height:63">\n' +
+                '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                '                // here a logo may be put in place very early on (sgv, png)\n' +
+                '                // otherwise the result is a final stage substitution\n' +
+                '                \n' +
+                '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                '    {{{svgLogo.content}}}\n' +
+                '</a>\n' +
+                '\n' +
+                '\n' +
+                '            </a>\n' +
+                '        </td>\n' +
+                '        <td>\n' +
+                '            <ul class="navbar-nav">\n' +
+                '                <li class="nav-item">\n' +
+                '                    \n' +
+                '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                '    {{{relatedAsset.content}}}\n' +
+                '</a>\n' +
+                '\n' +
+                '                </li>\n' +
+                '                <li id="squashMenu"\n' +
+                '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                '</svg>\n' +
+                '</li>\n' +
+                '            </ul>\n' +
+                '        </td>\n' +
+                '        <td style="text-align: center;">\n' +
+                '            <h2>{{{intergalactic.content}}}</h2> \n' +
+                '        </td>\n' +
+                '        <td>\n' +
+                '            &nbsp;\n' +
+                '        </td>\n' +
+                '    </tr>\n' +
+                '</table>\n' +
+                '</div>\n' +
+                '//',
+              logout: '\n<button class="mini">logout</button>'
+            },
+            executables: {
+              execs: [
+                {
+                  replace: '>>@{logout} ? <div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div> : @nothing <<',
+                  condition: { cond: '@{logout}', variable: 'logout' },
+                  positive_exec: {
+                    pos: '<div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div>'
+                  },
+                  negative_exec: { neg: '' }
+                }
+              ],
+              imports: []
+            }
+          },
+          backup_data: '@params<{lr_div : %file%, logout : %file%}>\n' +
+            '<nav id="mainNav">\n' +
+            '\t@{lr_div}\n' +
+            '\t>>@{logout} ? <div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div> : @nothing <<\n' +
+            '</nav>',
+          subst_recursive: [
+            {
+              params_def: {
+                lr_div: '//\n' +
+                  '<div style="width:100%;height:fit-content">\n' +
+                  '<table style="width:100%">\n' +
+                  '    <tr>\n' +
+                  '        <td style="width:62;height:63">\n' +
+                  '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '                // here a logo may be put in place very early on (sgv, png)\n' +
+                  '                // otherwise the result is a final stage substitution\n' +
+                  '                \n' +
+                  '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '    {{{svgLogo.content}}}\n' +
+                  '</a>\n' +
+                  '\n' +
+                  '\n' +
+                  '            </a>\n' +
+                  '        </td>\n' +
+                  '        <td>\n' +
+                  '            <ul class="navbar-nav">\n' +
+                  '                <li class="nav-item">\n' +
+                  '                    \n' +
+                  '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                  '    {{{relatedAsset.content}}}\n' +
+                  '</a>\n' +
+                  '\n' +
+                  '                </li>\n' +
+                  '                <li id="squashMenu"\n' +
+                  '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                  '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                  '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                  '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                  '</svg>\n' +
+                  '</li>\n' +
+                  '            </ul>\n' +
+                  '        </td>\n' +
+                  '        <td style="text-align: center;">\n' +
+                  '            <h2>{{{intergalactic.content}}}</h2> \n' +
+                  '        </td>\n' +
+                  '        <td>\n' +
+                  '            &nbsp;\n' +
+                  '        </td>\n' +
+                  '    </tr>\n' +
+                  '</table>\n' +
+                  '</div>\n' +
+                  '//',
+                logout: '\n<button class="mini">logout</button>'
+              },
+              conds: [
+                {
+                  replace: '>>@{logout} ? <div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div> : @nothing <<',
+                  replacer: '<div class="very-short conditional-hide" {{custom-logout-styles}}>\n' +
+                    '<button class="mini">logout</button></div>'
+                }
+              ],
+              data: '<nav id="mainNav">\n' +
+                '\t//\n' +
+                '<div style="width:100%;height:fit-content">\n' +
+                '<table style="width:100%">\n' +
+                '    <tr>\n' +
+                '        <td style="width:62;height:63">\n' +
+                '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                '                // here a logo may be put in place very early on (sgv, png)\n' +
+                '                // otherwise the result is a final stage substitution\n' +
+                '                \n' +
+                '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                '    {{{svgLogo.content}}}\n' +
+                '</a>\n' +
+                '\n' +
+                '\n' +
+                '            </a>\n' +
+                '        </td>\n' +
+                '        <td>\n' +
+                '            <ul class="navbar-nav">\n' +
+                '                <li class="nav-item">\n' +
+                '                    \n' +
+                '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                '    {{{relatedAsset.content}}}\n' +
+                '</a>\n' +
+                '\n' +
+                '                </li>\n' +
+                '                <li id="squashMenu"\n' +
+                '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                '</svg>\n' +
+                '</li>\n' +
+                '            </ul>\n' +
+                '        </td>\n' +
+                '        <td style="text-align: center;">\n' +
+                '            <h2>{{{intergalactic.content}}}</h2> \n' +
+                '        </td>\n' +
+                '        <td>\n' +
+                '            &nbsp;\n' +
+                '        </td>\n' +
+                '    </tr>\n' +
+                '</table>\n' +
+                '</div>\n' +
+                '//\n' +
+                '\t<div class="very-short conditional-hide" {{custom-logout-styles}}>\n' +
+                '<button class="mini">logout</button></div>\n' +
+                '</nav>'
+            }
+          ],
+          conds: [
+            {
+              replace: '>>@{logout} ? <div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div> : @nothing <<',
+              condition: { cond: '@{logout}', variable: 'logout' },
+              positive_exec: {
+                pos: '<div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div>'
+              },
+              negative_exec: { neg: '' }
+            }
+          ]
+        },
+        'files::MAP-sections_frame.smplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/MAP-sections_frame.smplt',
+          data: '@list<el><{ group_name <- @<el[1]>, SOURCE-LINK <- @<el[2]>}>\n' +
+            '<@el>\n' +
+            '<section id="@<el[1]>_container" class="content-container" {{@<el[1]>_styles}} >\n' +
+            '{{{SOURCE_LINK}}}\n' +
+            '</section>\n' +
+            '</@el>',
+          recursive: {
+            _is_loop: true,
+            params_def: {
+              group_name: '@<el[1]>',
+              'SOURCE-LINK': '@<el[2]>',
+              _var_name: 'el'
+            },
+            executables: { execs: [], imports: false }
+          },
+          subst_recursive: [
+            {
+              params_def: {
+                group_name: '@<el[1]>',
+                'SOURCE-LINK': '@<el[2]>',
+                _var_name: 'el'
+              },
+              conds: [],
+              data: '@list<el><{ group_name <- @<el[1]>, SOURCE-LINK <- @<el[2]>}>\n' +
+                '<@el>\n' +
+                '<section id="@<el[1]>_container" class="content-container" {{@<el[1]>_styles}} >\n' +
+                '{{{SOURCE_LINK}}}\n' +
+                '</section>\n' +
+                '</@el>'
+            }
+          ],
+          conds: [],
+          backup_data: '@list<el><{ group_name <- @<el[1]>, SOURCE-LINK <- @<el[2]>}>\n' +
+            '<@el>\n' +
+            '<section id="@{group_name}_container" class="content-container" {{@{group_name}_styles}} >\n' +
+            '{{{SOURCE_LINK}}}\n' +
+            '</section>\n' +
+            '</@el>'
+        },
+        'files::flexy_items_A-main.tmplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/flexy_items_A-main.tmplt',
+          data: '<main>\n' +
+            '\n' +
+            '\t<div class="items">\n' +
+            '\t\t<div class="item">\n' +
+            '\t\t\t{{{svgBannerFrame.content}}}\n' +
+            '\t\t</div>\n' +
+            '\t\t<div id="greet_and_meet_1" class="item">\n' +
+            '\t\t\t<div id="desktopCenter" class="shortviz" ></div>\n' +
+            '\t\t\t<p class="extra-i" style="color:navy">\n' +
+            '\t\t\t<span style="font-weight:bold;">{{conversation}}</span> chat :: Join our conversations.\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t<br>\n' +
+            '\t\t\t<a id="a4179" href="javascript:chat_opener()" style="cursor:pointer" >\n' +
+            '\t\t\t<p class="extra-i" style="text-align:center" >\n' +
+            '\t\t\t{{{chat.button.content}}}\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t</a>\n' +
+            '\t\t</div>\n' +
+            '\t\t<div class="item">\n' +
+            '\t\t\t<div class="longviz"  >&nbsp;</div>\n' +
+            '\t\t\t<p class="extra-i" style="color:darkred">\n' +
+            '\t\t\tBrowse the blog or check out some demonstrations.\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t<br>\n' +
+            '\t\t\t<p class="extra-i" style="text-align:center">\n' +
+            '\t\t\t\t{{{public_content_access.content}}}\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t<div id="desktopRight" class="shortviz" ></div>\n' +
+            '\t\t</div>\n' +
+            '\t\t<div id="greet_and_meet_2" class="item">\n' +
+            '\t\t\t<p class="extra-i" style="color:darkgreen;font-weight:bold;">\n' +
+            '\t\t\tFor Your Personal Use > Login\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t<hr><br>\n' +
+            '\t\t\t<a id="a4199" href="javascript:login_process()" style="cursor:pointer">\n' +
+            '\t\t\t<p class="extra-i" >\n' +
+            '\t\t\t\t{{{login_button.button.content}}}\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t</a>\n' +
+            '\t\t</div>\n' +
+            '\t\t<div id="audios_1" class="item" style="display:none;">\n' +
+            '\t\t\t<p class="extra-i" style="color:darkgreen;font-weight:bold;">\n' +
+            '\t\t\tYour session is going\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t<hr><br>\n' +
+            '\t\t\t<a id="b5199" href="javascript:logout_process()" style="cursor:pointer">\n' +
+            '\t\t\t<p class="extra-i" >\n' +
+            '\t\t\t\t{{{logout_button.button.content}}}\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t</a>\n' +
+            '\t\t</div>\t\t\n' +
+            '\t\t<div id="lowerFiller" class="fillLowerWrap">\n' +
+            '\t\t\t<div class="fillLower">\n' +
+            '\t\t\t\talpha test\n' +
+            '\t\t\t</div>\n' +
+            '\t\t</div>\n' +
+            '\t</div>\n' +
+            '</main>'
+        },
+        'files::footer_A.tmplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/footer_A.tmplt',
+          data: '<footer>\n' +
+            '\t<ul class="footer-list">\n' +
+            '\t\t<li>\n' +
+            '\t\t\t<a href="{{canonical}}" target="{{canonical}}-again">copyright &copy; {{copyRightYear}} {{companyShortLink}}</a>\n' +
+            '\t\t\t<span class="status-style" id="page-error-message">status: good</span>\n' +
+            '\t\t</li>\n' +
+            '\t</ul>\n' +
+            '</footer>'
+        },
+        'verbatim::95e0657b3716593b896721f68e0587f8afb85ce0': '\n<!-- start dynamic content -->\n',
+        'files::squashable_menu_A.tmplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/squashable_menu_A.tmplt',
+          data: '<div id="squashMenuContainer" >\n\tempty content\n</div>'
+        },
+        'files::calc::contact_box${start=100}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@init{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '=',
+          evaluations: { BOX_NAME: 'contact_box', INSERT: '' },
+          data: '\n' +
+            '<div id="contact_box" class="fade_able" style="z-index:100"  >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('contact_box')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{contact_box.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::about_box${start++}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'about_box', INSERT: '' },
+          data: '\n' +
+            '<div id="about_box" class="fade_able" style="z-index:101"  >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('about_box')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{about_box.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::thankyou_box${start++}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: "onclick='hide_thankyou_box(this)'"
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: {
+            BOX_NAME: 'thankyou_box',
+            INSERT: "onclick='hide_thankyou_box(this)'"
+          },
+          data: '\n' +
+            `<div id="thankyou_box" class="fade_able" style="z-index:102" onclick='hide_thankyou_box(this)' >\n` +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('thankyou_box')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{thankyou_box.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::topicBox_1${start++}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'topicBox_1', INSERT: '' },
+          data: '\n' +
+            '<div id="topicBox_1" class="fade_able" style="z-index:103"  >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('topicBox_1')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{topicBox_1.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::topicBox_2${start++}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'topicBox_2', INSERT: '' },
+          data: '\n' +
+            '<div id="topicBox_2" class="fade_able" style="z-index:104"  >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('topicBox_2')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{topicBox_2.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::topicBox_3${start++}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'topicBox_3', INSERT: '' },
+          data: '\n' +
+            '<div id="topicBox_3" class="fade_able" style="z-index:105"  >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('topicBox_3')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{topicBox_3.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::register${start++}': {
+          file: 'solidable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'register', INSERT: '' },
+          data: '<div id="register" class="solid_able" style="z-index:106" >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closesolid('register')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+            '\t\t\t{{{register.content}}}\n' +
+            '\t\t</div>\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '<div id="@{BOX_NAME}" class="solid_able" style="z-index:@{Z_INDEX}" >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closesolid('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+            '\t\t\t{{{@{BOX_NAME}.content}}}\n' +
+            '\t\t</div>\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::login${start++}': {
+          file: 'solidable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'login', INSERT: '' },
+          data: '<div id="login" class="solid_able" style="z-index:107" >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closesolid('login')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+            '\t\t\t{{{login.content}}}\n' +
+            '\t\t</div>\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '<div id="@{BOX_NAME}" class="solid_able" style="z-index:@{Z_INDEX}" >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closesolid('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+            '\t\t\t{{{@{BOX_NAME}.content}}}\n' +
+            '\t\t</div>\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::intergalactic-explain.tmplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/intergalactic-explain.tmplt',
+          data: '<style>\n' +
+            '\t.glactic-id-link {\n' +
+            '\t\tmargin: 6px;\n' +
+            '\t\tpadding: 2px;\n' +
+            '\t\tcursor: pointer;\n' +
+            '\t\tfont-weight: bold;\n' +
+            '\t}\n' +
+            '</style>\n' +
+            '<div id="intergalactic-explain" class="solid_able" style="z-index:1000" >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closesolid('intergalactic-explain')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            `\t\t<div onmousedown="closesolid('intergalactic-explain')" style="min-width: 400px;min-height: 300px;">\n` +
+            '\t\t\t<div style="padding-left:6px;padding-right:6px" >\n' +
+            `\t\t\t\t<div style="margin-bottom: 3px;font-weight:bolder;font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;">\n` +
+            '\t\t\t\t\tWhat is an intergalactic identity?\n' +
+            '\t\t\t\t</div>\n' +
+            '\t\t\t\t<blockquote style="padding-left:5%;background-color: rgb(255, 254, 245);color:rgb(2, 71, 2);">\n' +
+            '\t\t\t\t\tIt is a string with a special format derived from a secure hash of content that you make up about yourself.\n' +
+            '\t\t\t\t</blockquote>\n' +
+            '\t\t\t\t<div style="margin-bottom: 4px;">\n' +
+            '\t\t\t\t\tYou may use this identity anywhere that accepts it which means other website and concerns.\n' +
+            '\t\t\t\t</div>\n' +
+            `\t\t\t\t<div style="margin-bottom: 2px;font-weight:bolder;font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;">\n` +
+            '\t\t\t\t\tHow this site uses your intergalactic identity:\n' +
+            '\t\t\t\t</div>\n' +
+            '\t\t\t\t<div style="margin-top:3px;padding-left:3%;background-color: rgb(255, 255, 254);color:rgb(22, 48, 5);">\n' +
+            '\t\t\t\t\t<div style="margin-top:3px;margin-bottom:3px;">\n' +
+            '\t\t\t\t\t\t<ul style="list-style-type:disc;margin: 2px;">\n' +
+            '\t\t\t\t\t\t\t<li> This website associates your intergalactic identity with responses to your messages (e.g contact). \n' +
+            '\t\t\t\t\t\t\t\tYou may return to this site to retrieve responses to your messages.\n' +
+            '\t\t\t\t\t\t\t</li>\n' +
+            '\t\t\t\t\t\t\t<li> \n' +
+            '\t\t\t\t\t\t\t\tYou may use your intergalactic identity to start a session with this site (i.e. login).\n' +
+            '\t\t\t\t\t\t\t</li>\n' +
+            '\t\t\t\t\t\t</ul>\t\n' +
+            '\t\t\t\t\t</div>\n' +
+            '\t\t\t\t</div>\n' +
+            '\t\t\t\t<div>\n' +
+            '\t\t\t\t\t<div style="margin-top:3px;" >\n' +
+            '\t\t\t\t\t\t<div style="padding:3px;color:darkslateblue;border: solid 1px rgba(65, 128, 148, 0.527)">\n' +
+            '\t\t\t\t\t\t\t<div style="margin:2px">Your personal information will not be stored on our servers.</div>\n' +
+            '\t\t\t\t\t\t\t<div style="margin:2px">Your personal information will not be tied to our domain within your browser storage.</div>\n' +
+            '\t\t\t\t\t\t\t<div style="margin:2px"><b>Instead...</b> your personal information will be associated with a virtual URL tied to your identity.</div>\n' +
+            '\t\t\t\t\t\t</div>\n' +
+            '\t\t\t\t\t\t<div style="padding:3px;margin-top:4px;">\n' +
+            '\t\t\t\t\t\t\tYou will be given a personal <span style="font-weight: bolder;">URL framework page</span>\n' +
+            '\t\t\t\t\t\t</div>\n' +
+            '\t\t\t\t\t\t<div style="padding:4px;color:rgb(43, 71, 46)" >\n' +
+            '\t\t\t\t\t\t\t<p style="padding:4px;color:rgb(43, 71, 46)">\n' +
+            '\t\t\t\t\t\t\t\tThe links here can help lead you to tools that help open pages within your URL framework page enabling you to\n' +
+            '\t\t\t\t\t\t\t\twork with your personal preferences within those pages.\n' +
+            '\t\t\t\t\t\t\t</p>\n' +
+            '\t\t\t\t\t\t\t<p style="padding:4px;color:rgb(43, 71, 46)">\n' +
+            '\t\t\t\t\t\t\t\tThe pages you open may use personal data by asking your framework page to make requests on their behalf.\n' +
+            '\t\t\t\t\t\t\t\tFor example, an e-commerce page\n' +
+            '\t\t\t\t\t\t\t\twill not ask you for your credit card number, but will ask your personal page to carry out a transaction its behalf.\n' +
+            '\t\t\t\t\t\t\t</p>\n' +
+            '\t\t\t\t\t\t\t<p style="padding:4px;color:rgb(43, 71, 46)">\n' +
+            '\t\t\t\t\t\t\t\tYou will have complete control over your personal URL framework page. But, you can maintain it in any way you see fit.\n' +
+            '\t\t\t\t\t\t\t</p>\n' +
+            '\t\t\t\t\t\t</div>\n' +
+            '\t\t\t\t\t</div>\n' +
+            '\t\t\t\t</div>\n' +
+            '\t\t\t\t<div style="padding-left:5%;background-color: rgb(255, 254, 245);color:rgb(2, 71, 2);" >\n' +
+            '\t\t\t\t\tBasically, your personal data will be stored in one place and never leave your browser unless you say so. You will not login to this site, but you may allow the \n' +
+            '\t\t\t\t\tsite to log into you - by starting a sessions. The session merely knows you are there and does not ask to know too much about you.\n' +
+            '\t\t\t\t</div>\t\n' +
+            '\t\t\t</div>\n' +
+            '\t\t</div>\n' +
+            '\t\t<div style="padding-left:2%;background-color: rgb(255, 254, 245);color:rgb(7, 104, 7);" >\n' +
+            '\t\t\t<!-- link goes here -->\n' +
+            '\t\t\t<span class="glactic-id-link" onclick="galactic_id_maker_opener()">Follow this link to create your intergalactic identity</span>\n' +
+            '\t\t</div>\n' +
+            '\t\t<br><br><br><br><br><br><br>&nbsp;\n' +
+            '\t</div>\n' +
+            '</div>\n' +
+            '<script>\n' +
+            '\n' +
+            '\t\n' +
+            '</script>'
+        },
+        'template::{\n    {{{advertPopups.content}}}\n}': { type: 'template', data: '{\n    {{{advertPopups.content}}}' },
+        'html(8):end_body_html': '\n</body>\n</html>\n',
+        'html(9):start_script': '\n<script lang="JavaScript" >\n',
+        'verbatim::62859a79b38ec8550889db5268aa7bae33c59be2': '\n' +
+          '//  === ---------------------------------------  === ---------------------------------------  === --------------------------------------\n' +
+          '// APPLICATIONS\n' +
+          '// -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --\n',
+        'script::[alt-script]/floating_window_controls.js': {
+          type: 'script',
+          file: '/home/richard/GitHub/alphas/alpha-copious/script/floating_window_controls.js',
+          data: 'window.all_windows = false\n' +
+            'let draggers = {}\n' +
+            'let current_dragger = false\n' +
+            'function add_dragging() {\n' +
+            '    let drag_bars = document.getElementsByClassName("togglebar")\n' +
+            '    for ( let db of drag_bars ) {\n' +
+            '        let cname = db.parentNode.className\n' +
+            "        if ( cname.indexOf(' ') > 0 ) {\n" +
+            "            cname = cname.split(' ')[0]\n" +
+            '        }\n' +
+            "        if ( cname === 'solid_able' ) {\n" +
+            '            if ( db.parentNode.id === "intergalactic-explain" ) {\n' +
+            '                cname = "fade_able"\n' +
+            '            }\n' +
+            '        }\n' +
+            '        if ( ["fade_able","right_fade_able"].indexOf(cname) >= 0 ) {\n' +
+            '            let drag_Node = db.parentNode\n' +
+            '            draggers[drag_Node.id] = {\n' +
+            '                "offsetX" : 0,\n' +
+            '                "offsetY" : 0,\n' +
+            '                "isDragging" : false,\n' +
+            '                "dragged" : drag_Node,\n' +
+            '                "drag_control" : db\n' +
+            '            }\n' +
+            '            db.onmousedown = (e) => {\n' +
+            '                let drag_Node = e.target.parentNode;\n' +
+            '                if ( !draggers[drag_Node.id] ) return\n' +
+            '                e.preventDefault()\n' +
+            '                draggers[drag_Node.id].isDragging = true;\n' +
+            '                draggers[drag_Node.id].offsetX = e.clientX - drag_Node.getBoundingClientRect().left;\n' +
+            '                draggers[drag_Node.id].offsetY = e.clientY - drag_Node.getBoundingClientRect().top;\n' +
+            "                db.style.cursor = 'grabbing';\n" +
+            '                current_dragger = drag_Node.id\n' +
+            '            }\n' +
+            '            db.onmouseup = (ev) => {\n' +
+            '                if ( current_dragger ) {\n' +
+            '                    let dragger_stats = draggers[current_dragger]\n' +
+            '                    let drag_bar = dragger_stats.drag_control\n' +
+            "                    drag_bar.style.cursor = 'move';\n" +
+            '                }\n' +
+            '            }\n' +
+            '        }\n' +
+            '    }\n' +
+            "    document.addEventListener('mousemove', (e) => {\n" +
+            '        if (!current_dragger) return;\n' +
+            '        if ( current_dragger ) {\n' +
+            '            let dragger_stats = draggers[current_dragger]\n' +
+            '            let drag_Node = dragger_stats.dragged\n' +
+            '            if ( drag_Node ) {\n' +
+            '                const newX = e.clientX - dragger_stats.offsetX;\n' +
+            '                const newY = e.clientY - dragger_stats.offsetY;\n' +
+            '                drag_Node.style.left = `${newX}px`;\n' +
+            '                drag_Node.style.top = `${newY}px`;\n' +
+            '            }\n' +
+            '        }\n' +
+            '    });\n' +
+            "    document.addEventListener('mouseup', () => {\n" +
+            '        if ( current_dragger ) {\n' +
+            '            let dragger_stats = draggers[current_dragger]\n' +
+            '            let drag_bar = dragger_stats.drag_control\n' +
+            "            drag_bar.style.cursor = 'move';\n" +
+            '        }\n' +
+            '        current_dragger = false\n' +
+            '    });\n' +
+            '}\n' +
+            'add_dragging()\n' +
+            'let resizers = {}\n' +
+            'let current_resizer = false\n' +
+            'function add_resizing() {\n' +
+            '    let sizer_bobs = document.getElementsByClassName("sizerbar")\n' +
+            '    for ( let sb of sizer_bobs ) {\n' +
+            '        let pnode = sb.parentNode\n' +
+            '        resizers[pnode.id] = {\n' +
+            '            "isDragging" : false,\n' +
+            '            "dragged" : pnode,\n' +
+            '            "drag_control" : sb\n' +
+            '        }\n' +
+            '        sb.onmousedown = (e) => {\n' +
+            '            let pnode = e.target.parentNode;\n' +
+            '            if ( !resizers[pnode.id] ) return\n' +
+            '            e.preventDefault()\n' +
+            '            resizers[pnode.id].isDragging = true;\n' +
+            '            current_resizer = pnode.id\n' +
+            '        }\n' +
+            '  \n' +
+            '    }\n' +
+            "    document.addEventListener('mousemove', (e) => {\n" +
+            '        if (!current_resizer) return;\n' +
+            '        if ( current_resizer ) {\n' +
+            '            let resizer_stats = resizers[current_resizer]\n' +
+            '            let pnode = resizer_stats.dragged\n' +
+            '            if ( pnode ) {\n' +
+            '                const newX = e.clientX;\n' +
+            '                const newY = e.clientY;\n' +
+            '                let brect = pnode.getBoundingClientRect()\n' +
+            '                let newW = newX - brect.left\n' +
+            '                let newH = newY - brect.top\n' +
+            '                if ( newW > 60 ) {\n' +
+            '                    pnode.style.width = `${newW}px`;\n' +
+            '                }\n' +
+            '                if ( newH > 60 ) {\n' +
+            '                    pnode.style.height = `${newH}px`;\n' +
+            '                }\n' +
+            '            }\n' +
+            '        }\n' +
+            '    });\n' +
+            "    document.addEventListener('mouseup', () => {\n" +
+            '        current_resizer = false\n' +
+            '    });\n' +
+            '}\n' +
+            'add_resizing() \n' +
+            'function init_app_resize() {\n' +
+            "    window.addEventListener('resize',(ev) => {\n" +
+            "        let it_container = document.getElementById('sections-container')\n" +
+            '        if ( it_container ) {\n' +
+            "            let footer = document.getElementsByTagName('footer')[0]\n" +
+            '            if ( footer ) {\n' +
+            '                let ic_rect = it_container.getBoundingClientRect()\n' +
+            '                let ft_rect = footer.getBoundingClientRect()\n' +
+            '                let h = ft_rect.top - ic_rect.top - 1;\n' +
+            '                it_container.style.height = `${h}px`\n' +
+            '                it_container.style.minHeight= `${h}px`\n' +
+            '                for ( let i = 0; i < g_section_count; i++ ) {\n' +
+            '                    let sect = document.getElementById(`section_${i+1}`)\n' +
+            '                    if ( sect ) {\n' +
+            '                        sect.style.height = `${h - 2}px`\n' +
+            '                        sect.style.minHeight = `${h - 2}px`\n' +
+            '                    }\n' +
+            '                }\n' +
+            '            }\n' +
+            '        }\n' +
+            '        for ( let wbox_id in all_windows ) {\n' +
+            '            let wbox = all_windows[wbox_id]\n' +
+            '            if ( !wbox ) continue;\n' +
+            '            let w = window.innerWidth*0.8;\n' +
+            '            let x = window.innerWidth*0.3;\n' +
+            '            if ( wbox.x >= (window.innerWidth-20) ) {\n' +
+            '                wbox.move(x)\n' +
+            '            }\n' +
+            '            if ( wbox.y >= (window.innerHeight-20) ) {\n' +
+            '                wbox.move(wbox.y - 60)\n' +
+            '            }\n' +
+            '            let h = window.innerHeight*0.96\n' +
+            '            wbox.resize(w,h)\n' +
+            '        }\n' +
+            '        for ( let dinfo of Object.values(draggers) ) {\n' +
+            '            let dragged = dinfo.dragged\n' +
+            '            if ( dragged ) {\n' +
+            '                let drect = dragged.getBoundingClientRect()\n' +
+            '                let x = window.innerWidth*0.3;\n' +
+            '                let h = window.innerHeight*0.8\n' +
+            '                let w = window.innerWidth*0.9;\n' +
+            '                if ( drect.x >= (window.innerWidth-20) ) {\n' +
+            '                    dragged.style.left = `${x}px`\n' +
+            '                }\n' +
+            '                if ( drect.y >= (window.innerHeight-20) ) {\n' +
+            '                    dragged.style.top = `{drect.y - 60}px`\n' +
+            '                }\n' +
+            '                w = Math.min(450,w)\n' +
+            '                h = Math.min(450,h)\n' +
+            '                dragged.style.width = `${w}px`\n' +
+            '                dragged.style.height = `${h}px`\n' +
+            '            }\n' +
+            '        }\n' +
+            '    })\n' +
+            '}\n' +
+            'function init_app_windows() {\n' +
+            '    let left = "30%",\n' +
+            '        height = "96%",\n' +
+            '        width = "60%"\n' +
+            '    let ref_el = document.getElementById("sections-container")\n' +
+            '    if ( ref_el ) {\n' +
+            '        if ( window.innerWidth >= 1100 ) {\n' +
+            '            let rbox = ref_el.getBoundingClientRect()\n' +
+            '            let l = rbox.right + 6\n' +
+            '            left = `${rbox.right}px`\n' +
+            '            let r = window.innerWidth - 20;\n' +
+            '            let w = r - l\n' +
+            '            width = `${w}px`\n' +
+            '        } else {\n' +
+            '            let rbox = ref_el.getBoundingClientRect()\n' +
+            '            let l = rbox.left + 6\n' +
+            '            left = `${l}px`\n' +
+            '            width = `${window.innerWidth}px`\n' +
+            '        }\n' +
+            '    }\n' +
+            '    let winbox = new WinBox("extra-file-class",{\n' +
+            '"url" : "http:\n' +
+            '        "x" : left,\n' +
+            '        "height" : height,\n' +
+            '        "width" : width,\n' +
+            '        "hidden" : true,\n' +
+            '        "onclose" : () => {\n' +
+            '            let winbox = all_windows["extra-file-class"]\n' +
+            '            winbox.hide(true)\n' +
+            '            return true\n' +
+            '        }\n' +
+            '    })\n' +
+            '    all_windows["extra-file-class"] = winbox\n' +
+            '    winbox = new WinBox("roll-right",{\n' +
+            '"url" : "http:\n' +
+            '        "x" : left,\n' +
+            '        "height" : height,\n' +
+            '        "width" : width,\n' +
+            '        "hidden" : true,\n' +
+            '        "onclose" : () => {\n' +
+            '            let winbox = all_windows["roll-right"]\n' +
+            '            winbox.hide(true)\n' +
+            '            return true\n' +
+            '        }\n' +
+            '    })\n' +
+            '    all_windows["roll-right"] = winbox\n' +
+            '    winbox = new WinBox("release-lite",{\n' +
+            '"url" : "http:\n' +
+            '        "x" : left,\n' +
+            '        "height" : height,\n' +
+            '        "width" : width,\n' +
+            '        "hidden" : true,\n' +
+            '        "onclose" : () => {\n' +
+            '            let winbox = all_windows["release-lite"]\n' +
+            '            winbox.hide(true)\n' +
+            '            return true\n' +
+            '        }\n' +
+            '    })\n' +
+            '    all_windows["release-lite"] = winbox\n' +
+            '    init_app_resize()\n' +
+            '}'
+        },
+        'script::params::[alt-script]/pin_and_scroll_vars.tjs': {
+          type: 'script',
+          file: '/home/richard/GitHub/alphas/alpha-copious/script/pin_and_scroll_vars.tjs',
+          data: 'window.scroll_section_count = 3',
+          recursive: {
+            _is_loop: false,
+            params_def: { scroll_section_count: '%number%' },
+            executables: { execs: [], imports: false }
+          },
+          backup_data: 'window.scroll_section_count = 3',
+          evaluations: { scroll_section_count: '3' },
+          subst_recursive: [
+            {
+              params_def: { scroll_section_count: '%number%' },
+              conds: [],
+              data: 'window.scroll_section_count = 3'
+            }
+          ],
+          conds: []
+        },
+        'script::[alt-script]/section_scrolling.js': {
+          type: 'script',
+          file: '/home/richard/GitHub/alphas/alpha-copious/script/section_scrolling.js',
+          data: 'let g_section_count = (window.scroll_section_count && !(isNaN(window.scroll_section_count))) ? window.scroll_section_count : 0;\n' +
+            'let g_current_section_select = null\n' +
+            'let lastKnownScrollPosition = 0\n' +
+            'let elementsToCheck = []\n' +
+            'function scroll_pin(view_center) {\n' +
+            '\tif ( window.innerWidth >= 1100 ) {\n' +
+            "        if ( view_center !== 'section_1' ) {\n" +
+            '            let sect_box = `#${view_center}_response`\n' +
+            '            g_current_section_select = sect_box\n' +
+            '            pinBox(sect_box)\n' +
+            '        } else {\n' +
+            "            g_current_section_select = 'section_1_response'\n" +
+            '            unpin_current(true)\n' +
+            '        }\n' +
+            '    } else {\n' +
+            '        let details = document.getElementById("scroll-info-button")\n' +
+            "        if ( view_center !== 'section_1' ) {\n" +
+            '            let sect_box = `#${view_center}_response`\n' +
+            '            g_current_section_select = sect_box\n' +
+            '            if (details) details.removeAttribute("disabled")\n' +
+            '        } else {\n' +
+            "            g_current_section_select = 'section_1_response'\n" +
+            '            if (details) details.setAttribute("disabled",true)\n' +
+            '        }\n' +
+            '    }\n' +
+            '}\n' +
+            'function resize_sections(skip_container) {\n' +
+            '    let above = document.getElementById("sections-header")\n' +
+            '    let sects = document.getElementById("sections-container")\n' +
+            '    if ( sects && above) {\n' +
+            '        let abox = above.getBoundingClientRect()\n' +
+            '        let box = sects.getBoundingClientRect()\n' +
+            '        let pbox = sects.parentElement.getBoundingClientRect()\n' +
+            '        let bbot = pbox.bottom - 2\n' +
+            '        if ( !skip_container ) {\n' +
+            '            let btop = abox.bottom + 2\n' +
+            '            sects.style.height = `${bbot - btop}px`\n' +
+            '        }\n' +
+            '        for ( let i = 0; i < g_section_count; i++ ) {\n' +
+            '            let sect = document.getElementById(`section_${i+1}`)\n' +
+            '            if ( sect ) {\n' +
+            '                sect.style.height = `${bbot - box.top - 2}px`\n' +
+            '                sect.style.minHeight = `${bbot - box.top - 2}px`\n' +
+            '            }\n' +
+            '        }\n' +
+            '    }\n' +
+            '}\n' +
+            'function section_select() {\n' +
+            '    return g_current_section_select\n' +
+            '}\n' +
+            'function isElementInScrollView(container, element, partial) {\n' +
+            '  const domRect1 = container.getBoundingClientRect();\n' +
+            '  const domRect2 = element.getBoundingClientRect();\n' +
+            '  return !(\n' +
+            '    domRect1.top > domRect2.bottom ||\n' +
+            '    domRect1.right < domRect2.left ||\n' +
+            '    domRect1.bottom < domRect2.top ||\n' +
+            '    domRect1.left > domRect2.right\n' +
+            '  );\n' +
+            '}\n' +
+            'function top_difference(rect_1, rect_2) {\n' +
+            '    let b = rect_1.top - rect_2.top\n' +
+            '  \n' +
+            '    return b\n' +
+            '}\n' +
+            'function top_stray_amount(container,element) {\n' +
+            '  const rect_1 = container.getBoundingClientRect();\n' +
+            '  const rect_2 = element.getBoundingClientRect();\n' +
+            '  return Math.abs(top_difference(rect_1, rect_2))\n' +
+            '}\n' +
+            'function scroller(evnt) {\n' +
+            '    if ( lastKnownScrollPosition === 0 ) {\n' +
+            '        let element = evnt.target\n' +
+            '        lastKnownScrollPosition = evnt.target.scrollTop;\n' +
+            '    }\n' +
+            '}\n' +
+            'function scrollender(evnt) {\n' +
+            '    let current_scroll_pos = evnt.target.scrollTop;\n' +
+            '    lastKnownScrollPosition = 0;\n' +
+            '    let viz_list = {}\n' +
+            '    for ( let i = 0; i < g_section_count; i++ ) {\n' +
+            '        let checker = elementsToCheck[i]\n' +
+            '        if ( checker && !(checker.checked) ) {\n' +
+            '            let container = evnt.target\n' +
+            '            let el = checker.el\n' +
+            '            if ( isElementInScrollView(container,el) ) {\n' +
+            '                checker.checked = true\n' +
+            '            }\n' +
+            '        }\n' +
+            '        if ( checker && checker.checked) {\n' +
+            '            let container = evnt.target\n' +
+            '            let el = checker.el\n' +
+            '            viz_list[checker.name] = top_stray_amount(container,el)\n' +
+            '        }\n' +
+            '    }\n' +
+            '    let least_strayed = Infinity\n' +
+            '    let least_strayed_name = ""\n' +
+            '    for ( let [name,stray] of Object.entries(viz_list) ) {\n' +
+            '        if ( least_strayed > stray ) {\n' +
+            '            least_strayed = stray\n' +
+            '            least_strayed_name = name\n' +
+            '        }\n' +
+            '    }\n' +
+            '    scroll_pin(least_strayed_name)\n' +
+            '    for ( let i = 0; i < g_section_count; i++ ) {\n' +
+            '        let checker = elementsToCheck[i]\n' +
+            '        checker.checked = false\n' +
+            '    }\n' +
+            '}\n' +
+            'function init_els_to_check() {\n' +
+            '    for ( let i = 0; i < g_section_count; i++ ) {\n' +
+            '        let check_record = {\n' +
+            '            "name" : `section_${i+1}`,\n' +
+            '            "checked" : false,\n' +
+            '            "el" : document.getElementById(`section_${i+1}`)\n' +
+            '        }\n' +
+            '        elementsToCheck.push(check_record);\n' +
+            '    }\n' +
+            '}\n' +
+            ' \n' +
+            'function setup_section_toggles() {\n' +
+            '    let sect_togs = document.getElementsByClassName("togglebar-sect")\n' +
+            '    for ( let st of sect_togs ) {\n' +
+            '        let namer = st.parentNode.parentNode.id\n' +
+            '        st.onclick = (ev) => {\n' +
+            '            let sect_box = `#${namer}_response`\n' +
+            '            if ( g_current_section_select === sect_box ) {\n' +
+            '                let sbr = document.querySelector(sect_box)\n' +
+            '                if ( sbr.style.display === "none") {\n' +
+            '                    pinBox(sect_box)\n' +
+            '                } else {\n' +
+            '                    sbr.style.display = "none"\n' +
+            '                }\n' +
+            '            }\n' +
+            '        }\n' +
+            '    }\n' +
+            '}'
+        },
+        'html(10):end_script': '\n</script>\n'
+      },
+      incrementer_set: {
+        start: {
+          print_vname: 'start',
+          apply_to: 'Z_INDEX',
+          start_val: 100,
+          starter: {
+            file: 'fadable_box.tmplt',
+            key_values: {
+              Z_INDEX: 'f@init{$}',
+              BOX_NAME: 'f@name{parent}',
+              INSERT: ''
+            },
+            path_finder: 'html',
+            op: '=',
+            evaluations: { BOX_NAME: 'contact_box', INSERT: '' },
+            data: '\n' +
+              '<div id="contact_box" class="fade_able" style="z-index:100"  >\n' +
+              '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+              `\t\t<span class="closer_x" onmousedown="closefader('contact_box')">x</span>\n` +
+              '\t</div>\n' +
+              '\t<div class="fade_able_content" >\n' +
+              '\t\t{{{contact_box.content }}}\n' +
+              '\t</div>\n' +
+              '</div>\n',
+            backup_data: '\n' +
+              '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+              '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+              `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+              '\t</div>\n' +
+              '\t<div class="fade_able_content" >\n' +
+              '\t\t{{{@{BOX_NAME}.content }}}\n' +
+              '\t</div>\n' +
+              '</div>\n'
+          },
+          list: [
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@init{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '=',
+              evaluations: { BOX_NAME: 'contact_box', INSERT: '' },
+              data: '\n' +
+                '<div id="contact_box" class="fade_able" style="z-index:100"  >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('contact_box')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{contact_box.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'about_box', INSERT: '' },
+              data: '\n' +
+                '<div id="about_box" class="fade_able" style="z-index:101"  >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('about_box')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{about_box.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: "onclick='hide_thankyou_box(this)'"
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: {
+                BOX_NAME: 'thankyou_box',
+                INSERT: "onclick='hide_thankyou_box(this)'"
+              },
+              data: '\n' +
+                `<div id="thankyou_box" class="fade_able" style="z-index:102" onclick='hide_thankyou_box(this)' >\n` +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('thankyou_box')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{thankyou_box.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'topicBox_1', INSERT: '' },
+              data: '\n' +
+                '<div id="topicBox_1" class="fade_able" style="z-index:103"  >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('topicBox_1')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{topicBox_1.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'topicBox_2', INSERT: '' },
+              data: '\n' +
+                '<div id="topicBox_2" class="fade_able" style="z-index:104"  >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('topicBox_2')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{topicBox_2.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'topicBox_3', INSERT: '' },
+              data: '\n' +
+                '<div id="topicBox_3" class="fade_able" style="z-index:105"  >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('topicBox_3')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{topicBox_3.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'solidable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'register', INSERT: '' },
+              data: '<div id="register" class="solid_able" style="z-index:106" >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closesolid('register')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+                '\t\t\t{{{register.content}}}\n' +
+                '\t\t</div>\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '<div id="@{BOX_NAME}" class="solid_able" style="z-index:@{Z_INDEX}" >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closesolid('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+                '\t\t\t{{{@{BOX_NAME}.content}}}\n' +
+                '\t\t</div>\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'solidable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'login', INSERT: '' },
+              data: '<div id="login" class="solid_able" style="z-index:107" >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closesolid('login')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+                '\t\t\t{{{login.content}}}\n' +
+                '\t\t</div>\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '<div id="@{BOX_NAME}" class="solid_able" style="z-index:@{Z_INDEX}" >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closesolid('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+                '\t\t\t{{{@{BOX_NAME}.content}}}\n' +
+                '\t\t</div>\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            }
+          ]
+        }
+      }
+    },
+    shops: {
+      defaults: {
+        top_level: true,
+        uses_config_vars: 'shops',
+        path_abreviations: {
+          '[alpha-copious]': '[github]/alphas/alpha-copious',
+          '[github]': '~/GitHub',
+          '[websites]': '[alphas]/websites'
+        },
+        ext_default_dir: {
+          tmplt: '[alpha-copious]/html',
+          js: '[alpha-copious]/client',
+          svg: '[alpha-copious]/icons',
+          css: '[alpha-copious]/css'
+        },
+        top_dir_location: {
+          script: '[alpha-copious]/client',
+          'for-humans': '[alpha-copious]/for-humans',
+          files: '[alpha-copious]/html'
+        }
+      },
+      final: { markup: false, scripts: false },
+      skeleton: [
+        'html:start_doc_head<<',
+        'files::header.tmplt<<',
+        'bundle::bundle_13.js',
+        'bundle::shop-kiosk_bundle.js',
+        'link<css>::shared_styles.css<<',
+        'html:end_head<<',
+        'html:start_style<<',
+        'css::quick_view.css<<',
+        'html:end_style<<',
+        'html:start_script<<',
+        'files<js>::top_vars<<',
+        'html:end_script<<',
+        'html:start_body<<',
+        'files::params::nav_bar_V.smplt',
+        'files::MAP-sections_frame.smplt',
+        'files::flexy_items_A-main.tmplt<<',
+        'files::footer_A.tmplt<<',
+        'verbatim::{\n<!-- start dynamic content -->\n}',
+        'files::squashable_menu_A.tmplt<<',
+        'files::calc::contact_box<<${start=100}',
+        'files::calc::about_box<<${start++}',
+        'files::calc::thankyou_box<<${start++}',
+        'files::calc::topicBox_1<<${start++}',
+        'files::calc::topicBox_2<<${start++}',
+        'files::calc::topicBox_3<<${start++}',
+        'files::calc::register<<${start++}',
+        'files::calc::login<<${start++}',
+        'files::intergalactic-explain.tmplt<<',
+        'template::{\n    {{{advertPopups.content}}}\n}',
+        'html:end_body_html<<',
+        'html:start_script<<',
+        'verbatim::{\n' +
+          '//  === ---------------------------------------  === ---------------------------------------  === --------------------------------------\n' +
+          '// APPLICATIONS\n' +
+          '// -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --\n' +
+          '}',
+        'script::[alt-script]/floating_window_controls.js<<',
+        'script::params::[alt-script]/pin_and_scroll_vars.tjs',
+        'script::[alt-script]/section_scrolling.js<<',
+        'html:end_script<<'
+      ],
+      files: [
+        'header.tmplt<<',
+        'params::nav_bar_V.smplt',
+        'MAP-sections_frame.smplt',
+        'flexy_items_A-main.tmplt<<',
+        'footer_A.tmplt<<',
+        'squashable_menu_A.tmplt<<',
+        'calc::contact_box<<${start=100}',
+        'calc::about_box<<${start++}',
+        'calc::thankyou_box<<${start++}',
+        'calc::topicBox_1<<${start++}',
+        'calc::topicBox_2<<${start++}',
+        'calc::topicBox_3<<${start++}',
+        'calc::register<<${start++}',
+        'calc::login<<${start++}',
+        'intergalactic-explain.tmplt<<'
+      ],
+      css: [ 'quick_view.css<<' ],
+      scripts: [
+        '[alt-script]/floating_window_controls.js<<',
+        'params::[alt-script]/pin_and_scroll_vars.tjs',
+        '[alt-script]/section_scrolling.js<<'
+      ],
+      bundles: [ 'bundle_13.js', 'shop-kiosk_bundle.js' ],
+      parameterized: {
+        'files::MAP-sections_frame.smplt': {
+          el: 'list',
+          '_type<el>': [
+            {
+              group_name: 'docs',
+              'SOURCE-LINK': '{{{shop_docs}}}',
+              'FRAME-ACTIONS': "onclick=''"
+            },
+            {
+              group_name: 'blog',
+              'SOURCE-LINK': '{{{shop_blog}}}',
+              'FRAME-ACTIONS': "onclick=''"
+            },
+            {
+              group_name: 'search',
+              'SOURCE-LINK': '{{{shop_search}}}',
+              'FRAME-ACTIONS': "onclick=''"
+            }
+          ]
+        },
+        'script::params::[alt-script]/pin_and_scroll_vars.tjs': {
+          scroll_section_count: { file: false, tree: false, data: '3' },
+          '_params<scroll_section_count>': { scroll_section_count: '%number%' }
+        },
+        'files::params::nav_bar_V.smplt': {
+          lr_div: {
+            file: 'left-right-div.smplt',
+            tree: {
+              logo: {
+                file: 'logo.tmplt',
+                tree: false,
+                data: '\n' +
+                  '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '    {{{svgLogo.content}}}\n' +
+                  '</a>\n' +
+                  '\n'
+              },
+              spacer: {
+                file: 'spacer.tmplt',
+                tree: false,
+                data: '\n' +
+                  '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                  '    {{{relatedAsset.content}}}\n' +
+                  '</a>\n'
+              },
+              menu: {
+                file: 'shroom.tmplt',
+                tree: {
+                  mushroom: {
+                    file: 'mushroom-menu-icon.svg',
+                    tree: false,
+                    data: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                      '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                      '</svg>'
+                  },
+                  '_params<>': {}
+                },
+                data: '<li id="squashMenu"\n' +
+                  '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                  '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                  '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                  '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                  '</svg>\n' +
+                  '</li>',
+                recursive: {
+                  _is_loop: false,
+                  params_def: { mushroom: '' },
+                  executables: {
+                    execs: [
+                      {
+                        replace: '>>@{mushroom} ? @{mushroom} : $$icons::mushroom-menu-icon.svg<<<<',
+                        condition: { cond: '@{mushroom}', variable: 'mushroom' },
+                        positive_exec: { pos: '@{mushroom}' },
+                        negative_exec: {
+                          neg: '$$icons::mushroom-menu-icon.svg<<',
+                          replace: '$$icons::mushroom-menu-icon.svg<<',
+                          file: [
+                            {
+                              replace: '$$icons::mushroom-menu-icon.svg<<',
+                              type: 'icons',
+                              file: 'mushroom-menu-icon.svg',
+                              path_finder: 'icons',
+                              data: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                                '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                                '</svg>'
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    imports: [
+                      {
+                        replace: undefined,
+                        type: 'icons',
+                        file: 'mushroom-menu-icon.svg',
+                        path_finder: 'icons',
+                        data: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                          '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                          '</svg>'
+                      }
+                    ]
+                  }
+                },
+                subst_recursive: [
+                  {
+                    params_def: { mushroom: '' },
+                    conds: [
+                      {
+                        replace: '>>@{mushroom} ? @{mushroom} : $$icons::mushroom-menu-icon.svg<<<<',
+                        replacer: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                          '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                          '</svg>'
+                      }
+                    ],
+                    data: '<li id="squashMenu"\n' +
+                      '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                      '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                      '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                      '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                      '</svg>\n' +
+                      '</li>\n'
+                  }
+                ],
+                conds: [
+                  {
+                    replace: '>>@{mushroom} ? @{mushroom} : $$icons::mushroom-menu-icon.svg<<<<',
+                    condition: { cond: '@{mushroom}', variable: 'mushroom' },
+                    positive_exec: { pos: '@{mushroom}' },
+                    negative_exec: {
+                      neg: '$$icons::mushroom-menu-icon.svg<<',
+                      replace: '$$icons::mushroom-menu-icon.svg<<',
+                      file: [
+                        {
+                          replace: '$$icons::mushroom-menu-icon.svg<<',
+                          type: 'icons',
+                          file: 'mushroom-menu-icon.svg',
+                          path_finder: 'icons',
+                          data: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                            '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                            '</svg>'
+                        }
+                      ]
+                    }
+                  }
+                ],
+                backup_data: '<li id="squashMenu"\n' +
+                  '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                  '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                  '    >>@{mushroom} ? @{mushroom} : $$icons::mushroom-menu-icon.svg<<<<\n' +
+                  '</li>\n'
+              },
+              '_params<logo,spacer,menu>': { logo: '%file%', spacer: '%file%', menu: '%file%' }
+            },
+            data: '//\n' +
+              '<div style="width:100%;height:fit-content">\n' +
+              '<table style="width:100%">\n' +
+              '    <tr>\n' +
+              '        <td style="width:62;height:63">\n' +
+              '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+              '                // here a logo may be put in place very early on (sgv, png)\n' +
+              '                // otherwise the result is a final stage substitution\n' +
+              '                \n' +
+              '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+              '    {{{svgLogo.content}}}\n' +
+              '</a>\n' +
+              '\n' +
+              '\n' +
+              '            </a>\n' +
+              '        </td>\n' +
+              '        <td>\n' +
+              '            <ul class="navbar-nav">\n' +
+              '                <li class="nav-item">\n' +
+              '                    \n' +
+              '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+              '    {{{relatedAsset.content}}}\n' +
+              '</a>\n' +
+              '\n' +
+              '                </li>\n' +
+              '                <li id="squashMenu"\n' +
+              '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+              '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+              '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+              '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+              '</svg>\n' +
+              '</li>\n' +
+              '            </ul>\n' +
+              '        </td>\n' +
+              '        <td style="text-align: center;">\n' +
+              '            <h2>{{{intergalactic.content}}}</h2> \n' +
+              '        </td>\n' +
+              '        <td>\n' +
+              '            &nbsp;\n' +
+              '        </td>\n' +
+              '    </tr>\n' +
+              '</table>\n' +
+              '</div>\n' +
+              '//',
+            recursive: {
+              _is_loop: false,
+              params_def: {
+                logo: '\n' +
+                  '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '    {{{svgLogo.content}}}\n' +
+                  '</a>\n' +
+                  '\n',
+                spacer: '\n' +
+                  '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                  '    {{{relatedAsset.content}}}\n' +
+                  '</a>\n',
+                menu: '<li id="squashMenu"\n' +
+                  '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                  '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                  '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                  '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                  '</svg>\n' +
+                  '</li>'
+              },
+              executables: {
+                execs: [
+                  {
+                    replace: '>>@{logo} ? @{logo} : {{{svgLogo.content}}}<<',
+                    condition: { cond: '@{logo}', variable: 'logo' },
+                    positive_exec: { pos: '@{logo}' },
+                    negative_exec: { neg: '{{{svgLogo.content}}}' }
+                  },
+                  {
+                    replace: '>>@{menu} ? @{menu} : @nothing<<',
+                    condition: { cond: '@{menu}', variable: 'menu' },
+                    positive_exec: { pos: '@{menu}' },
+                    negative_exec: { neg: '' }
+                  }
+                ],
+                imports: []
+              }
+            },
+            subst_recursive: [
+              {
+                params_def: {
+                  logo: '\n' +
+                    '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                    '    {{{svgLogo.content}}}\n' +
+                    '</a>\n' +
+                    '\n',
+                  spacer: '\n' +
+                    '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                    '    {{{relatedAsset.content}}}\n' +
+                    '</a>\n',
+                  menu: '<li id="squashMenu"\n' +
+                    '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                    '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                    '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                    '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                    '</svg>\n' +
+                    '</li>'
+                },
+                conds: [
+                  {
+                    replace: '>>@{logo} ? @{logo} : {{{svgLogo.content}}}<<',
+                    replacer: '\n' +
+                      '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                      '    {{{svgLogo.content}}}\n' +
+                      '</a>\n' +
+                      '\n'
+                  },
+                  {
+                    replace: '>>@{menu} ? @{menu} : @nothing<<',
+                    replacer: '<li id="squashMenu"\n' +
+                      '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                      '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                      '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                      '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                      '</svg>\n' +
+                      '</li>'
+                  }
+                ],
+                data: '//\n' +
+                  '<div style="width:100%;height:fit-content">\n' +
+                  '<table style="width:100%">\n' +
+                  '    <tr>\n' +
+                  '        <td style="width:62;height:63">\n' +
+                  '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '                // here a logo may be put in place very early on (sgv, png)\n' +
+                  '                // otherwise the result is a final stage substitution\n' +
+                  '                \n' +
+                  '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '    {{{svgLogo.content}}}\n' +
+                  '</a>\n' +
+                  '\n' +
+                  '\n' +
+                  '            </a>\n' +
+                  '        </td>\n' +
+                  '        <td>\n' +
+                  '            <ul class="navbar-nav">\n' +
+                  '                <li class="nav-item">\n' +
+                  '                    \n' +
+                  '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                  '    {{{relatedAsset.content}}}\n' +
+                  '</a>\n' +
+                  '\n' +
+                  '                </li>\n' +
+                  '                <li id="squashMenu"\n' +
+                  '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                  '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                  '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                  '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                  '</svg>\n' +
+                  '</li>\n' +
+                  '            </ul>\n' +
+                  '        </td>\n' +
+                  '        <td style="text-align: center;">\n' +
+                  '            <h2>{{{intergalactic.content}}}</h2> \n' +
+                  '        </td>\n' +
+                  '        <td>\n' +
+                  '            &nbsp;\n' +
+                  '        </td>\n' +
+                  '    </tr>\n' +
+                  '</table>\n' +
+                  '</div>\n' +
+                  '//'
+              }
+            ],
+            conds: [
+              {
+                replace: '>>@{logo} ? @{logo} : {{{svgLogo.content}}}<<',
+                condition: { cond: '@{logo}', variable: 'logo' },
+                positive_exec: { pos: '@{logo}' },
+                negative_exec: { neg: '{{{svgLogo.content}}}' }
+              },
+              {
+                replace: '>>@{menu} ? @{menu} : @nothing<<',
+                condition: { cond: '@{menu}', variable: 'menu' },
+                positive_exec: { pos: '@{menu}' },
+                negative_exec: { neg: '' }
+              }
+            ],
+            backup_data: '@params<{ logo : %file%, spacer : %file%, menu : %file% }>\n' +
+              '//\n' +
+              '<div style="width:100%;height:fit-content">\n' +
+              '<table style="width:100%">\n' +
+              '    <tr>\n' +
+              '        <td style="width:62;height:63">\n' +
+              '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+              '                // here a logo may be put in place very early on (sgv, png)\n' +
+              '                // otherwise the result is a final stage substitution\n' +
+              '                >>@{logo} ? @{logo} : {{{svgLogo.content}}}<<\n' +
+              '            </a>\n' +
+              '        </td>\n' +
+              '        <td>\n' +
+              '            <ul class="navbar-nav">\n' +
+              '                <li class="nav-item">\n' +
+              '                    @{spacer}\n' +
+              '                </li>\n' +
+              '                >>@{menu} ? @{menu} : @nothing<<\n' +
+              '            </ul>\n' +
+              '        </td>\n' +
+              '        <td style="text-align: center;">\n' +
+              '            <h2>{{{intergalactic.content}}}</h2> \n' +
+              '        </td>\n' +
+              '        <td>\n' +
+              '            &nbsp;\n' +
+              '        </td>\n' +
+              '    </tr>\n' +
+              '</table>\n' +
+              '</div>\n' +
+              '//\n'
+          },
+          logout: {
+            file: 'logout.tmplt',
+            tree: false,
+            data: '\n<button class="mini">logout</button>'
+          },
+          '_params<lr_div,logout>': { lr_div: '%file%', logout: '%file%' }
+        }
+      },
+      skeleton_map: {
+        'html(1):start_doc_head': '\n<!doctype html>\n<html>\n<head>\n',
+        'files::header.tmplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/header.tmplt',
+          data: '<meta charset="utf-8">\n' +
+            '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">\n' +
+            '<meta name="author" content="R. Leddy" />\n' +
+            '<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">\n' +
+            '<meta id="theme-color" name="theme-color" content="#452770">\n' +
+            '\n' +
+            '<link rel="canonical" href="{{canonical}}">\n' +
+            '\n' +
+            '<title>{{pageTitle}}</title>\n' +
+            '<meta name="description" content="{{pageDescription}}">\n' +
+            '\n' +
+            '\n' +
+            "<script defer src='{{primary_bundle}}'></script>",
+          recursive: {
+            _is_loop: false,
+            params_def: { 'AUTHOR%config%': '%config%' },
+            executables: { execs: [], imports: false }
+          },
+          backup_data: '<meta charset="utf-8">\n' +
+            '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">\n' +
+            '<meta name="author" content="@{AUTHOR%config%}" />\n' +
+            '<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">\n' +
+            '<meta id="theme-color" name="theme-color" content="#452770">\n' +
+            '\n' +
+            '<link rel="canonical" href="{{canonical}}">\n' +
+            '\n' +
+            '<title>{{pageTitle}}</title>\n' +
+            '<meta name="description" content="{{pageDescription}}">\n' +
+            '\n' +
+            '\n' +
+            "<script defer src='{{primary_bundle}}'></script>",
+          subst_recursive: [
+            {
+              params_def: { 'AUTHOR%config%': '%config%' },
+              conds: [],
+              data: '<meta charset="utf-8">\n' +
+                '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">\n' +
+                '<meta name="author" content="R. Leddy" />\n' +
+                '<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">\n' +
+                '<meta id="theme-color" name="theme-color" content="#452770">\n' +
+                '\n' +
+                '<link rel="canonical" href="{{canonical}}">\n' +
+                '\n' +
+                '<title>{{pageTitle}}</title>\n' +
+                '<meta name="description" content="{{pageDescription}}">\n' +
+                '\n' +
+                '\n' +
+                "<script defer src='{{primary_bundle}}'></script>"
+            }
+          ],
+          conds: []
+        },
+        'bundle::44b9d596dbddaeaabc88f15f0bd790a29199451d': "\n<script defer src='bundle_13.js'></script>\n",
+        'bundle::6f7aafc1e2bbfbdc29741059414bff35a51e9891': "\n<script defer src='shop-kiosk_bundle.js'></script>\n",
+        'link::53408966b15c9e09f6566162fe7605b6a4c8783b': "\n<link rel='stylesheet' href='shared_styles.css'>\n",
+        'html(2):end_head': '\n</head>\n',
+        'html(3):start_style': '\n<style>\n',
+        'css::quick_view.css': {
+          type: 'css',
+          file: '/home/richard/GitHub/alphas/alpha-copious/css/quick_view.css',
+          data: 'a {\n    text-decoration: none;\n}'
+        },
+        'html(4):end_style': '\n</style>\n',
+        'html(5):start_script': '\n<script lang="JavaScript" >\n',
+        'files<js>::top_vars': {
+          type: 'script',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/top_vars.js',
+          data: 'var g_siteURL = window.location.host;\n' +
+            'var g_finalizers = []\n' +
+            'var g_loginStateViewHolders = {}\n' +
+            'var g_loginValueViews = {}\n' +
+            'var g_LoggedIn = false\n' +
+            'var g_global_web3_public_identity = false'
+        },
+        'html(6):end_script': '\n</script>\n',
+        'html(7):start_body': '\n<body>\n',
+        'files::params::nav_bar_V.smplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/nav_bar_V.smplt',
+          data: '<nav id="mainNav">\n' +
+            '\t//\n' +
+            '<div style="width:100%;height:fit-content">\n' +
+            '<table style="width:100%">\n' +
+            '    <tr>\n' +
+            '        <td style="width:62;height:63">\n' +
+            '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+            '                // here a logo may be put in place very early on (sgv, png)\n' +
+            '                // otherwise the result is a final stage substitution\n' +
+            '                \n' +
+            '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+            '    {{{svgLogo.content}}}\n' +
+            '</a>\n' +
+            '\n' +
+            '\n' +
+            '            </a>\n' +
+            '        </td>\n' +
+            '        <td>\n' +
+            '            <ul class="navbar-nav">\n' +
+            '                <li class="nav-item">\n' +
+            '                    \n' +
+            '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+            '    {{{relatedAsset.content}}}\n' +
+            '</a>\n' +
+            '\n' +
+            '                </li>\n' +
+            '                <li id="squashMenu"\n' +
+            '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+            '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+            '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+            '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+            '</svg>\n' +
+            '</li>\n' +
+            '            </ul>\n' +
+            '        </td>\n' +
+            '        <td style="text-align: center;">\n' +
+            '            <h2>{{{intergalactic.content}}}</h2> \n' +
+            '        </td>\n' +
+            '        <td>\n' +
+            '            &nbsp;\n' +
+            '        </td>\n' +
+            '    </tr>\n' +
+            '</table>\n' +
+            '</div>\n' +
+            '//\n' +
+            '\t<div class="very-short conditional-hide" {{custom-logout-styles}}>\n' +
+            '<button class="mini">logout</button></div>\n' +
+            '</nav>',
+          recursive: {
+            _is_loop: false,
+            params_def: {
+              lr_div: '//\n' +
+                '<div style="width:100%;height:fit-content">\n' +
+                '<table style="width:100%">\n' +
+                '    <tr>\n' +
+                '        <td style="width:62;height:63">\n' +
+                '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                '                // here a logo may be put in place very early on (sgv, png)\n' +
+                '                // otherwise the result is a final stage substitution\n' +
+                '                \n' +
+                '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                '    {{{svgLogo.content}}}\n' +
+                '</a>\n' +
+                '\n' +
+                '\n' +
+                '            </a>\n' +
+                '        </td>\n' +
+                '        <td>\n' +
+                '            <ul class="navbar-nav">\n' +
+                '                <li class="nav-item">\n' +
+                '                    \n' +
+                '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                '    {{{relatedAsset.content}}}\n' +
+                '</a>\n' +
+                '\n' +
+                '                </li>\n' +
+                '                <li id="squashMenu"\n' +
+                '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                '</svg>\n' +
+                '</li>\n' +
+                '            </ul>\n' +
+                '        </td>\n' +
+                '        <td style="text-align: center;">\n' +
+                '            <h2>{{{intergalactic.content}}}</h2> \n' +
+                '        </td>\n' +
+                '        <td>\n' +
+                '            &nbsp;\n' +
+                '        </td>\n' +
+                '    </tr>\n' +
+                '</table>\n' +
+                '</div>\n' +
+                '//',
+              logout: '\n<button class="mini">logout</button>'
+            },
+            executables: {
+              execs: [
+                {
+                  replace: '>>@{logout} ? <div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div> : @nothing <<',
+                  condition: { cond: '@{logout}', variable: 'logout' },
+                  positive_exec: {
+                    pos: '<div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div>'
+                  },
+                  negative_exec: { neg: '' }
+                }
+              ],
+              imports: []
+            }
+          },
+          backup_data: '@params<{lr_div : %file%, logout : %file%}>\n' +
+            '<nav id="mainNav">\n' +
+            '\t@{lr_div}\n' +
+            '\t>>@{logout} ? <div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div> : @nothing <<\n' +
+            '</nav>',
+          subst_recursive: [
+            {
+              params_def: {
+                lr_div: '//\n' +
+                  '<div style="width:100%;height:fit-content">\n' +
+                  '<table style="width:100%">\n' +
+                  '    <tr>\n' +
+                  '        <td style="width:62;height:63">\n' +
+                  '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '                // here a logo may be put in place very early on (sgv, png)\n' +
+                  '                // otherwise the result is a final stage substitution\n' +
+                  '                \n' +
+                  '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                  '    {{{svgLogo.content}}}\n' +
+                  '</a>\n' +
+                  '\n' +
+                  '\n' +
+                  '            </a>\n' +
+                  '        </td>\n' +
+                  '        <td>\n' +
+                  '            <ul class="navbar-nav">\n' +
+                  '                <li class="nav-item">\n' +
+                  '                    \n' +
+                  '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                  '    {{{relatedAsset.content}}}\n' +
+                  '</a>\n' +
+                  '\n' +
+                  '                </li>\n' +
+                  '                <li id="squashMenu"\n' +
+                  '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                  '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                  '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                  '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                  '</svg>\n' +
+                  '</li>\n' +
+                  '            </ul>\n' +
+                  '        </td>\n' +
+                  '        <td style="text-align: center;">\n' +
+                  '            <h2>{{{intergalactic.content}}}</h2> \n' +
+                  '        </td>\n' +
+                  '        <td>\n' +
+                  '            &nbsp;\n' +
+                  '        </td>\n' +
+                  '    </tr>\n' +
+                  '</table>\n' +
+                  '</div>\n' +
+                  '//',
+                logout: '\n<button class="mini">logout</button>'
+              },
+              conds: [
+                {
+                  replace: '>>@{logout} ? <div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div> : @nothing <<',
+                  replacer: '<div class="very-short conditional-hide" {{custom-logout-styles}}>\n' +
+                    '<button class="mini">logout</button></div>'
+                }
+              ],
+              data: '<nav id="mainNav">\n' +
+                '\t//\n' +
+                '<div style="width:100%;height:fit-content">\n' +
+                '<table style="width:100%">\n' +
+                '    <tr>\n' +
+                '        <td style="width:62;height:63">\n' +
+                '            <a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                '                // here a logo may be put in place very early on (sgv, png)\n' +
+                '                // otherwise the result is a final stage substitution\n' +
+                '                \n' +
+                '<a class="nav-link" href="/"  target="{{canonical}}-again" >\n' +
+                '    {{{svgLogo.content}}}\n' +
+                '</a>\n' +
+                '\n' +
+                '\n' +
+                '            </a>\n' +
+                '        </td>\n' +
+                '        <td>\n' +
+                '            <ul class="navbar-nav">\n' +
+                '                <li class="nav-item">\n' +
+                '                    \n' +
+                '<a class="nav-link" href="{{relatedAsset.link}}" target="{{relatedAsset.name}}" >\n' +
+                '    {{{relatedAsset.content}}}\n' +
+                '</a>\n' +
+                '\n' +
+                '                </li>\n' +
+                '                <li id="squashMenu"\n' +
+                '    class="nav-item" style="visibility:hidden;cursor:pointer" \n' +
+                '    onmousedown="menuHandler(this)" onmouseup="releaseMenu(this)">\n' +
+                '    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">\n' +
+                '\t<path class="heroicon-ui" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/>\n' +
+                '</svg>\n' +
+                '</li>\n' +
+                '            </ul>\n' +
+                '        </td>\n' +
+                '        <td style="text-align: center;">\n' +
+                '            <h2>{{{intergalactic.content}}}</h2> \n' +
+                '        </td>\n' +
+                '        <td>\n' +
+                '            &nbsp;\n' +
+                '        </td>\n' +
+                '    </tr>\n' +
+                '</table>\n' +
+                '</div>\n' +
+                '//\n' +
+                '\t<div class="very-short conditional-hide" {{custom-logout-styles}}>\n' +
+                '<button class="mini">logout</button></div>\n' +
+                '</nav>'
+            }
+          ],
+          conds: [
+            {
+              replace: '>>@{logout} ? <div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div> : @nothing <<',
+              condition: { cond: '@{logout}', variable: 'logout' },
+              positive_exec: {
+                pos: '<div class="very-short conditional-hide" {{custom-logout-styles}}>@{logout}</div>'
+              },
+              negative_exec: { neg: '' }
+            }
+          ]
+        },
+        'files::MAP-sections_frame.smplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/MAP-sections_frame.smplt',
+          data: '@list<el><{ group_name <- @<el[1]>, SOURCE-LINK <- @<el[2]>}>\n' +
+            '<@el>\n' +
+            '<section id="@<el[1]>_container" class="content-container" {{@<el[1]>_styles}} >\n' +
+            '{{{SOURCE_LINK}}}\n' +
+            '</section>\n' +
+            '</@el>',
+          recursive: {
+            _is_loop: true,
+            params_def: {
+              group_name: '@<el[1]>',
+              'SOURCE-LINK': '@<el[2]>',
+              _var_name: 'el'
+            },
+            executables: { execs: [], imports: false }
+          },
+          subst_recursive: [
+            {
+              params_def: {
+                group_name: '@<el[1]>',
+                'SOURCE-LINK': '@<el[2]>',
+                _var_name: 'el'
+              },
+              conds: [],
+              data: '@list<el><{ group_name <- @<el[1]>, SOURCE-LINK <- @<el[2]>}>\n' +
+                '<@el>\n' +
+                '<section id="@<el[1]>_container" class="content-container" {{@<el[1]>_styles}} >\n' +
+                '{{{SOURCE_LINK}}}\n' +
+                '</section>\n' +
+                '</@el>'
+            }
+          ],
+          conds: [],
+          backup_data: '@list<el><{ group_name <- @<el[1]>, SOURCE-LINK <- @<el[2]>}>\n' +
+            '<@el>\n' +
+            '<section id="@{group_name}_container" class="content-container" {{@{group_name}_styles}} >\n' +
+            '{{{SOURCE_LINK}}}\n' +
+            '</section>\n' +
+            '</@el>'
+        },
+        'files::flexy_items_A-main.tmplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/flexy_items_A-main.tmplt',
+          data: '<main>\n' +
+            '\n' +
+            '\t<div class="items">\n' +
+            '\t\t<div class="item">\n' +
+            '\t\t\t{{{svgBannerFrame.content}}}\n' +
+            '\t\t</div>\n' +
+            '\t\t<div id="greet_and_meet_1" class="item">\n' +
+            '\t\t\t<div id="desktopCenter" class="shortviz" ></div>\n' +
+            '\t\t\t<p class="extra-i" style="color:navy">\n' +
+            '\t\t\t<span style="font-weight:bold;">{{conversation}}</span> chat :: Join our conversations.\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t<br>\n' +
+            '\t\t\t<a id="a4179" href="javascript:chat_opener()" style="cursor:pointer" >\n' +
+            '\t\t\t<p class="extra-i" style="text-align:center" >\n' +
+            '\t\t\t{{{chat.button.content}}}\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t</a>\n' +
+            '\t\t</div>\n' +
+            '\t\t<div class="item">\n' +
+            '\t\t\t<div class="longviz"  >&nbsp;</div>\n' +
+            '\t\t\t<p class="extra-i" style="color:darkred">\n' +
+            '\t\t\tBrowse the blog or check out some demonstrations.\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t<br>\n' +
+            '\t\t\t<p class="extra-i" style="text-align:center">\n' +
+            '\t\t\t\t{{{public_content_access.content}}}\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t<div id="desktopRight" class="shortviz" ></div>\n' +
+            '\t\t</div>\n' +
+            '\t\t<div id="greet_and_meet_2" class="item">\n' +
+            '\t\t\t<p class="extra-i" style="color:darkgreen;font-weight:bold;">\n' +
+            '\t\t\tFor Your Personal Use > Login\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t<hr><br>\n' +
+            '\t\t\t<a id="a4199" href="javascript:login_process()" style="cursor:pointer">\n' +
+            '\t\t\t<p class="extra-i" >\n' +
+            '\t\t\t\t{{{login_button.button.content}}}\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t</a>\n' +
+            '\t\t</div>\n' +
+            '\t\t<div id="audios_1" class="item" style="display:none;">\n' +
+            '\t\t\t<p class="extra-i" style="color:darkgreen;font-weight:bold;">\n' +
+            '\t\t\tYour session is going\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t<hr><br>\n' +
+            '\t\t\t<a id="b5199" href="javascript:logout_process()" style="cursor:pointer">\n' +
+            '\t\t\t<p class="extra-i" >\n' +
+            '\t\t\t\t{{{logout_button.button.content}}}\n' +
+            '\t\t\t</p>\n' +
+            '\t\t\t</a>\n' +
+            '\t\t</div>\t\t\n' +
+            '\t\t<div id="lowerFiller" class="fillLowerWrap">\n' +
+            '\t\t\t<div class="fillLower">\n' +
+            '\t\t\t\talpha test\n' +
+            '\t\t\t</div>\n' +
+            '\t\t</div>\n' +
+            '\t</div>\n' +
+            '</main>'
+        },
+        'files::footer_A.tmplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/footer_A.tmplt',
+          data: '<footer>\n' +
+            '\t<ul class="footer-list">\n' +
+            '\t\t<li>\n' +
+            '\t\t\t<a href="{{canonical}}" target="{{canonical}}-again">copyright &copy; {{copyRightYear}} {{companyShortLink}}</a>\n' +
+            '\t\t\t<span class="status-style" id="page-error-message">status: good</span>\n' +
+            '\t\t</li>\n' +
+            '\t</ul>\n' +
+            '</footer>'
+        },
+        'verbatim::95e0657b3716593b896721f68e0587f8afb85ce0': '\n<!-- start dynamic content -->\n',
+        'files::squashable_menu_A.tmplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/squashable_menu_A.tmplt',
+          data: '<div id="squashMenuContainer" >\n\tempty content\n</div>'
+        },
+        'files::calc::contact_box${start=100}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@init{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '=',
+          evaluations: { BOX_NAME: 'contact_box', INSERT: '' },
+          data: '\n' +
+            '<div id="contact_box" class="fade_able" style="z-index:100"  >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('contact_box')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{contact_box.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::about_box${start++}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'about_box', INSERT: '' },
+          data: '\n' +
+            '<div id="about_box" class="fade_able" style="z-index:101"  >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('about_box')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{about_box.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::thankyou_box${start++}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: "onclick='hide_thankyou_box(this)'"
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: {
+            BOX_NAME: 'thankyou_box',
+            INSERT: "onclick='hide_thankyou_box(this)'"
+          },
+          data: '\n' +
+            `<div id="thankyou_box" class="fade_able" style="z-index:102" onclick='hide_thankyou_box(this)' >\n` +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('thankyou_box')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{thankyou_box.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::topicBox_1${start++}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'topicBox_1', INSERT: '' },
+          data: '\n' +
+            '<div id="topicBox_1" class="fade_able" style="z-index:103"  >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('topicBox_1')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{topicBox_1.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::topicBox_2${start++}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'topicBox_2', INSERT: '' },
+          data: '\n' +
+            '<div id="topicBox_2" class="fade_able" style="z-index:104"  >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('topicBox_2')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{topicBox_2.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::topicBox_3${start++}': {
+          file: 'fadable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'topicBox_3', INSERT: '' },
+          data: '\n' +
+            '<div id="topicBox_3" class="fade_able" style="z-index:105"  >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('topicBox_3')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{topicBox_3.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '\n' +
+            '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t{{{@{BOX_NAME}.content }}}\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::register${start++}': {
+          file: 'solidable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'register', INSERT: '' },
+          data: '<div id="register" class="solid_able" style="z-index:106" >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closesolid('register')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+            '\t\t\t{{{register.content}}}\n' +
+            '\t\t</div>\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '<div id="@{BOX_NAME}" class="solid_able" style="z-index:@{Z_INDEX}" >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closesolid('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+            '\t\t\t{{{@{BOX_NAME}.content}}}\n' +
+            '\t\t</div>\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::calc::login${start++}': {
+          file: 'solidable_box.tmplt',
+          key_values: {
+            Z_INDEX: 'f@incr{$}',
+            BOX_NAME: 'f@name{parent}',
+            INSERT: ''
+          },
+          path_finder: 'html',
+          op: '++',
+          evaluations: { BOX_NAME: 'login', INSERT: '' },
+          data: '<div id="login" class="solid_able" style="z-index:107" >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closesolid('login')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+            '\t\t\t{{{login.content}}}\n' +
+            '\t\t</div>\n' +
+            '\t</div>\n' +
+            '</div>\n',
+          backup_data: '<div id="@{BOX_NAME}" class="solid_able" style="z-index:@{Z_INDEX}" >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closesolid('@{BOX_NAME}')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+            '\t\t\t{{{@{BOX_NAME}.content}}}\n' +
+            '\t\t</div>\n' +
+            '\t</div>\n' +
+            '</div>\n'
+        },
+        'files::intergalactic-explain.tmplt': {
+          type: 'tmplt',
+          file: '/home/richard/GitHub/alphas/alpha-copious/html/intergalactic-explain.tmplt',
+          data: '<style>\n' +
+            '\t.glactic-id-link {\n' +
+            '\t\tmargin: 6px;\n' +
+            '\t\tpadding: 2px;\n' +
+            '\t\tcursor: pointer;\n' +
+            '\t\tfont-weight: bold;\n' +
+            '\t}\n' +
+            '</style>\n' +
+            '<div id="intergalactic-explain" class="solid_able" style="z-index:1000" >\n' +
+            '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+            `\t\t<span class="closer_x" onmousedown="closesolid('intergalactic-explain')">x</span>\n` +
+            '\t</div>\n' +
+            '\t<div class="fade_able_content" >\n' +
+            `\t\t<div onmousedown="closesolid('intergalactic-explain')" style="min-width: 400px;min-height: 300px;">\n` +
+            '\t\t\t<div style="padding-left:6px;padding-right:6px" >\n' +
+            `\t\t\t\t<div style="margin-bottom: 3px;font-weight:bolder;font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;">\n` +
+            '\t\t\t\t\tWhat is an intergalactic identity?\n' +
+            '\t\t\t\t</div>\n' +
+            '\t\t\t\t<blockquote style="padding-left:5%;background-color: rgb(255, 254, 245);color:rgb(2, 71, 2);">\n' +
+            '\t\t\t\t\tIt is a string with a special format derived from a secure hash of content that you make up about yourself.\n' +
+            '\t\t\t\t</blockquote>\n' +
+            '\t\t\t\t<div style="margin-bottom: 4px;">\n' +
+            '\t\t\t\t\tYou may use this identity anywhere that accepts it which means other website and concerns.\n' +
+            '\t\t\t\t</div>\n' +
+            `\t\t\t\t<div style="margin-bottom: 2px;font-weight:bolder;font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;">\n` +
+            '\t\t\t\t\tHow this site uses your intergalactic identity:\n' +
+            '\t\t\t\t</div>\n' +
+            '\t\t\t\t<div style="margin-top:3px;padding-left:3%;background-color: rgb(255, 255, 254);color:rgb(22, 48, 5);">\n' +
+            '\t\t\t\t\t<div style="margin-top:3px;margin-bottom:3px;">\n' +
+            '\t\t\t\t\t\t<ul style="list-style-type:disc;margin: 2px;">\n' +
+            '\t\t\t\t\t\t\t<li> This website associates your intergalactic identity with responses to your messages (e.g contact). \n' +
+            '\t\t\t\t\t\t\t\tYou may return to this site to retrieve responses to your messages.\n' +
+            '\t\t\t\t\t\t\t</li>\n' +
+            '\t\t\t\t\t\t\t<li> \n' +
+            '\t\t\t\t\t\t\t\tYou may use your intergalactic identity to start a session with this site (i.e. login).\n' +
+            '\t\t\t\t\t\t\t</li>\n' +
+            '\t\t\t\t\t\t</ul>\t\n' +
+            '\t\t\t\t\t</div>\n' +
+            '\t\t\t\t</div>\n' +
+            '\t\t\t\t<div>\n' +
+            '\t\t\t\t\t<div style="margin-top:3px;" >\n' +
+            '\t\t\t\t\t\t<div style="padding:3px;color:darkslateblue;border: solid 1px rgba(65, 128, 148, 0.527)">\n' +
+            '\t\t\t\t\t\t\t<div style="margin:2px">Your personal information will not be stored on our servers.</div>\n' +
+            '\t\t\t\t\t\t\t<div style="margin:2px">Your personal information will not be tied to our domain within your browser storage.</div>\n' +
+            '\t\t\t\t\t\t\t<div style="margin:2px"><b>Instead...</b> your personal information will be associated with a virtual URL tied to your identity.</div>\n' +
+            '\t\t\t\t\t\t</div>\n' +
+            '\t\t\t\t\t\t<div style="padding:3px;margin-top:4px;">\n' +
+            '\t\t\t\t\t\t\tYou will be given a personal <span style="font-weight: bolder;">URL framework page</span>\n' +
+            '\t\t\t\t\t\t</div>\n' +
+            '\t\t\t\t\t\t<div style="padding:4px;color:rgb(43, 71, 46)" >\n' +
+            '\t\t\t\t\t\t\t<p style="padding:4px;color:rgb(43, 71, 46)">\n' +
+            '\t\t\t\t\t\t\t\tThe links here can help lead you to tools that help open pages within your URL framework page enabling you to\n' +
+            '\t\t\t\t\t\t\t\twork with your personal preferences within those pages.\n' +
+            '\t\t\t\t\t\t\t</p>\n' +
+            '\t\t\t\t\t\t\t<p style="padding:4px;color:rgb(43, 71, 46)">\n' +
+            '\t\t\t\t\t\t\t\tThe pages you open may use personal data by asking your framework page to make requests on their behalf.\n' +
+            '\t\t\t\t\t\t\t\tFor example, an e-commerce page\n' +
+            '\t\t\t\t\t\t\t\twill not ask you for your credit card number, but will ask your personal page to carry out a transaction its behalf.\n' +
+            '\t\t\t\t\t\t\t</p>\n' +
+            '\t\t\t\t\t\t\t<p style="padding:4px;color:rgb(43, 71, 46)">\n' +
+            '\t\t\t\t\t\t\t\tYou will have complete control over your personal URL framework page. But, you can maintain it in any way you see fit.\n' +
+            '\t\t\t\t\t\t\t</p>\n' +
+            '\t\t\t\t\t\t</div>\n' +
+            '\t\t\t\t\t</div>\n' +
+            '\t\t\t\t</div>\n' +
+            '\t\t\t\t<div style="padding-left:5%;background-color: rgb(255, 254, 245);color:rgb(2, 71, 2);" >\n' +
+            '\t\t\t\t\tBasically, your personal data will be stored in one place and never leave your browser unless you say so. You will not login to this site, but you may allow the \n' +
+            '\t\t\t\t\tsite to log into you - by starting a sessions. The session merely knows you are there and does not ask to know too much about you.\n' +
+            '\t\t\t\t</div>\t\n' +
+            '\t\t\t</div>\n' +
+            '\t\t</div>\n' +
+            '\t\t<div style="padding-left:2%;background-color: rgb(255, 254, 245);color:rgb(7, 104, 7);" >\n' +
+            '\t\t\t<!-- link goes here -->\n' +
+            '\t\t\t<span class="glactic-id-link" onclick="galactic_id_maker_opener()">Follow this link to create your intergalactic identity</span>\n' +
+            '\t\t</div>\n' +
+            '\t\t<br><br><br><br><br><br><br>&nbsp;\n' +
+            '\t</div>\n' +
+            '</div>\n' +
+            '<script>\n' +
+            '\n' +
+            '\t\n' +
+            '</script>'
+        },
+        'template::{\n    {{{advertPopups.content}}}\n}': { type: 'template', data: '{\n    {{{advertPopups.content}}}' },
+        'html(8):end_body_html': '\n</body>\n</html>\n',
+        'html(9):start_script': '\n<script lang="JavaScript" >\n',
+        'verbatim::62859a79b38ec8550889db5268aa7bae33c59be2': '\n' +
+          '//  === ---------------------------------------  === ---------------------------------------  === --------------------------------------\n' +
+          '// APPLICATIONS\n' +
+          '// -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --\n',
+        'script::[alt-script]/floating_window_controls.js': {
+          type: 'script',
+          file: '/home/richard/GitHub/alphas/alpha-copious/script/floating_window_controls.js',
+          data: 'window.all_windows = false\n' +
+            'let draggers = {}\n' +
+            'let current_dragger = false\n' +
+            'function add_dragging() {\n' +
+            '    let drag_bars = document.getElementsByClassName("togglebar")\n' +
+            '    for ( let db of drag_bars ) {\n' +
+            '        let cname = db.parentNode.className\n' +
+            "        if ( cname.indexOf(' ') > 0 ) {\n" +
+            "            cname = cname.split(' ')[0]\n" +
+            '        }\n' +
+            "        if ( cname === 'solid_able' ) {\n" +
+            '            if ( db.parentNode.id === "intergalactic-explain" ) {\n' +
+            '                cname = "fade_able"\n' +
+            '            }\n' +
+            '        }\n' +
+            '        if ( ["fade_able","right_fade_able"].indexOf(cname) >= 0 ) {\n' +
+            '            let drag_Node = db.parentNode\n' +
+            '            draggers[drag_Node.id] = {\n' +
+            '                "offsetX" : 0,\n' +
+            '                "offsetY" : 0,\n' +
+            '                "isDragging" : false,\n' +
+            '                "dragged" : drag_Node,\n' +
+            '                "drag_control" : db\n' +
+            '            }\n' +
+            '            db.onmousedown = (e) => {\n' +
+            '                let drag_Node = e.target.parentNode;\n' +
+            '                if ( !draggers[drag_Node.id] ) return\n' +
+            '                e.preventDefault()\n' +
+            '                draggers[drag_Node.id].isDragging = true;\n' +
+            '                draggers[drag_Node.id].offsetX = e.clientX - drag_Node.getBoundingClientRect().left;\n' +
+            '                draggers[drag_Node.id].offsetY = e.clientY - drag_Node.getBoundingClientRect().top;\n' +
+            "                db.style.cursor = 'grabbing';\n" +
+            '                current_dragger = drag_Node.id\n' +
+            '            }\n' +
+            '            db.onmouseup = (ev) => {\n' +
+            '                if ( current_dragger ) {\n' +
+            '                    let dragger_stats = draggers[current_dragger]\n' +
+            '                    let drag_bar = dragger_stats.drag_control\n' +
+            "                    drag_bar.style.cursor = 'move';\n" +
+            '                }\n' +
+            '            }\n' +
+            '        }\n' +
+            '    }\n' +
+            "    document.addEventListener('mousemove', (e) => {\n" +
+            '        if (!current_dragger) return;\n' +
+            '        if ( current_dragger ) {\n' +
+            '            let dragger_stats = draggers[current_dragger]\n' +
+            '            let drag_Node = dragger_stats.dragged\n' +
+            '            if ( drag_Node ) {\n' +
+            '                const newX = e.clientX - dragger_stats.offsetX;\n' +
+            '                const newY = e.clientY - dragger_stats.offsetY;\n' +
+            '                drag_Node.style.left = `${newX}px`;\n' +
+            '                drag_Node.style.top = `${newY}px`;\n' +
+            '            }\n' +
+            '        }\n' +
+            '    });\n' +
+            "    document.addEventListener('mouseup', () => {\n" +
+            '        if ( current_dragger ) {\n' +
+            '            let dragger_stats = draggers[current_dragger]\n' +
+            '            let drag_bar = dragger_stats.drag_control\n' +
+            "            drag_bar.style.cursor = 'move';\n" +
+            '        }\n' +
+            '        current_dragger = false\n' +
+            '    });\n' +
+            '}\n' +
+            'add_dragging()\n' +
+            'let resizers = {}\n' +
+            'let current_resizer = false\n' +
+            'function add_resizing() {\n' +
+            '    let sizer_bobs = document.getElementsByClassName("sizerbar")\n' +
+            '    for ( let sb of sizer_bobs ) {\n' +
+            '        let pnode = sb.parentNode\n' +
+            '        resizers[pnode.id] = {\n' +
+            '            "isDragging" : false,\n' +
+            '            "dragged" : pnode,\n' +
+            '            "drag_control" : sb\n' +
+            '        }\n' +
+            '        sb.onmousedown = (e) => {\n' +
+            '            let pnode = e.target.parentNode;\n' +
+            '            if ( !resizers[pnode.id] ) return\n' +
+            '            e.preventDefault()\n' +
+            '            resizers[pnode.id].isDragging = true;\n' +
+            '            current_resizer = pnode.id\n' +
+            '        }\n' +
+            '  \n' +
+            '    }\n' +
+            "    document.addEventListener('mousemove', (e) => {\n" +
+            '        if (!current_resizer) return;\n' +
+            '        if ( current_resizer ) {\n' +
+            '            let resizer_stats = resizers[current_resizer]\n' +
+            '            let pnode = resizer_stats.dragged\n' +
+            '            if ( pnode ) {\n' +
+            '                const newX = e.clientX;\n' +
+            '                const newY = e.clientY;\n' +
+            '                let brect = pnode.getBoundingClientRect()\n' +
+            '                let newW = newX - brect.left\n' +
+            '                let newH = newY - brect.top\n' +
+            '                if ( newW > 60 ) {\n' +
+            '                    pnode.style.width = `${newW}px`;\n' +
+            '                }\n' +
+            '                if ( newH > 60 ) {\n' +
+            '                    pnode.style.height = `${newH}px`;\n' +
+            '                }\n' +
+            '            }\n' +
+            '        }\n' +
+            '    });\n' +
+            "    document.addEventListener('mouseup', () => {\n" +
+            '        current_resizer = false\n' +
+            '    });\n' +
+            '}\n' +
+            'add_resizing() \n' +
+            'function init_app_resize() {\n' +
+            "    window.addEventListener('resize',(ev) => {\n" +
+            "        let it_container = document.getElementById('sections-container')\n" +
+            '        if ( it_container ) {\n' +
+            "            let footer = document.getElementsByTagName('footer')[0]\n" +
+            '            if ( footer ) {\n' +
+            '                let ic_rect = it_container.getBoundingClientRect()\n' +
+            '                let ft_rect = footer.getBoundingClientRect()\n' +
+            '                let h = ft_rect.top - ic_rect.top - 1;\n' +
+            '                it_container.style.height = `${h}px`\n' +
+            '                it_container.style.minHeight= `${h}px`\n' +
+            '                for ( let i = 0; i < g_section_count; i++ ) {\n' +
+            '                    let sect = document.getElementById(`section_${i+1}`)\n' +
+            '                    if ( sect ) {\n' +
+            '                        sect.style.height = `${h - 2}px`\n' +
+            '                        sect.style.minHeight = `${h - 2}px`\n' +
+            '                    }\n' +
+            '                }\n' +
+            '            }\n' +
+            '        }\n' +
+            '        for ( let wbox_id in all_windows ) {\n' +
+            '            let wbox = all_windows[wbox_id]\n' +
+            '            if ( !wbox ) continue;\n' +
+            '            let w = window.innerWidth*0.8;\n' +
+            '            let x = window.innerWidth*0.3;\n' +
+            '            if ( wbox.x >= (window.innerWidth-20) ) {\n' +
+            '                wbox.move(x)\n' +
+            '            }\n' +
+            '            if ( wbox.y >= (window.innerHeight-20) ) {\n' +
+            '                wbox.move(wbox.y - 60)\n' +
+            '            }\n' +
+            '            let h = window.innerHeight*0.96\n' +
+            '            wbox.resize(w,h)\n' +
+            '        }\n' +
+            '        for ( let dinfo of Object.values(draggers) ) {\n' +
+            '            let dragged = dinfo.dragged\n' +
+            '            if ( dragged ) {\n' +
+            '                let drect = dragged.getBoundingClientRect()\n' +
+            '                let x = window.innerWidth*0.3;\n' +
+            '                let h = window.innerHeight*0.8\n' +
+            '                let w = window.innerWidth*0.9;\n' +
+            '                if ( drect.x >= (window.innerWidth-20) ) {\n' +
+            '                    dragged.style.left = `${x}px`\n' +
+            '                }\n' +
+            '                if ( drect.y >= (window.innerHeight-20) ) {\n' +
+            '                    dragged.style.top = `{drect.y - 60}px`\n' +
+            '                }\n' +
+            '                w = Math.min(450,w)\n' +
+            '                h = Math.min(450,h)\n' +
+            '                dragged.style.width = `${w}px`\n' +
+            '                dragged.style.height = `${h}px`\n' +
+            '            }\n' +
+            '        }\n' +
+            '    })\n' +
+            '}\n' +
+            'function init_app_windows() {\n' +
+            '    let left = "30%",\n' +
+            '        height = "96%",\n' +
+            '        width = "60%"\n' +
+            '    let ref_el = document.getElementById("sections-container")\n' +
+            '    if ( ref_el ) {\n' +
+            '        if ( window.innerWidth >= 1100 ) {\n' +
+            '            let rbox = ref_el.getBoundingClientRect()\n' +
+            '            let l = rbox.right + 6\n' +
+            '            left = `${rbox.right}px`\n' +
+            '            let r = window.innerWidth - 20;\n' +
+            '            let w = r - l\n' +
+            '            width = `${w}px`\n' +
+            '        } else {\n' +
+            '            let rbox = ref_el.getBoundingClientRect()\n' +
+            '            let l = rbox.left + 6\n' +
+            '            left = `${l}px`\n' +
+            '            width = `${window.innerWidth}px`\n' +
+            '        }\n' +
+            '    }\n' +
+            '    let winbox = new WinBox("extra-file-class",{\n' +
+            '"url" : "http:\n' +
+            '        "x" : left,\n' +
+            '        "height" : height,\n' +
+            '        "width" : width,\n' +
+            '        "hidden" : true,\n' +
+            '        "onclose" : () => {\n' +
+            '            let winbox = all_windows["extra-file-class"]\n' +
+            '            winbox.hide(true)\n' +
+            '            return true\n' +
+            '        }\n' +
+            '    })\n' +
+            '    all_windows["extra-file-class"] = winbox\n' +
+            '    winbox = new WinBox("roll-right",{\n' +
+            '"url" : "http:\n' +
+            '        "x" : left,\n' +
+            '        "height" : height,\n' +
+            '        "width" : width,\n' +
+            '        "hidden" : true,\n' +
+            '        "onclose" : () => {\n' +
+            '            let winbox = all_windows["roll-right"]\n' +
+            '            winbox.hide(true)\n' +
+            '            return true\n' +
+            '        }\n' +
+            '    })\n' +
+            '    all_windows["roll-right"] = winbox\n' +
+            '    winbox = new WinBox("release-lite",{\n' +
+            '"url" : "http:\n' +
+            '        "x" : left,\n' +
+            '        "height" : height,\n' +
+            '        "width" : width,\n' +
+            '        "hidden" : true,\n' +
+            '        "onclose" : () => {\n' +
+            '            let winbox = all_windows["release-lite"]\n' +
+            '            winbox.hide(true)\n' +
+            '            return true\n' +
+            '        }\n' +
+            '    })\n' +
+            '    all_windows["release-lite"] = winbox\n' +
+            '    init_app_resize()\n' +
+            '}'
+        },
+        'script::params::[alt-script]/pin_and_scroll_vars.tjs': {
+          type: 'script',
+          file: '/home/richard/GitHub/alphas/alpha-copious/script/pin_and_scroll_vars.tjs',
+          data: 'window.scroll_section_count = 3',
+          recursive: {
+            _is_loop: false,
+            params_def: { scroll_section_count: '%number%' },
+            executables: { execs: [], imports: false }
+          },
+          backup_data: 'window.scroll_section_count = 3',
+          evaluations: { scroll_section_count: '3' },
+          subst_recursive: [
+            {
+              params_def: { scroll_section_count: '%number%' },
+              conds: [],
+              data: 'window.scroll_section_count = 3'
+            }
+          ],
+          conds: []
+        },
+        'script::[alt-script]/section_scrolling.js': {
+          type: 'script',
+          file: '/home/richard/GitHub/alphas/alpha-copious/script/section_scrolling.js',
+          data: 'let g_section_count = (window.scroll_section_count && !(isNaN(window.scroll_section_count))) ? window.scroll_section_count : 0;\n' +
+            'let g_current_section_select = null\n' +
+            'let lastKnownScrollPosition = 0\n' +
+            'let elementsToCheck = []\n' +
+            'function scroll_pin(view_center) {\n' +
+            '\tif ( window.innerWidth >= 1100 ) {\n' +
+            "        if ( view_center !== 'section_1' ) {\n" +
+            '            let sect_box = `#${view_center}_response`\n' +
+            '            g_current_section_select = sect_box\n' +
+            '            pinBox(sect_box)\n' +
+            '        } else {\n' +
+            "            g_current_section_select = 'section_1_response'\n" +
+            '            unpin_current(true)\n' +
+            '        }\n' +
+            '    } else {\n' +
+            '        let details = document.getElementById("scroll-info-button")\n' +
+            "        if ( view_center !== 'section_1' ) {\n" +
+            '            let sect_box = `#${view_center}_response`\n' +
+            '            g_current_section_select = sect_box\n' +
+            '            if (details) details.removeAttribute("disabled")\n' +
+            '        } else {\n' +
+            "            g_current_section_select = 'section_1_response'\n" +
+            '            if (details) details.setAttribute("disabled",true)\n' +
+            '        }\n' +
+            '    }\n' +
+            '}\n' +
+            'function resize_sections(skip_container) {\n' +
+            '    let above = document.getElementById("sections-header")\n' +
+            '    let sects = document.getElementById("sections-container")\n' +
+            '    if ( sects && above) {\n' +
+            '        let abox = above.getBoundingClientRect()\n' +
+            '        let box = sects.getBoundingClientRect()\n' +
+            '        let pbox = sects.parentElement.getBoundingClientRect()\n' +
+            '        let bbot = pbox.bottom - 2\n' +
+            '        if ( !skip_container ) {\n' +
+            '            let btop = abox.bottom + 2\n' +
+            '            sects.style.height = `${bbot - btop}px`\n' +
+            '        }\n' +
+            '        for ( let i = 0; i < g_section_count; i++ ) {\n' +
+            '            let sect = document.getElementById(`section_${i+1}`)\n' +
+            '            if ( sect ) {\n' +
+            '                sect.style.height = `${bbot - box.top - 2}px`\n' +
+            '                sect.style.minHeight = `${bbot - box.top - 2}px`\n' +
+            '            }\n' +
+            '        }\n' +
+            '    }\n' +
+            '}\n' +
+            'function section_select() {\n' +
+            '    return g_current_section_select\n' +
+            '}\n' +
+            'function isElementInScrollView(container, element, partial) {\n' +
+            '  const domRect1 = container.getBoundingClientRect();\n' +
+            '  const domRect2 = element.getBoundingClientRect();\n' +
+            '  return !(\n' +
+            '    domRect1.top > domRect2.bottom ||\n' +
+            '    domRect1.right < domRect2.left ||\n' +
+            '    domRect1.bottom < domRect2.top ||\n' +
+            '    domRect1.left > domRect2.right\n' +
+            '  );\n' +
+            '}\n' +
+            'function top_difference(rect_1, rect_2) {\n' +
+            '    let b = rect_1.top - rect_2.top\n' +
+            '  \n' +
+            '    return b\n' +
+            '}\n' +
+            'function top_stray_amount(container,element) {\n' +
+            '  const rect_1 = container.getBoundingClientRect();\n' +
+            '  const rect_2 = element.getBoundingClientRect();\n' +
+            '  return Math.abs(top_difference(rect_1, rect_2))\n' +
+            '}\n' +
+            'function scroller(evnt) {\n' +
+            '    if ( lastKnownScrollPosition === 0 ) {\n' +
+            '        let element = evnt.target\n' +
+            '        lastKnownScrollPosition = evnt.target.scrollTop;\n' +
+            '    }\n' +
+            '}\n' +
+            'function scrollender(evnt) {\n' +
+            '    let current_scroll_pos = evnt.target.scrollTop;\n' +
+            '    lastKnownScrollPosition = 0;\n' +
+            '    let viz_list = {}\n' +
+            '    for ( let i = 0; i < g_section_count; i++ ) {\n' +
+            '        let checker = elementsToCheck[i]\n' +
+            '        if ( checker && !(checker.checked) ) {\n' +
+            '            let container = evnt.target\n' +
+            '            let el = checker.el\n' +
+            '            if ( isElementInScrollView(container,el) ) {\n' +
+            '                checker.checked = true\n' +
+            '            }\n' +
+            '        }\n' +
+            '        if ( checker && checker.checked) {\n' +
+            '            let container = evnt.target\n' +
+            '            let el = checker.el\n' +
+            '            viz_list[checker.name] = top_stray_amount(container,el)\n' +
+            '        }\n' +
+            '    }\n' +
+            '    let least_strayed = Infinity\n' +
+            '    let least_strayed_name = ""\n' +
+            '    for ( let [name,stray] of Object.entries(viz_list) ) {\n' +
+            '        if ( least_strayed > stray ) {\n' +
+            '            least_strayed = stray\n' +
+            '            least_strayed_name = name\n' +
+            '        }\n' +
+            '    }\n' +
+            '    scroll_pin(least_strayed_name)\n' +
+            '    for ( let i = 0; i < g_section_count; i++ ) {\n' +
+            '        let checker = elementsToCheck[i]\n' +
+            '        checker.checked = false\n' +
+            '    }\n' +
+            '}\n' +
+            'function init_els_to_check() {\n' +
+            '    for ( let i = 0; i < g_section_count; i++ ) {\n' +
+            '        let check_record = {\n' +
+            '            "name" : `section_${i+1}`,\n' +
+            '            "checked" : false,\n' +
+            '            "el" : document.getElementById(`section_${i+1}`)\n' +
+            '        }\n' +
+            '        elementsToCheck.push(check_record);\n' +
+            '    }\n' +
+            '}\n' +
+            ' \n' +
+            'function setup_section_toggles() {\n' +
+            '    let sect_togs = document.getElementsByClassName("togglebar-sect")\n' +
+            '    for ( let st of sect_togs ) {\n' +
+            '        let namer = st.parentNode.parentNode.id\n' +
+            '        st.onclick = (ev) => {\n' +
+            '            let sect_box = `#${namer}_response`\n' +
+            '            if ( g_current_section_select === sect_box ) {\n' +
+            '                let sbr = document.querySelector(sect_box)\n' +
+            '                if ( sbr.style.display === "none") {\n' +
+            '                    pinBox(sect_box)\n' +
+            '                } else {\n' +
+            '                    sbr.style.display = "none"\n' +
+            '                }\n' +
+            '            }\n' +
+            '        }\n' +
+            '    }\n' +
+            '}'
+        },
+        'html(10):end_script': '\n</script>\n'
+      },
+      incrementer_set: {
+        start: {
+          print_vname: 'start',
+          apply_to: 'Z_INDEX',
+          start_val: 100,
+          starter: {
+            file: 'fadable_box.tmplt',
+            key_values: {
+              Z_INDEX: 'f@init{$}',
+              BOX_NAME: 'f@name{parent}',
+              INSERT: ''
+            },
+            path_finder: 'html',
+            op: '=',
+            evaluations: { BOX_NAME: 'contact_box', INSERT: '' },
+            data: '\n' +
+              '<div id="contact_box" class="fade_able" style="z-index:100"  >\n' +
+              '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+              `\t\t<span class="closer_x" onmousedown="closefader('contact_box')">x</span>\n` +
+              '\t</div>\n' +
+              '\t<div class="fade_able_content" >\n' +
+              '\t\t{{{contact_box.content }}}\n' +
+              '\t</div>\n' +
+              '</div>\n',
+            backup_data: '\n' +
+              '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+              '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+              `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+              '\t</div>\n' +
+              '\t<div class="fade_able_content" >\n' +
+              '\t\t{{{@{BOX_NAME}.content }}}\n' +
+              '\t</div>\n' +
+              '</div>\n'
+          },
+          list: [
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@init{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '=',
+              evaluations: { BOX_NAME: 'contact_box', INSERT: '' },
+              data: '\n' +
+                '<div id="contact_box" class="fade_able" style="z-index:100"  >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('contact_box')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{contact_box.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'about_box', INSERT: '' },
+              data: '\n' +
+                '<div id="about_box" class="fade_able" style="z-index:101"  >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('about_box')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{about_box.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: "onclick='hide_thankyou_box(this)'"
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: {
+                BOX_NAME: 'thankyou_box',
+                INSERT: "onclick='hide_thankyou_box(this)'"
+              },
+              data: '\n' +
+                `<div id="thankyou_box" class="fade_able" style="z-index:102" onclick='hide_thankyou_box(this)' >\n` +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('thankyou_box')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{thankyou_box.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'topicBox_1', INSERT: '' },
+              data: '\n' +
+                '<div id="topicBox_1" class="fade_able" style="z-index:103"  >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('topicBox_1')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{topicBox_1.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'topicBox_2', INSERT: '' },
+              data: '\n' +
+                '<div id="topicBox_2" class="fade_able" style="z-index:104"  >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('topicBox_2')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{topicBox_2.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'fadable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'topicBox_3', INSERT: '' },
+              data: '\n' +
+                '<div id="topicBox_3" class="fade_able" style="z-index:105"  >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('topicBox_3')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{topicBox_3.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '\n' +
+                '<div id="@{BOX_NAME}" class="fade_able" style="z-index:@{Z_INDEX}" @{INSERT} >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closefader('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t{{{@{BOX_NAME}.content }}}\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'solidable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'register', INSERT: '' },
+              data: '<div id="register" class="solid_able" style="z-index:106" >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closesolid('register')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+                '\t\t\t{{{register.content}}}\n' +
+                '\t\t</div>\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '<div id="@{BOX_NAME}" class="solid_able" style="z-index:@{Z_INDEX}" >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closesolid('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+                '\t\t\t{{{@{BOX_NAME}.content}}}\n' +
+                '\t\t</div>\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            },
+            {
+              file: 'solidable_box.tmplt',
+              key_values: {
+                Z_INDEX: 'f@incr{$}',
+                BOX_NAME: 'f@name{parent}',
+                INSERT: ''
+              },
+              path_finder: 'html',
+              op: '++',
+              evaluations: { BOX_NAME: 'login', INSERT: '' },
+              data: '<div id="login" class="solid_able" style="z-index:107" >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closesolid('login')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+                '\t\t\t{{{login.content}}}\n' +
+                '\t\t</div>\n' +
+                '\t</div>\n' +
+                '</div>\n',
+              backup_data: '<div id="@{BOX_NAME}" class="solid_able" style="z-index:@{Z_INDEX}" >\n' +
+                '\t<div class="togglebar" onmouseenter="togglebar(this,1)" onmouseleave="togglebar(this,0)">\n' +
+                `\t\t<span class="closer_x" onmousedown="closesolid('@{BOX_NAME}')">x</span>\n` +
+                '\t</div>\n' +
+                '\t<div class="fade_able_content" >\n' +
+                '\t\t<div style="min-width: 400px;min-height: 300px;">\n' +
+                '\t\t\t{{{@{BOX_NAME}.content}}}\n' +
+                '\t\t</div>\n' +
+                '\t</div>\n' +
+                '</div>\n'
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+-------------------------------------------------------------
