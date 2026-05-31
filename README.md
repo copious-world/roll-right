@@ -2,32 +2,41 @@
 
 ***A tool that helps generate HTML pages, or other types of pages such as PWA components.***
 
+## Overview
 
-## install it
+### install it
 
 ```
 npm install -g roll-right
 ```
 
+### run it
 
-## run it
-
-```
-roll-right --phase prepare <website-identifier> <directory including config>
-```
+<b>Here is an example:</b>
 
 ```
-roll-right --phase template <website-identifier> <directory including config>
+roll-right --phase prepare --sources [websites]/template-configs/  --generator generate.json --structure parsed.json
 ```
 
 ```
-roll-right --phase page <website-identifier> <directory including config>
+roll-right --phase template --sources [websites]/template-configs/  --generator generate.json --structure parsed.json
 ```
 
+```
+roll-right --phase page --sources [websites]/template-configs/ --values assignments.json
+```
 
-## purpose
+In the examples, there is a parameter ***sources*** that is a directory. The other parameters that take files as arguments are expected to be offsets from the ***sources*** parameter. The documentation that follows will include a description of these parameters.
 
-> The aim of this project is to make a tool that helps to generate web pages and packages for a numnber of websites.
+### purpose
+
+> This tool helps create a flow in creating and maintaining web pages and PWAs in a few phases.
+>
+> Each phase runs against a configuration file that helps select web page skeletons for a number of concerns (different URLs and web applications) and operates to fill out the skeletons with the custom content through a few steps until outputting a final pre-release page for testing prior to release.
+
+The web pages (apps) in the pre-release directories can undergo further transformation before they are deposited into a final staging directory, where the pages can reside in their compressed form with bundles in subdirectories structured for delivery by a web server.
+
+
 
 The idea is that there should be a repository of snippets and skeletons of output pages. The process requires configuration files relfecting choices made by the user of the program. The tool is used in several phases. Each phase generates outputs and configurations for use in the next phase, until the final outputs are placed into a "staging" directory. In the end, the
 staging directory should be something that can be copied to a server directory where a web server looks for web pages and code pages.
@@ -43,7 +52,6 @@ Once pages are in staging, delivery to server directories or other uses are left
 
 The configuration for the first phase is used to pick a general structure by picking skeletons for concerns. The configuration will specify a common source for the files providing skeletal forms for all the concerns listed in that particular configuration. One configuration may specify a number of skeleton uses and output specializations for a number of concerns. Different configurations can be used all the same for collecting outputs into other targeted directories.
 
-
 > In spite of the aim of this project, other kinds of text files can be output through the process, including programs, documents, art.
 
 This tool mainly puts together snippets into final forms, files, directories. It does not attempt to know much, but is useful where replication with small differences works. That is, it is not going to be better than just copying files is that is all that has to be done. Also, it is not an automatic programming agent (at least no yet).
@@ -56,7 +64,6 @@ This project started out as something to help save time.  Sometimes it did, some
 faster. But, there is a need to propagate improvements. So, there is a need to take snippets from edge-of-the-envelope textual artifacts back into the pool of snippets this project reads, and then use this tool again to change/upgrade all textual artifacts using the snippet repository.
 
 So, this project is being upgraded to make the process easier.
-
 
 ## Differences Compared to Bundlers
 
@@ -80,9 +87,7 @@ So, this project is being upgraded to make the process easier.
 
 * This tool will put JavaScript files in a directory ready for bundling. If an appropriate template is chosen for an HTML output, the refernce to the final bundled file will be linked in the HTML.
 
-
 ## Basic Use Process
-
 
 ***Here are steps of a generation process for site maintainers***:
 
@@ -93,37 +98,17 @@ So, this project is being upgraded to make the process easier.
 5. Decide on further template customization (or select defaults) by editing component descriptions from the *prepare* phase.
 6. Run the *template* phase.
 7. For each concern, provide static html components, pictures, etc. to be used to populate templates; keep them in directories per website, app, etc.
-6. Run roll-right in the *page* pahse with `.subst` files specifying the template instantiation.
-7. Use other tools to deploy files that have been dropped into a staging directory
-
+8. Run roll-right in the *page* pahse with `.subst` files specifying the template instantiation.
+9. Use other tools to deploy files that have been dropped into a staging directory
 
 It is possible that command line call of the tool can be done once if the user is willing to accept defaults and
 have all the resource directories ready. Generally, however, the command line tool will be called once for each phase for each initial configuration file. 
-
-
-
-## reverse it
-
-It can help, when developing, to split up a file that has been composed by **roll-right**. Later versions of **roll-right** will put in file separators when files are appended together to form a single file artifact for a web page or module. The command line tool, **roll-right-breakup**, will output a directory of all the files between the separators. There are times that it may be useful to use compare tools with the output of **roll-right-breakup** and the source files.
-
-Here is how to call it:
-
-```
-roll-right-breakup <path to file> <optional output directory>
-```
-
-
-**roll-right-breakup** will create a directory in the calling directory named **rr-breakup** or within the optional directory if it is on the command line.
 
 ## HTML Generation Steps
 
 1. For generation of HTML, a project should begin first with a pre-template. The developer will either make one of these, or use one from a repository of them. A pre-template contains some HTML, usually the header; and, the header may **variable forms** in it. The ouline of the body may be available. But, somewhere in the pre-template will be **link forms** that indicate where files may be included. **May be included**... The pre-template usually lists more files than a project may want. But, the next step, 
 2. The developer needs to make a cofiguration file. The configuration file is read by the **roll-right**, enabling **roll-right** to find the pre-tempalte and the set of files that will be use to replace **link forms**. The configuration file has its own set of variables. Every configuration file contains a JSON object with two fields **alpha** and **beta**. The **alpha** field contains the phase 1 configuration, while the **beta** field contains the phase 2 configuration. It is more likely that different projects will use the same alpha field and different beta fields.
 3. 
-
-
-
-
 
 ## An example - human page
 
@@ -137,18 +122,18 @@ In order to generate the template, a pre-template is required. Here is the pre-t
 <!doctype html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<meta name="author" content="{{who_am_I}}" />
-	<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-	<meta id="theme-color" name="theme-color" content="{{user-theme-color}}">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="author" content="{{who_am_I}}" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta id="theme-color" name="theme-color" content="{{user-theme-color}}">
 
-	<link rel="canonical" href="{{canonical}}">
+    <link rel="canonical" href="{{canonical}}">
 
-	<title>{{who_am_I}}</title>
-	<meta name="description" content="{{pageDescription}}">
-	<style>
-		/*csslint important:false*/
+    <title>{{who_am_I}}</title>
+    <meta name="description" content="{{pageDescription}}">
+    <style>
+        /*csslint important:false*/
         .super-header {
             border: solid 1px rgb(223, 89, 11);
             padding: 2px;
@@ -169,23 +154,23 @@ In order to generate the template, a pre-template is required. Here is the pre-t
             bottom: 0;
             width : calc(100vw - 4px);
         }
-        
+
         ... etc ...
-	</style>
+    </style>
 </head>
 <body>
 <div id="super-header" class="super-header" style="white-space: nowrap;overflow-x: scroll;" >
     <span class="owner_name">{{who_am_I}}</span>
     <div id="open-controls" style="display:inline-block;">
-        <button onclick="show_controls()">&gt;&gt;</button>
+        <button onclick="show_controls()">>></button>
     </div>
     <div id="user-controls" style="display:none;">
         :: control page :: 
-        <button id="db_container-btn" onclick="show_local_data()">local data</button>&nbsp;
-        <button id="manager_container-btn" onclick="show_id_manager()">identity manager</button>&nbsp;
-        <button id="wallet_container-btn" onclick="show_wallet_manager()">wallet manager</button>&nbsp;
+        <button id="db_container-btn" onclick="show_local_data()">local data</button> 
+        <button id="manager_container-btn" onclick="show_id_manager()">identity manager</button> 
+        <button id="wallet_container-btn" onclick="show_wallet_manager()">wallet manager</button> 
         <button id="application_container-btn" onclick="show_application()" class="selected-frame">application</button>
-        <button onclick="hide_controls()">&lt;&lt;</button>
+        <button onclick="hide_controls()"><<</button>
     </div>
 </div>
 
@@ -226,9 +211,7 @@ $$script::for-humans/frame_page_tab_com.js<<
 $$script::app-dir/window_app.js<<
 
 </script>
-
 ```
-
 
 In the above code, one can see the **variable forms** such as `{{canonical}}`, while for this project all the **link forms**
 are in the script section. This project does no use more HTML than provided in the file.
@@ -305,7 +288,6 @@ Here is a configuration file for the human frame.
         }
     }
 }
-
 ```
 
 This project only makes a template and leaves a later process to fill it out. So, there is no **beta** field. But, there is an **alpha** field.
@@ -336,7 +318,6 @@ Some of the files listed in the field names are file paths. For example, `for-hu
 
 This form is expanded further until an absolute path is determined.
 
-
 This example did not use the file form. Here is an example of that:
 
 ```
@@ -363,11 +344,6 @@ So, there are options for deciding how alpha code will be included in projects. 
 
 In order to create a template, this tool reads a skeleton file and a JSON configuration that describes how to select alpha code and use some or all of the skeleton to create an .html file that has code and variables, where the mark the place where final code will be placed.
 
-
 ## Setting up publisher calls in a node.js module
 
 First install the command line version of roll-right.
-
-
-
-
