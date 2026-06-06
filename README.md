@@ -76,283 +76,478 @@ For more on the evolution of this tools you may be interested in the following: 
 
 ## Differences Compared to Bundlers
 
-* This main process used by this package is substitution and expansion. The output is mainly a self contained file or a small collection of files. The output is not bundled. Also, there is a dependency on Handlebars, which handles conditional substitution.
+The main process used by this package is substitution and expansion. The output is mainly a self contained file or a small collection of files. The output is not bundled. Also, there is a dependency on Handlebars, which handles conditional substitution.
 
-> After the final phase, HTML output may be compressed and made ready for upload. If compression is not requested, it may be handled by a bundler.
-
-* Bundlers can be used to take some of the output from this program to create packages that finalize the packaging required for a website or web application.  Bundlers such as **rollup** or **vite** can be used for such operations if the final step is needed.
-
-* Skeleton files: These files feed into phase 1. These files might be like a language. But, they are not. They provide an outline as to the order of files to be included in a final output. They are similar to a layout. These are used to feed into template creation. They use some limited features of programming languages.
-
-* Templates: The templates output by the *template* phase are ready for substitution. Substitution values are often targeted at making versions of websites for different concerns that may have the same templates.
-
-> After the *template*, unsightly HTML files will be output with variables in place for substitution. These template files are passed into the final phase.
-
-* The ***page*** phase will take in a template file and a value file (`.subst`) and run *Mustache* on the template in order to produce HTML. There will likley be a `.subst` file for each business page or application page provided by a website. 
-
-> Some of the JavaScript required for immediate appearance (as opposed to web app function) will be included in the HTML outpout. 
-
-* Bundlers will usually help package JavaScript into a single file to be linked into the web page.
-
-* This tool will put JavaScript files in a directory ready for bundling. If an appropriate template is chosen for an HTML output, the refernce to the final bundled file will be linked in the HTML.
+This tool does put script and markup into a file, given a repository of commonly occurring template snippets and code files. The files an output page will use and include must be mentioned in the original skeleton file in some way, directly or through decision logic or code. This tool leaves compression and a certain amount of tree shaking to other tools. 
 
 ## Basic Use Process
 
 ***Here are steps of a generation process for site maintainers***:
 
 1. Store commonly used, well-tested code in files in selected directories
-2. Provide a file describing families of pages call *skeletons*
-3. Provide a JSON description that selects which skeleton parts are to be used along with source directories
-4. Run roll-right in the *prepare* phase with the JSON configuration to generate site templates
+2. Provide a collection of files each describing families of pages called *skeletons*
+3. Provide a JSON description, the configuration, that selects which skeleton parts are to be used along with source directories
+4. Run **roll-right** in the *prepare* phase with the JSON configuration to generate intermediate compilation files and *prepare* databases of sections for each output.
 5. Decide on further template customization (or select defaults) by editing component descriptions from the *prepare* phase.
-6. Run the *template* phase.
-7. For each concern, provide static html components, pictures, etc. to be used to populate templates; keep them in directories per website, app, etc.
-8. Run roll-right in the *page* pahse with `.subst` files specifying the template instantiation.
-9. Use other tools to deploy files that have been dropped into a staging directory
+6. For each concern, provide static html components, pictures, etc. to be used to populate templates; keep them in directories per website, app, etc. (usually a ***static*** directory within the concern's directory )
+7. Run the *template* phase to generate `.tmplt` files, one for each output page/file being generated. This also generates `.subst` files.
+8. Edit `.subst` files for each file being output (or possibly one master `.subst` file per concern) in order to specify content.
+9. Run **roll-right** in the *page* phase with `.subst` files specifying the template instantiation values.
+10. Use other tools to deploy files that have been dropped into a pre-staging directory.
 
-It is possible that command line call of the tool can be done once if the user is willing to accept defaults and
-have all the resource directories ready. Generally, however, the command line tool will be called once for each phase for each initial configuration file. 
+It is possible that command line call of the tool can be done once if the user is willing to accept defaults and to have all the resource directories ready. Generally, however, the command line tool will be called once for each phase for each initial configuration file. 
 
 ## HTML Generation Steps
 
-1. For generation of HTML, a project should begin first with a pre-template. The developer will either make one of these, or use one from a repository of them. A pre-template contains some HTML, usually the header; and, the header may **variable forms** in it. The ouline of the body may be available. But, somewhere in the pre-template will be **link forms** that indicate where files may be included. **May be included**... The pre-template usually lists more files than a project may want. But, the next step, 
-2. The developer needs to make a cofiguration file. The configuration file is read by the **roll-right**, enabling **roll-right** to find the pre-tempalte and the set of files that will be use to replace **link forms**. The configuration file has its own set of variables. Every configuration file contains a JSON object with two fields **alpha** and **beta**. The **alpha** field contains the phase 1 configuration, while the **beta** field contains the phase 2 configuration. It is more likely that different projects will use the same alpha field and different beta fields.
-3. 
+1. For generation of HTML, a project should begin first with a skeleton The developer will either make one of these, or use one from a repository of them. The skeleton will not contain HTML. If it being used to generate HTML, the skeleton may lines indicating that HTML tags should be included at certain points. Between those tags it may have lines indicating the import of partial template files which may include HTML markup as well as substitution variable forms.
+2. The developer needs to make a configuration file.  **roll-right** reads configuration file, enabling **roll-right** to find the pre-template and the set of files that will be use to replace **link forms**. The configuration file has its own set of variables. It contains a set of directory abbreviations, some global variable assignments, and a list of output groups. Each output group indicates the targets that should be generated and the skeletons that should be used to generate the outputs for a set of concerns indicated within the output group structure. 
+3. **roll-right** compiles the skeletons given the variable assignments in the configuration file. The parsing output will be stored in the sources directory. The parsing output will include intermediate parsing information for every skeleton in use for a run. A number of section database file, called `calc_<something>.db`will be generated, one for each output file being generated. The  `calc_<something>.db`file may be edited by the user. It is called "calc" because it may either make a link reference to a file in a static directory belonging to a concern, or it may be a calculation. In some cases, the calc file indicates how to make replications of a section which is again a calculation used in skeleton processing.
+4. **roll-right** reads the parsing information and the edited  `calc_<something>.db`files and generates template files. roll-right places the template files for a concern in a template directory. It also places files containing maps of substitution variables to values, one for each template being generated. It also produces a master substitution map for the entire website belonging to each concern.
+5. During the template phase **roll-right** attempts to merge previously determined substitutions in with the new substitution maps being generated. It might be the case that the site maintainer does not have to change any values in the substitution maps, but he may. In either case, **roll-right** will read in the templates and the substitution maps and used them to generate complete HTML files. The HTML files will be deposited in the pre-staging directories for each concern.  
 
-## An example - human page
+## An example
 
-For humans of this world, we have created the of-this.world collection of subdomains. Each subdomain has a main access page, which is a dashboard owned by a particular user. The dashboard prominently displays a set of `<iframes>` that host other applications that make requests through it.
-
-Each dashboard owner, a human, will have the page generated for him/her containing some name and identity information, the public part. Other processes make user that private information is stored in the user's browser under the user's URL. Each page is generated from a template used by the **of-this.world** server. And, the template is generated by an application of **roll-right**.
-
-In order to generate the template, a pre-template is required. Here is the pre-template for the human page (some code is removed for the sake of brevity):
+Here is a full skeleton for a kind of page that may be used by a concern.
 
 ```
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="author" content="{{who_am_I}}" />
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <meta id="theme-color" name="theme-color" content="{{user-theme-color}}">
+$$defs:{
+    "top_level" : true,
+    "path_abreviations" : {
+        "[alpha-copious]" : "[github]/alphas/alpha-copious",
+        "[github]" : "~/GitHub",
+        "[websites]" : "[alphas]/websites"
+    },
+    "ext_default_dir" : {
+        "tmplt" : "[alpha-copious]/html",
+        "js" : "[alpha-copious]/client",
+        "svg" : "[alpha-copious]/icons",
+        "css" : "[alpha-copious]/css"
+    },
+    "top_dir_location" : {
+        "script" : "[alpha-copious]/client",
+        "for-humans" : "[alpha-copious]/for-humans",
+        "files" : "[alpha-copious]/html"
+    }
+}
+//  ----
+$$html:start_doc_head<<
+$$files::header.tmplt<<
+$$html:end_head<<
 
-    <link rel="canonical" href="{{canonical}}">
+$$html:start_style<<
+$$css::styles1.css<<
+$$html:end_style<<
 
-    <title>{{who_am_I}}</title>
-    <meta name="description" content="{{pageDescription}}">
-    <style>
-        /*csslint important:false*/
-        .super-header {
-            border: solid 1px rgb(223, 89, 11);
-            padding: 2px;
-            font-size: smaller;
-            font-weight: 700;
-            background-color: rgb(255, 254, 248);
-            color: rgb(74, 83, 55);
-            max-height:32px;
-            width: 100%;
+$$html:start_script<<
+$$files<js>::top_vars<<
+$$html:end_script<<
+
+$$html:start_body<<
+
+$$files::params::nav_bar_V.smplt<< {
+    $@{lr_div}$files::params::left-right-div.smplt<<    {
+        $@{logo}$files::logo.tmplt<<
+        $@{spacer}$files::spacer.tmplt<<
+        $@{menu}$files::shroom.tmplt<<{
+             $@{mushroom}$icons::mushroom-menu-icon.svg<<
         }
-        .content-container {
-            border: solid 1px rgb(0, 6, 85);
-            padding: 2px;
-            padding-left: 1px;
-            background-color: white;
-            position: absolute;
-            top: 34px;
-            bottom: 0;
-            width : calc(100vw - 4px);
-        }
+    }
+    $@{logout}$files::logout.tmplt<<
+}
 
-        ... etc ...
-    </style>
-</head>
-<body>
-<div id="super-header" class="super-header" style="white-space: nowrap;overflow-x: scroll;" >
-    <span class="owner_name">{{who_am_I}}</span>
-    <div id="open-controls" style="display:inline-block;">
-        <button onclick="show_controls()">>></button>
-    </div>
-    <div id="user-controls" style="display:none;">
-        :: control page :: 
-        <button id="db_container-btn" onclick="show_local_data()">local data</button> 
-        <button id="manager_container-btn" onclick="show_id_manager()">identity manager</button> 
-        <button id="wallet_container-btn" onclick="show_wallet_manager()">wallet manager</button> 
-        <button id="application_container-btn" onclick="show_application()" class="selected-frame">application</button>
-        <button onclick="hide_controls()"><<</button>
-    </div>
-</div>
+$$files::flexy_items_A-main.tmplt<<
 
-<div id="application_container" class="content-container" >
-    <iframe id="content-frame" src="" class="super-container" >
-    Source will open here
-    </iframe>
-</div>
+$$files::footer_A.tmplt<<
 
-<div id="manager_container" class="content-container" >
-    <iframe id="id-manager-frame" src="https://www.of-this.world/manager" class="super-container" onload="info_to_manager_container()">
-    manager frame
-    </iframe>
-</div>
+$$verbatim::{
+<!-- start dynamic content -->
+}
 
+$$files::squashable_menu_A.tmplt<<
 
-<!--  ... ETC. ...  -->
+$$files::calc::contact_box<<${box_i=100}
 
-</div>
+$$files::calc::about_box<<${box_i++}
 
-</body>
-<script>
+$$files::calc::thankyou_box<<${box_i++}
 
-$$script::pc_location.js<<
-$$script::crypto-global.js<<
-$$script::base64.js<<
-$$script::crypto-hash.js<<
-$$script::crypto-wraps.js<<
+$$files::loop::calc::topicBox_<1,3><<${box_i++}
+
+$$files::calc::register<<${box_i++}
+
+$$files::calc::login<<${box_i++}
+
+$$files::intergalactic-explain.tmplt<<
+
+$$template::{
+{{{advertPopups.content}}}
+}
+
+$$html:end_body_html<<
+//
+//
+$$html:start_script<<
+
+// global defs of some static topology
+$$script::[alt-script]/flexy_items_A-top.js<<
+
 $$script::common.js<<
-$$script::https_checks.js<<
-$$script::post_fetch.js<<
-$$script::file_ops.js<<
-$$script::one_table_db.js<<
-$$script::app-dir/user_db.js<<
-$$script::for-humans/shared_constants.js<<
-$$script::for-humans/human_frame_client.js<<
-$$script::for-humans/frame_page_tab_com.js<<
-$$script::app-dir/window_app.js<<
 
-</script>
+$$script::field_checks.js<<
+
+$$script::https_checks.js<<
+
+$$script::post_fetch.js<<
+
+$$script::uploader_class.js<<
+
+$$script::validation_class.js<<
+
+$$script::captcha_service.js<<
+//
+$$script::login-logout.js<<
+
+$$script::one_table_db.js<<
+
+$$script::file_ops.js<<
+
+$$script::[alt-script]/flexy_items_A-layout-and-menu.js<<
+
+$$script::[alt-script]/flexy_items_A-animation.js<<
+
+
+// CAPTCHA PERFORMANT
+
+$$script::captcha_app.js<<
+
+$$verbatim::{
+//  === ---------------------------------------  === ---------------------------------------  === --------------------------------------
+// APPLICATIONS
+// -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+}
+
+$$script::[for-humans]/shared_constants.js<<
+
+$$script::[for-humans]/msg_vars.js<<
+
+$$script::[for-humans]/external-id-intake.js<<
+
+$$script::[for-humans]/human_frame_client.js<<
+
+$$script::[for-humans]/frame_page_opener.js<<
+
+$$script::[for-humans]/site_page_tab_com.js<<
+
+$$script::user_db.js<<
+
+$$script::[app<scripts>]/site_app.js<<
+
+$$script::[alt-script]/flexy_items_A-app-finalize.js<<
+
+$$html:end_script<<
+
 ```
 
-In the above code, one can see the **variable forms** such as `{{canonical}}`, while for this project all the **link forms**
-are in the script section. This project does no use more HTML than provided in the file.
+**roll-right** can work on this skeleton, but by using some tools pull out files that an be in bundles or linked, **roll-right** can work on a smaller file. Here is the file transformed after the use of some tools that pre-process the skeletons.
+
+```
+$$defs:{
+    "top_level" : true,
+    "path_abreviations" : {
+        "[alpha-copious]" : "[github]/alphas/alpha-copious",
+        "[github]" : "~/GitHub",
+        "[websites]" : "[alphas]/websites"
+    },
+    "ext_default_dir" : {
+        "tmplt" : "[alpha-copious]/html",
+        "js" : "[alpha-copious]/client",
+        "svg" : "[alpha-copious]/icons",
+        "css" : "[alpha-copious]/css"
+    },
+    "top_dir_location" : {
+        "script" : "[alpha-copious]/client",
+        "for-humans" : "[alpha-copious]/for-humans",
+        "files" : "[alpha-copious]/html"
+    }
+}
+//  ----
+$$html:start_doc_head<<
+$$files::header.tmplt<<
+$$bundle::bundle_13.js
+$$bundle::web3-mixed-boxy_bundle.js
+$$link<css>::shared_styles.css<<
+$$html:end_head<<
+
+$$html:start_style<<
+$$css::quick_view.css<<
+$$html:end_style<<
+
+$$html:start_script<<
+$$files<js>::top_vars<<
+$$html:end_script<<
+
+$$html:start_body<<
+
+$$files::params::nav_bar_V.smplt<< {
+    $@{lr_div}$files::params::left-right-div.smplt<<    {
+        $@{logo}$files::logo.tmplt<<
+        $@{spacer}$files::spacer.tmplt<<
+        $@{menu}$files::shroom.tmplt<<{
+             $@{mushroom}$icons::mushroom-menu-icon.svg<<
+        }
+    }
+    $@{logout}$files::logout.tmplt<<
+}
+
+$$files::flexy_items_A-main.tmplt<<
+
+$$files::footer_A.tmplt<<
+
+$$verbatim::{
+<!-- start dynamic content -->
+}
+
+$$files::squashable_menu_A.tmplt<<
+
+$$files::calc::contact_box<<${box_i=100}
+
+$$files::calc::about_box<<${box_i++}
+
+$$files::calc::thankyou_box<<${box_i++}
+
+$$files::loop::calc::topicBox_<1,3><<${box_i++}
+
+$$files::calc::register<<${box_i++}
+
+$$files::calc::login<<${box_i++}
+
+$$files::intergalactic-explain.tmplt<<
+
+$$template::{
+{{{advertPopups.content}}}
+}
+
+$$html:end_body_html<<
+//
+//
+$$html:start_script<<
+
+// global defs of some static topology
+$$script::[alt-script]/flexy_items_A-top.js<<
+
+//
+
+$$script::[alt-script]/flexy_items_A-layout-and-menu.js<<
+
+$$script::[alt-script]/flexy_items_A-animation.js<<
+// CAPTCHA PERFORMANT
+$$verbatim::{
+//  === ---------------------------------------  === ---------------------------------------  === --------------------------------------
+// APPLICATIONS
+// -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+}
+$$script::[app<scripts>]/site_app.js<<
+
+$$script::[alt-script]/flexy_items_A-app-finalize.js<<
+
+$$html:end_script<<
+
+```
+
+The tools that make this change are not part of roll-right. But, roll-right does pay attention to the bundling statements:
+
+```
+$$bundle::bundle_13.js
+$$bundle::web3-mixed-boxy_bundle.js
+```
+
+Also, there is a CSS link, whereas before the file was included. In the first version of the skeleton, roll-right would have included the CSS in the output file. In the edited version, a link to the file will be included in the HTML header.
+
+```
+$$link<css>::shared_styles.css<<
+```
+
+
 
 ## configuration
 
 The configuration for the first phase is used to pick a general structure by picking skeletons for concerns. The configuration will specify a common source for the files providing skeletal forms for all the concerns listed in that particular configuration. One configuration may specify a number of skeleton uses and output specializations for a number of concerns. Different configurations can be used all the same for collecting outputs into other targeted directories.
 
-But, it does bring in scripts. It does not necessarily bring in all the scripts or even all of each script. The *alpha* field of a configuration object determines how much of the listed scripts to include. 
-
-Here is a configuration file for the human frame.
-
 ```
 {
-    "alpha" : {
-        "pre_template" : "[alpha-copious]/pre-template/human_page.html",
-        "business_url" : "copious.world",
-        "out_dir" : "./templates",
-        "key_values" : {
-            "$$AUTHOR" : "Richard Leddy",
-            "INSERT" : ""
+    "@target" : "templates/",
+    "inputs" : {
+        "path_abreviations" : {
+            "[websites]" : "[alphas]/websites",
+            "[PWA]" : "[alphas]/PWA-apps",
+            "[alphas]" : "[github]/alphas",
+            "[alpha-copious]" : "[alphas]/alpha-copious",
+            "[github]" : "~/GitHub/",
+            "[skeletons]" : "[alpha-copious]/pre-template",
+            "[names]" : "[alpha-copious]/name-drops",
+            "[PWA-lib]" : "[PWA]/lib",
+            "[PWA-skeletons]" : "[PWA]/pre-template",
+            "[client]" : "[alpha-copious]/client",
+            "[template-configs]" : "[websites]/template-configs"
+        }
+    },
+    "ext_default_dirs" : {
+        "tmplt" : "[alpha-copious]/html",
+        "js" : "[alpha-copious]/client",
+        "svg" : "[alpha-copious]/icons"
+    },
+    "top_dir_locations" : {
+        "script" : "[client]",
+        "client" : "[client]",
+        "pwa-lib" : "[PWA-lib]",
+        "databases" : "[alpha-copious]/databases",
+        "alt-script" : "[alpha-copious]/script",
+        "for-humans" : "[alpha-copious]/for-humans",
+        "html" : "[alpha-copious]/html",
+        "css" : "[alpha-copious]/css",
+        "icons" : "[alpha-copious]/icons",
+        "names" : "[alpha-copious]/name-drops"
+    },
+    "use_case<[targets.dir]>" : {
+        "app<scripts>" : "[targets.dir]",
+        "app<static>" : "[targets.dir]",
+        "app<images>" : "[targets.dir]"
+    },
+    "app_skel_vars" : {
+        "boxy" : {
+            "topic_count" : 3
         },
-        "path_abbreviations" : {
-            "[alpha-copious]" : "[github]/alphas/alpha-copious",
-            "[github]" : "~/Documents/GitHub",
-            "[app-local]" : "[github]/alphas/of-this-world"
+        "mixed" : {
+            "topic_count" : 3,
+            "groups" : [
+                { "group_name" : "docs", "SOURCE-LINK" : "{{{shop_docs}}}", "FRAME-ACTIONS" : "onclick=''" },
+                { "group_name" : "blog", "SOURCE-LINK" :  "{{{shop_blog}}}", "FRAME-ACTIONS" : "onclick=''" },
+                { "group_name" : "search", "SOURCE-LINK" : "{{{shop_search}}}", "FRAME-ACTIONS" : "onclick=''" }
+            ]
+        },
+        "shops" : {
+            "topic_count" : 3,
+            "groups" : [
+                { "group_name" : "docs", "SOURCE-LINK" : "{{{shop_docs}}}", "FRAME-ACTIONS" : "onclick=''" },
+                { "group_name" : "blog", "SOURCE-LINK" :  "{{{shop_blog}}}", "FRAME-ACTIONS" : "onclick=''" },
+                { "group_name" : "search", "SOURCE-LINK" : "{{{shop_search}}}", "FRAME-ACTIONS" : "onclick=''" }
+            ]
+        }
+    },
+    "global_variable_values" : {
+        "var_to_value" : {
+            "AUTHOR" : "R. Leddy"
+        },
+        "by_concern" : {
+            "copious" : {},
+            "popsong" : {},
+            "villa-family" : {},
+            "bakersfield-robots": {},
+            "docs.copious.world": {},
+            "shops.copious.world": {},
+            "shops.for-humans.net": {}
+        }
+    },
+    "outputs" : [
+        {
+            "targets" : {
+                "dir" : "[websites]/@concern/@kernel",
+                "dir_form" : "[websites]/@concern/@target",
+                "concerns" : ["copious","popsong","villa-family"],
+                "uses_config_vars" : "boxy"
 
+            },
+            "skeletons" : {
+                "index.tmplt" : "[skeletons]/web3-boxy.skel",
+                "login.tmplt" : "[skeletons]/login-boxy.skel",
+                "blog/index.tmplt" : "[skeletons]/galactic-blog.skel",
+                "demos/index.tmplt" : "[skeletons]/galactic-blog.skel",
+                "streams/index.tmplt" : "[skeletons]/galactic-blog.skel"
+            },
+            "name_parameters" : {
+                "db" : "[names]/name-drop.db",
+                "parameter_values" : "[websites]/@concern/@target/name-drop.json",
+                "index.tmplt" : [ "contact_box", "about_box", "topicBox_<1,3>", "thankyou_box", "register" ],
+                "login.tmplt" : [ "contact_box", "thankyou_box", "login" ]
+            }
         },
-        "ext_default_dir" : {
-            ".html" : "[alpha-copious]/html",
-            ".js" : "[alpha-copious]/client",
-            ".svg" : "[alpha-copious]/icons"
+        {
+            "targets" : {
+                "dir" : "[websites]/@concern/@kernel",
+                "dir_form" : "[websites]/@concern/@target",
+                "concerns" : ["bakersfield-robots","docs.copious.world"],
+                "uses_config_vars" : "mixed"
+            },
+            "skeletons" : {
+                "index.tmplt" : "[skeletons]/web3-mixed-boxy.skel",
+                "login.tmplt" : "[skeletons]/login-boxy.skel",
+                "blog/index.tmplt" : "[skeletons]/galactic-blog.skel",
+                "demos/index.tmplt" : "[skeletons]/galactic-blog.skel"
+            },
+            "name_parameters" : {
+                "db" : "[names]/name-drop.db",
+                "parameter_values" : "[websites]/@concern/@target/name-drop.json",
+                "index.tmplt" : [ "contact_box", "about_box", "topicBox_<1,3>", "thankyou_box", "register" ],
+                "login.tmplt" : [ "contact_box", "thankyou_box", "login" ]
+            }
         },
-        "top_dir_location" : {
-            "script" : "[alpha-copious]/script",
-            "for-humans" : "[alpha-copious]/for-humans",
-            "html" : "[alpha-copious]/html",
-            "app-dir" : "[app-local]/scripts"
+        {
+            "targets" : {
+                "dir" : "[websites]/@concern/@kernel",
+                "dir_form" : "[websites]/@concern/@target",
+                "concerns" : ["of-this.world","for-humans.net"]
+            },
+            "skeletons" : {
+                "index.tmplt" : "[skeletons]/galactic.skel"
+            },
+            "name_parameters" : {
+                "db" : "[names]/name-drop.db",
+                "parameter_values" : "[websites]/@concern/@target/name-drop.json",
+                "index.tmplt" : [ "contact_box", "about_box", "topicBox_<1,3>", "thankyou_box", "register" ],
+                "login.tmplt" : [ "contact_box", "thankyou_box", "login" ]
+            }
         },
-        "files" : {
-            "index.html" : {
-                "footer_A.html" : 6,
-                "name::about_box" : {
-                    "file" : "fadable_box.html",
-                    "key_values" : {
-                        "Z_INDEX" : 102,
-                        "BOX_NAME" : ">name"
-                    }
-                },
-                "intergalactic-explain.html" : "1",
-                "script" : {
-                    "pc_location.js" : 1,
-                    "crypto-global.js" : 1,
-                    "base64.js" : 1,
-                    "crypto-wraps.js" : 1,
-                    "crypto-hash.js" : 1,
-                    "common.js" : 2,
-                    "field_checks.js" : 3,
-                    "https_checks.js" : 4,
-                    "post_fetch.js" : {
-                        "order" : 14,
-                        "include" : ["postData"],
-                        "exclude" : false
-                    },
-                    "uploader_class.js" : 6,
-                    "file_ops.js" : 1,
-                    "one_table_db.js" : 1,
-                    "script/flexy_items_A-animation.js" : 12,
-                    "for-humans/human_frame_client.js" : 1,
-                    "for-humans/external-id-intake.js" : 13,
-                    "for-humans/frame_page_opener.js" : 1,
-                    "for-humans/frame_page_tab_com.js" : 1,
-                    "app-dir/user_db.js" : 2,
-                    "for-humans/shared_constants.js" : 1,
-                    "app-dir/window_app.js" : 2
-                }
+        {
+            "targets" : {
+                "dir" : "[websites]/@concern/@kernel",
+                "dir_form" : "[websites]/@concern/@target",
+                "concerns" : ["shops.copious.world","shops.for-humans.net"],
+                "uses_config_vars" : "shops"
+            },
+            "skeletons" : {
+                "index.tmplt" : "[skeletons]/shop-kiosk.skel"
+            },
+            "name_parameters" : {
+                "db" : "[names]/name-drop.db",
+                "parameter_values" : "[websites]/@concern/@target/name-drop.json",
+                "index.tmplt" : [ "contact_box", "about_box", "topicBox_<1,3>", "thankyou_box", "register" ],
+                "login.tmplt" : [ "contact_box", "thankyou_box", "login" ]
+            }
+        },
+        {
+            "targets" : {
+                "dir" : "[PWA]/@concern/@kernel",
+                "dir_form" : "[PWA]/@concern/@target",
+                "concerns" : ["safe-recorder"]
+            },
+            "skeletons" : {
+                "index.tmplt" : "[skeletons]/PWA.skel",
+                "recorder-PWA.tmplt" : "[PWA-skeletons]/recorder-PWA.skel",
+                "ownership.tmplt" : "[PWA-skeletons]/ownership.skel"
+            },
+            "name_parameters" : {
+                "db" : "[names]/name-drop.db"
             }
         }
-    }
+    ]
 }
-```
 
-This project only makes a template and leaves a later process to fill it out. So, there is no **beta** field. But, there is an **alpha** field.
-
-Notice that the **alpha** field begins with the field **pre_template**. That is the file above. Look at the **[alpha-copious]** form in the directory path. This is a path abbreviation. The path form substitution rules are listed in the **alpha** object under the fields **path_abbreviations** and **top_dir_location**. The expand bottom up.
-
-Under the **files** field, are fields whose keys are the names of files being generated. This configuration will generate **index.html**. Some HTML files are lists under **index.html**. But, these files are not mentioned in the pre-template being used, so they will be ignored. This example is only concerned with the inclusion of JavaScript.
-
-In the `<script>` section, all the files that might go into the pre-template are given. There are a few that won't be used by the pre-template. In general, the file has to be listed by both the pre-template and the configuration to be included. The only assurance is that file depencies are included. So, a file that is not listed in either the pre-template or the configuration but that a file being included requires to operate, that file will be included as well.
-
-Notice the **post_fetch** inclusion:
 
 ```
-                    "post_fetch.js" : {
-                        "order" : 14,
-                        "include" : ["postData"],
-                        "exclude" : false
-                    },
-```
 
-This inclusion shows just one function, **postData**, being included in the project. The source of post_fetch lists the set of functions it exports. And, the "post_fetch.js" field value is a selector of the method. Other methods will not be included from the file unless there are dependencies.
 
-Some of the files listed in the field names are file paths. For example, `for-humans/human_frame_client.js` seems to indicate that a directory "for-humans" will be used. But, in fact, the directory is defined by the top-dir fields and the abbreviations as such:
-
-```
- "for-humans" : "[alpha-copious]/for-humans",
-```
-
-This form is expanded further until an absolute path is determined.
-
-This example did not use the file form. Here is an example of that:
-
-```
-$$files::nav_bar_A.html<<
-```
-
-The file version of the **link form** uses the **ext_default_dir** field to establish the location of the file based on the extension. In the file form example, **roll-right** will look for `nav_bar_A.html` in the directory `[alpha-copious]/html` once the path variable `[alpha-copious]` is expanded.
 
 ## How it Helps
 
-This tool is not a replacement for final publication steps enabled by rollup, browserify, or others. Instead, this stool may generate code that will be sumbitted to those tools.
+Once the snippets, sub templates, skeletons, and code modules are in place, this tool generates entire sites with a carriage return. The project [copious-software-dev-manager](https://github.com/copious-world/copious-software-dev-manager.git) can call this tool. The software dev manager is web app that helps prepare the skeletons, fill out substitution maps, and finally release the software, doing some bundle management. This is all a work in progress. 
 
-In fact, whole pages needing no further manipulation may be generated by this tool. So, in some cases this tool does the job that others do. However, some build systems use the other tools to generate their final runtime products. And, this tool may be upstream from those tools.
-
-In particular, this tool addresses moving preexisting code into certain packaged contexts at the source level. Other packages rollup modules into single code sets or module collections into one file. 
-
-This tool can be used to replicate code into projects, allowing for function by function selection. The final output will be a combined source file with a chain of support for working code. That is, a developer may request that a whole module be copied into a combined source file for a project, or he may select some functions to be placed into the combined source file. But, he may expect that the functions included will have their supporting functions brought in as well.
-
-More commonly, this tool is useful for creating web pages that host bundled operations and that provide basic common libraries that will not be accessed on the global (window) level. In the sense that a browser provides a common library accessible to all parts of a project, a window can offer an extension of that capability. The extension is mostly a packaging of that capability into simpler calls.
-
-One may ask why one would allow code (fixed version) to be copied into a number of projects without creating a module publication. The answer has more to do with expediency of project creation with some time being taken to decide what is a maintainable module. The tool will copy just one function from a group of functions into a project if that is specified. But, when the module is maintained, the tool may copy all the function of a group into the new module and ready the code for publication. Projects that use the module will import all the functions in some sense into their code. Certainly, down stream tree shaking may work to reduce the number of functions included. But, that may just move certain worries down stream.
-
-So, there are options for deciding how alpha code will be included in projects. But, this tool also provides generation based on skeletons.
-
-In order to create a template, this tool reads a skeleton file and a JSON configuration that describes how to select alpha code and use some or all of the skeleton to create an .html file that has code and variables, where the mark the place where final code will be placed.
