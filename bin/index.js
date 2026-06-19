@@ -144,6 +144,7 @@ async function command_line_operations_new(args) {
                 break
             }
             case "page"   :
+            case "pages"   :
             case "assign" :
             case 3: {
                 //
