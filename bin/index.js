@@ -138,7 +138,7 @@ async function command_line_operations_new(args) {
                         to_pre_staging.set_project_directory(project_dir)
                         let subst_defs = await to_pre_staging.prepare_files_and_substitutions(concerns)
                         await to_pre_staging.publish_subs_defs(subst_defs)
-                        await to_pre_staging.selective_css_publication(concerns)
+                        await to_pre_staging.selective_css_publication(concerns,parsed_skels)
                     }
                     //
                 }
