@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>lib/utils.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Overview</a></h2><h2><a href="https://github.com/copious-world/roll-right" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h2><a href="https://www.npmjs.com/package/roll-right" target="_blank" class="menu-item" id="package" >Npm package</a></h2><h3>Classes</h3>
+                        <ul id="classes-ul-overflow" class="menu-contained-nav" ><li><a href="PreStagingSubsitutions.html">PreStagingSubsitutions</a><ul class='methods'><li data-type='method' style='display: none;'><a href="PreStagingSubsitutions.html#process_files">process_files</a></li></ul></li><li><a href="SkelToTemplate.html">SkelToTemplate</a><ul class='methods'><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#add_to_css_staging">add_to_css_staging</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#add_to_incrementers">add_to_incrementers</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#add_tracking_for_calc">add_tracking_for_calc</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#assemble_subfile">assemble_subfile</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#block_verabtim_parameters">block_verabtim_parameters</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#build_entry_parsing">build_entry_parsing</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#build_param_tree">build_param_tree</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#capture_param_sub_call">capture_param_sub_call</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#capture_parameters">capture_parameters</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#check_recursive_data">check_recursive_data</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#clean_verbatim">clean_verbatim</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#coalesce_scripts">coalesce_scripts</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#collect_concerns">collect_concerns</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#conditional_evaluations">conditional_evaluations</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#conditionless_evaluations_substitution">conditionless_evaluations_substitution</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#conds_reduction">conds_reduction</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#config_var_transformations">config_var_transformations</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#data_from_parameter">data_from_parameter</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#delay_file_loading">delay_file_loading</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#early_evaluations">early_evaluations</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#ensure_all_concerns_template_directories">ensure_all_concerns_template_directories</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#entry_directive_location_remap">entry_directive_location_remap</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#entry_is_list">entry_is_list</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#entry_loading">entry_loading</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#errant_variable_extraction">errant_variable_extraction</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#evaluate_delayed_queue">evaluate_delayed_queue</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#evaluation_map">evaluation_map</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#executable_condition_processing">executable_condition_processing</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#existing_calc_track">existing_calc_track</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#extract_excecutables">extract_excecutables</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#extract_lang_controller_key">extract_lang_controller_key</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#figure_size">figure_size</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#finalize_markup">finalize_markup</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#find_conditionals">find_conditionals</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#find_next">find_next</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#gather_calculations">gather_calculations</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#generate_all_concerns_templates">generate_all_concerns_templates</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#get_file_data_descriptor">get_file_data_descriptor</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#get_files_and_vars">get_files_and_vars</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#go_deep">go_deep</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_calc">has_calc</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_import_def">has_import_def</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_incrementer">has_incrementer</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_list_expr">has_list_expr</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_range_expr">has_range_expr</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_verbatim_params">has_verbatim_params</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#incremental_evaluations">incremental_evaluations</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#is_const_type">is_const_type</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#is_tree_type">is_tree_type</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#join_executables">join_executables</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#leaf_html_directives">leaf_html_directives</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#lift_remaining_imports">lift_remaining_imports</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#list_map_to_substs">list_map_to_substs</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#list_start">list_start</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#list_to_skeletal_variable_assignment">list_to_skeletal_variable_assignment</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#load_name_drops_db">load_name_drops_db</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#load_ogroups_intermediate_files">load_ogroups_intermediate_files</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#load_skeletons">load_skeletons</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#loop_finalization">loop_finalization</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#make_call">make_call</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#map_to_substs">map_to_substs</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#name_parameters_output">name_parameters_output</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#offset_from_project_dir">offset_from_project_dir</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#output_ogroup_template">output_ogroup_template</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#parameterized_block_unification">parameterized_block_unification</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#parse_executable">parse_executable</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#partition">partition</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#partition_stats">partition_stats</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#prep_script_directories">prep_script_directories</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#prepare_directories">prepare_directories</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#pull_out_bundles">pull_out_bundles</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#pull_out_css">pull_out_css</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#pull_out_files">pull_out_files</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#pull_out_html_directives">pull_out_html_directives</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#pull_out_script">pull_out_script</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#remove_loop_header">remove_loop_header</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#resolve_with_configuration">resolve_with_configuration</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#script_no_bundle">script_no_bundle</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#script_specialization">script_specialization</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#section_parsing">section_parsing</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#seek_imports">seek_imports</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#sequence_expansion">sequence_expansion</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#set_project_directory">set_project_directory</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#skeleton_parsing">skeleton_parsing</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#skeleton_parts_extraction">skeleton_parts_extraction</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#skeleton_unification">skeleton_unification</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#structural_substitution">structural_substitution</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#ternary_conditional">ternary_conditional</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#tree_conditional_reduction">tree_conditional_reduction</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#unblock_verabtim_parameters">unblock_verabtim_parameters</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#up_prop_data_to_vars">up_prop_data_to_vars</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#update_calc_tracking">update_calc_tracking</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#update_script_stats_usage">update_script_stats_usage</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#update_tracker_with_new">update_tracker_with_new</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#value_from_custom_source">value_from_custom_source</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#value_is_custom_type">value_is_custom_type</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#var_substitution">var_substitution</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#write_templates_op_data">write_templates_op_data</a></li></ul></li><li><a href="TemplatesToPreStaging.html">TemplatesToPreStaging</a><ul class='methods'><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#find_substitutions_vars">find_substitutions_vars</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#get_skel_css_link_files">get_skel_css_link_files</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#get_subst_vars">get_subst_vars</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#load_concerns_namer_dbs">load_concerns_namer_dbs</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#lookup_app_assignement">lookup_app_assignement</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#merge_existing_subst">merge_existing_subst</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#namer_in_name_db">namer_in_name_db</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#prepare_files_and_substitutions">prepare_files_and_substitutions</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#publish_css_to_concern_pre_staging">publish_css_to_concern_pre_staging</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#publish_subs_defs">publish_subs_defs</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#selective_css_publication">selective_css_publication</a></li></ul></li></ul>
+                    <h3>Global</h3><ul><li><a href="global.html#array_flatten">array_flatten</a></li><li><a href="global.html#bundle_inclusion_transform">bundle_inclusion_transform</a></li><li><a href="global.html#command_line_operations_new">command_line_operations_new</a></li><li><a href="global.html#find_map">find_map</a></li><li><a href="global.html#key_map_sub">key_map_sub</a></li><li><a href="global.html#link_inclusion_transform">link_inclusion_transform</a></li><li><a href="global.html#mapify">mapify</a></li><li><a href="global.html#recursive_flat">recursive_flat</a></li><li><a href="global.html#subst">subst</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">lib/utils.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const fs = require('fs')
+
+/**
+ * subst
+ * 
+ * Calls String.replace sequentially until no instances of the pattern are left.
+ * Puts the value in place of the pattern.
+ * 
+ * Returns the string 
+ * 
+ * @param {string} str 
+ * @param {string} pattern 
+ * @param {string} value 
+ * @returns string
+ */
+function subst(str,pattern,value) {
+    let i = str.indexOf(pattern)
+    let j = 0
+    while ( i >= 0 ) {
+        str = str.replace(pattern,value,j)
+        j = i
+        i = str.indexOf(pattern)
+    }
+    return str
+}
+
+
+
+/**
+ * recursive_flat
+ * 
+ * Takes in an array whose elements are either atoms or arrays.
+ * The structure is assumed to be recursive and have some max depth
+ * not checked by this method.
+ * 
+ * @param {Array} ary 
+ * @returns Array
+ */
+function recursive_flat(ary) {
+    if ( Array.isArray(ary) ) {
+        let outary = []
+        for ( let el of ary ) {
+            if ( Array.isArray(el) ) {
+                outary = outary.concat(recursive_flat(el))
+            } else {
+                outary.push(el)
+            }
+        }
+        return outary
+    } else {
+        return ary
+    }
+}
+
+
+
+/**
+ * array_flatten
+ * 
+ * A top level call for `recursive_flat`
+ * 
+ * @param {Array} items_array 
+ * @returns Array
+ */
+function array_flatten(items_array) {
+    let final_array = []
+    for ( let item of items_array ) {
+        if ( !Array.isArray(item) ) {
+            final_array.push(item)
+        } else {
+            let ary = recursive_flat(item)
+            final_array = final_array.concat(ary)
+        }
+    }
+    return final_array
+}
+
+
+/**
+ * mapify
+ * 
+ * Given two arrays creates an object whose keys are the to be found in the first array and the values in the second.
+ * 
+ * The method uses all the keys and as many values found at the front of the array. 
+ * It is possible that the value array will be longer than the keys. If the value array is short, 
+ * then key will map to 'undefined'.
+ * 
+ * 
+ * 
+ * @param {Array} a1 
+ * @param {Array} a2 
+ * @param {Function} key_edit
+ * 
+ * @returns Object
+ */
+function mapify(a1,a2,key_edit) {
+    let the_map = {}
+    let n = a1.length
+    if ( typeof key_edit === 'function' ) {
+        for ( let i = 0; i &lt; n; i++ ) {
+            let ky = key_edit(a1[i])
+            the_map[ky] = a2[i]
+        }
+    } else {
+        for ( let i = 0; i &lt; n; i++ ) {
+            the_map[a1[i]] = a2[i]
+        }    
+    }
+    return the_map
+}
+
+
+/**
+ * find_map
+ * 
+ * This is for an application that takes in a string that is expected to have 
+ * a delimeter marking the end of the prefix (or first part) of the string.
+ * 
+ * It pulls of the prefix and uses it as a key into the map to get stored data. 
+ * 
+ * This returns key and data as a pair.
+ * 
+ * default "&lt;&lt;"
+ * 
+ * @param {string} part_form 
+ * @param {object} the_map 
+ * @param {string}
+ * @returns pair&lt;key,data>  -- this is an array with a key in position 0, and data in position 1
+ */
+function find_map(part_form,the_map,section_key) {
+    
+    if ( section_key === undefined ) {
+        section_key = "&lt;&lt;"
+    }
+
+    let key = part_form.substring(0,part_form.indexOf(section_key)).trim()
+    if ( key.length === 0 ) {
+        //console.log(part_form)
+    }
+
+    let data = the_map[key]
+
+    return[key,data]
+}
+
+
+/**
+ * key_map_sub
+ * 
+ * Takes in a string `source_str`, which may be formatted with substitution forms.
+ * The form '$${key}' is similar to the JavaScript substitution directive '${subsitution expre}'.
+ * There is one extra '$' up front. The object contains key-value pairs.
+ * 
+ * In some cases, a value from the object may be a stored variable.
+ * In this application, the value as variable is indicated by a character prefix. (default '>')
+ * The vars parameter includes variable-value pairs allowing for substitutions specifically for a string 
+ * outside the use of the key-value object. This provides override for globally set values.
+ * 
+ * 
+ * @param {string} source_str 
+ * @param {object} key_values 
+ * @param {string} vars - a string of variable,value pairs delimited by the var_delimiter
+ * @param {string} value_var_prefix (optional)
+ * @param {string} var_delimiter 
+ * @returns string
+ */
+function key_map_sub(source_str,key_values,vars,value_var_prefix,var_delimiter) {
+    if ( value_var_prefix === undefined ) {
+        value_var_prefix = '>'
+    }
+    if ( var_delimiter === undefined ) {
+        var_delimiter = "::"
+    }
+    let fdata = '' + source_str
+    for ( let key in key_values ) {
+        let value = key_values[key]
+        if ( value[0] === value_var_prefix ) {
+            let varname = value.substr(1)
+            let i = vars.indexOf(varname)
+            if ( i >= 0 ) {
+                value = vars.substring(i + varname.length + var_delimiter.length)  // take in the full variable and including the delimiter, value follows
+                if ( value.indexOf(var_delimiter) > 0 ) {  // just clear of the delimiter
+                    value = value.substr(0,value.indexOf(var_delimiter))
+                }
+                value = value.trim()
+            }
+        }
+        fdata = subst(fdata,`$$${key}`,value)
+    }
+    //
+    return fdata
+}
+
+
+class ParseUtils {
+
+    constructor() {}
+
+    clear_block_comments(str) {
+        let output = ""
+        let n = str.length - 1
+        let prev_c = str[0]
+        let i = 1
+        for ( ; i &lt; n; i++ ) {
+            let c = str[i]
+            if ( "/*" === (`${prev_c}${c}`) )  {
+                while ( i &lt; n ) {
+                    c = str[i++]
+                    if ( (c === '*') &amp;&amp; (str[i++] === '/') ) {
+                        prev_c = str[i]
+                        break
+                    }
+                }
+            } else {
+                output += prev_c
+                prev_c = c
+            }
+        }
+        n = str.length
+        if ( i &lt; n ) {
+            output += str.substring(i-1)
+        }
+        
+        return output
+    }
+
+    clear_comments(str) {
+        if ( str.indexOf("verbatim::") === 0 ) {
+            let check_end = str.lastIndexOf('}')
+            //
+            if ( check_end > 0 ) {
+                let front = str.substring(0,check_end+1)
+                return front
+            }
+        } else {
+            if ( str.indexOf("//") >= 0 ) {
+                let lines = str.split('\n')
+                let n = lines.length
+                for ( let i = 0; i &lt; n; i++ ) {
+                    let line = lines[i]
+                    line = line.trim()
+                    if ( line.length &amp;&amp; (line.indexOf('//') === 0) ) {
+                        lines[i] = ""
+                    } else if ( line.length &amp;&amp; (line.indexOf('//') > 0) ) {
+                        line = line.substring(0,(line.indexOf('//'))).trim()
+                        lines[i] = line
+                    }
+                }
+                lines = lines.filter((line)  => {
+                    return line.length > 0
+                })
+                return lines.join("\n")
+            }
+        }
+        return str.trim()
+    }
+    remove_spaces(str) {
+        let strs = str.split(' ')
+        strs = strs.filter((sub) => {
+            return sub.length > 0
+        })
+        return strs.join('')
+    }
+    remove_white(str) {
+        str = str.replace(/\s+/g,'')
+        return str
+    }
+
+    flatten(data_parts) {
+        let flattened = []
+        for ( let part of data_parts ) {
+            if ( typeof part === "string" ) {
+                flattened.push(part)
+            } else {
+                let parted = this.flatten(part)
+                for ( let p of parted ) {
+                    flattened.push(p)
+                }
+            }
+        }
+        return flattened
+    }
+
+
+    capitalize(str) {
+        let rest = str.substring(1)
+        str = str.substring(0,1).toUpperCase() + rest
+        return str
+    }
+
+
+    subst(str,ky,val) {
+        while ( str.indexOf(ky) >= 0 ) {
+            str = str.replace(ky,val)
+        }
+        return str
+    }
+
+
+    extract_var(str) {
+        let var_up = str.substring(str.indexOf('@{') + 2)
+        let vname = var_up.substring(0,var_up.indexOf('}'))
+        return vname
+    }
+
+    has_parameter_block(data) {
+        return data.indexOf("@params&lt;{") >= 0
+    }
+
+    remove_parameter_block(data) {
+        data = data.trim()
+        let front_split = data.split("@params&lt;{")
+        let front = front_split[0]
+        let rest = front_split[1]
+
+        let end_block = rest.indexOf("}>")
+        rest = rest.substring(end_block+2).trim()
+        data = front + rest
+        return data.trim()
+    }
+
+
+    /**
+     * Revers a map... take into consideration that the original mapping might not be one to one
+     * @param {object} skeletons 
+     * @returns {object}
+     */
+    reverse_map(skeletons) {
+        let robj = {}
+        for ( let [ky,val] of Object.entries(skeletons) ) {
+            let obj = robj[val]   // robj maps from value to object (a map)
+            if ( !obj ) {   // create object (new value as key)
+                obj = {}
+                robj[val] = obj
+            }
+            obj[ky] = ""    // collect keys that mapped to value (may be one or more)
+        }
+        return robj
+    }
+
+    copy_keys(dst,src,type) {
+        if ( type === "array" ) {
+            for ( let ky in src ) {
+                dst[ky] = []
+            }
+        } else if ( type === "object" ) {
+            for ( let ky in src ) {
+                dst[ky] = {}
+            }
+        } else {
+            for ( let ky in src ) {
+                dst[ky] = ""
+            }
+        }
+    }
+
+
+    /**
+     * 
+     * @param {object} obj 
+     * @param {Function} fn 
+     */
+    key_sort(obj,fn) {
+        let sobj = {}
+        let keys = Object.keys(obj)
+        if ( typeof fn === "function" ) {
+            keys.sort((el1,el2) => {
+                let ky1 = fn(el1)
+                let ky2 = fn(el2)
+                if ( ky1 &lt; ky2 ) {
+                    return -1
+                } else if ( ky1 &lt; ky2 ) {
+                    return 1
+                } else {
+                    return 0
+                }
+            })
+        } else {
+            keys.sort()
+        }
+        for ( let ky of keys ) {
+            sobj[ky] = obj[ky]
+        }
+        return sobj
+    }
+
+
+
+    next_char(achar) {
+        let b = achar.charCodeAt(0)
+        b++
+        let c = String.fromCharCode(b)
+        return c
+    }
+}
+
+
+module.exports = ParseUtils
+
+module.exports.gsubst = subst
+module.exports.array_flatten = array_flatten
+module.exports.recursive_flat = recursive_flat
+module.exports.find_map = find_map
+module.exports.mapify = mapify
+module.exports.key_map_sub = key_map_sub
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Thu Jul 16 2026 23:04:24 GMT-0700 (Pacific Daylight Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>lib/TemplateToPreStaging.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Overview</a></h2><h2><a href="https://github.com/copious-world/roll-right" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h2><a href="https://www.npmjs.com/package/roll-right" target="_blank" class="menu-item" id="package" >Npm package</a></h2><h3>Classes</h3>
+                        <ul id="classes-ul-overflow" class="menu-contained-nav" ><li><a href="PreStagingSubsitutions.html">PreStagingSubsitutions</a><ul class='methods'><li data-type='method' style='display: none;'><a href="PreStagingSubsitutions.html#process_files">process_files</a></li></ul></li><li><a href="SkelToTemplate.html">SkelToTemplate</a><ul class='methods'><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#add_to_css_staging">add_to_css_staging</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#add_to_incrementers">add_to_incrementers</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#add_tracking_for_calc">add_tracking_for_calc</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#assemble_subfile">assemble_subfile</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#block_verabtim_parameters">block_verabtim_parameters</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#build_entry_parsing">build_entry_parsing</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#build_param_tree">build_param_tree</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#capture_param_sub_call">capture_param_sub_call</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#capture_parameters">capture_parameters</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#check_recursive_data">check_recursive_data</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#clean_verbatim">clean_verbatim</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#coalesce_scripts">coalesce_scripts</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#collect_concerns">collect_concerns</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#conditional_evaluations">conditional_evaluations</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#conditionless_evaluations_substitution">conditionless_evaluations_substitution</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#conds_reduction">conds_reduction</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#config_var_transformations">config_var_transformations</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#data_from_parameter">data_from_parameter</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#delay_file_loading">delay_file_loading</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#early_evaluations">early_evaluations</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#ensure_all_concerns_template_directories">ensure_all_concerns_template_directories</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#entry_directive_location_remap">entry_directive_location_remap</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#entry_is_list">entry_is_list</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#entry_loading">entry_loading</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#errant_variable_extraction">errant_variable_extraction</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#evaluate_delayed_queue">evaluate_delayed_queue</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#evaluation_map">evaluation_map</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#executable_condition_processing">executable_condition_processing</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#existing_calc_track">existing_calc_track</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#extract_excecutables">extract_excecutables</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#extract_lang_controller_key">extract_lang_controller_key</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#figure_size">figure_size</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#finalize_markup">finalize_markup</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#find_conditionals">find_conditionals</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#find_next">find_next</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#gather_calculations">gather_calculations</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#generate_all_concerns_templates">generate_all_concerns_templates</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#get_file_data_descriptor">get_file_data_descriptor</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#get_files_and_vars">get_files_and_vars</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#go_deep">go_deep</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_calc">has_calc</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_import_def">has_import_def</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_incrementer">has_incrementer</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_list_expr">has_list_expr</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_range_expr">has_range_expr</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#has_verbatim_params">has_verbatim_params</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#incremental_evaluations">incremental_evaluations</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#is_const_type">is_const_type</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#is_tree_type">is_tree_type</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#join_executables">join_executables</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#leaf_html_directives">leaf_html_directives</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#lift_remaining_imports">lift_remaining_imports</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#list_map_to_substs">list_map_to_substs</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#list_start">list_start</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#list_to_skeletal_variable_assignment">list_to_skeletal_variable_assignment</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#load_name_drops_db">load_name_drops_db</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#load_ogroups_intermediate_files">load_ogroups_intermediate_files</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#load_skeletons">load_skeletons</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#loop_finalization">loop_finalization</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#make_call">make_call</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#map_to_substs">map_to_substs</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#name_parameters_output">name_parameters_output</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#offset_from_project_dir">offset_from_project_dir</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#output_ogroup_template">output_ogroup_template</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#parameterized_block_unification">parameterized_block_unification</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#parse_executable">parse_executable</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#partition">partition</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#partition_stats">partition_stats</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#prep_script_directories">prep_script_directories</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#prepare_directories">prepare_directories</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#pull_out_bundles">pull_out_bundles</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#pull_out_css">pull_out_css</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#pull_out_files">pull_out_files</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#pull_out_html_directives">pull_out_html_directives</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#pull_out_script">pull_out_script</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#remove_loop_header">remove_loop_header</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#resolve_with_configuration">resolve_with_configuration</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#script_no_bundle">script_no_bundle</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#script_specialization">script_specialization</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#section_parsing">section_parsing</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#seek_imports">seek_imports</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#sequence_expansion">sequence_expansion</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#set_project_directory">set_project_directory</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#skeleton_parsing">skeleton_parsing</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#skeleton_parts_extraction">skeleton_parts_extraction</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#skeleton_unification">skeleton_unification</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#structural_substitution">structural_substitution</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#ternary_conditional">ternary_conditional</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#tree_conditional_reduction">tree_conditional_reduction</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#unblock_verabtim_parameters">unblock_verabtim_parameters</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#up_prop_data_to_vars">up_prop_data_to_vars</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#update_calc_tracking">update_calc_tracking</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#update_script_stats_usage">update_script_stats_usage</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#update_tracker_with_new">update_tracker_with_new</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#value_from_custom_source">value_from_custom_source</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#value_is_custom_type">value_is_custom_type</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#var_substitution">var_substitution</a></li><li data-type='method' style='display: none;'><a href="SkelToTemplate.html#write_templates_op_data">write_templates_op_data</a></li></ul></li><li><a href="TemplatesToPreStaging.html">TemplatesToPreStaging</a><ul class='methods'><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#find_substitutions_vars">find_substitutions_vars</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#get_skel_css_link_files">get_skel_css_link_files</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#get_subst_vars">get_subst_vars</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#load_concerns_namer_dbs">load_concerns_namer_dbs</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#lookup_app_assignement">lookup_app_assignement</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#merge_existing_subst">merge_existing_subst</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#namer_in_name_db">namer_in_name_db</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#prepare_files_and_substitutions">prepare_files_and_substitutions</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#publish_css_to_concern_pre_staging">publish_css_to_concern_pre_staging</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#publish_subs_defs">publish_subs_defs</a></li><li data-type='method' style='display: none;'><a href="TemplatesToPreStaging.html#selective_css_publication">selective_css_publication</a></li></ul></li></ul>
+                    <h3>Global</h3><ul><li><a href="global.html#array_flatten">array_flatten</a></li><li><a href="global.html#bundle_inclusion_transform">bundle_inclusion_transform</a></li><li><a href="global.html#command_line_operations_new">command_line_operations_new</a></li><li><a href="global.html#find_map">find_map</a></li><li><a href="global.html#key_map_sub">key_map_sub</a></li><li><a href="global.html#link_inclusion_transform">link_inclusion_transform</a></li><li><a href="global.html#mapify">mapify</a></li><li><a href="global.html#recursive_flat">recursive_flat</a></li><li><a href="global.html#subst">subst</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">lib/TemplateToPreStaging.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+
+const fos = require('extra-file-class')()
+let ParseUtils = require('../lib/utils')
+let parse_util = new ParseUtils()
+
+
+const SkelToTemplate = require('../lib/SkelToTemplate')
+
+/**
+ * @class TemplatesToPreStaging
+ * 
+ * This class extends SkelToTemplate with operations specific to phase 2.
+ * 
+ * This is mostly about creating substitution files and merging them with existing susbt files.
+ * 
+ * Also, the .db files, which are used to make subst file entries, are loaded from specialized 
+ * templates for the concerns.
+ * 
+ * This phase will generate (** may regenerate) templates after taking into consideration the customization of the db.
+ * The db in question is the db generated from entries in the name_drop.db. These db's are called `_calc.db` files 
+ * since they are made for files::calc entries in the skeleton.
+ * 
+ * A file such as index_calc.db will have entries that are merged into the subst file for the website.
+ * 
+ * 
+ */
+class TemplatesToPreStaging extends SkelToTemplate {
+
+    /**
+     * 
+     * @param {object} conf 
+     */
+    constructor(conf) {
+        super(conf)
+        this.concern_to_odir = {}
+        let outputs = conf.outputs
+        if ( outputs &amp;&amp; Array.isArray(outputs) ) {
+            outputs = JSON.parse(JSON.stringify(outputs))
+            for ( let ogroup of outputs ) {
+                let dir_form = ogroup.targets.dir_form
+                for ( let concern of ogroup.targets.concerns ) {
+                    this.concern_to_odir[concern] = dir_form.replace("@concern",concern)
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 
+     * @param {string} data 
+     * @returns {Array}
+     */
+    find_substitutions_vars(data) {
+        let found_vars = {}
+        let var_starts = data.split("{{")
+        var_starts.shift()
+        for ( let dstart of var_starts ) {
+            let add_brace = dstart[0] === "{" ? 1 : 0
+            let a_var = dstart.substring(0,dstart.indexOf("}}") + add_brace)
+            a_var = parse_util.remove_white(a_var)
+            found_vars[a_var] = ""
+        }
+        return found_vars
+    }
+
+
+    /**
+     * 
+     * Loads the top level file concerns named DB, mapping concerns to DB files associated with each template.
+     * 
+     * This method continues on to load all the DB file mentioned in the `concerns_named.db` file.
+     * 
+     * The DB files are the name_drop.db's for each file. e.g. [websites]/@target/@concern/templates/index_calc.db
+     *
+     */
+    async load_concerns_namer_dbs() {
+        //
+        let db_locations = `[websites]/${this.project_dir}/concerns_named.db`
+        db_locations = this.paths.compile_one_path(db_locations)
+        //
+        let all_concerns_db = await fos.load_json_data_at_path(db_locations)
+
+        for ( let files of Object.values(all_concerns_db) ) {
+            for ( let file in files ) {
+                files[file] = await fos.load_json_data_at_path(file)
+            }
+        }
+        this.all_concerns_namer_db = all_concerns_db
+    }
+
+
+    /**
+     * Phase 2 operation...
+     * 
+     * Analyze data (files) top find variables. 
+     * 
+     * Create variable to value objects associated with the files that a concern will 
+     * require. Make sure the directories that will hold the subst file will exists 
+     * before the files are created in an ensuing method call.
+     * 
+     * The following applies to the entries of the map that is returned:
+     * 
+        // Prepares an entry for each file in a subdirectory of the concern.
+        // A set of variables found in the file will be identified and listed in 
+        // the *variables* field. The output file is the file to be found in staging.
+        // The source directory will likely be the *static* directory which will hold
+        // assets used in the site/app pages of the concern. The subst file, containing
+        // values and substitution maps for the file to be output will be named here as 
+        // the 'subst' file. 
+
+     * 
+     * @param {object} concerns 
+     * @returns {object}
+     */
+    async prepare_files_and_substitutions(concerns) {
+        let all_c_vars = {}
+        await this.load_concerns_namer_dbs()
+        //
+        for ( let concern in concerns ) {
+            let concerns_dir = `[websites]/${concern}/`
+            concerns_dir = this.concern_to_odir[concern]
+            concerns_dir = this.paths.dirname(concerns_dir)
+            concerns_dir = this.paths.compile_one_path(concerns_dir)
+            let targeted_files = Object.values(concerns[concern])
+            let concerns_vars = {}
+            let concerns_files = {}
+            for ( let pair of targeted_files ) {
+                let keys = Object.keys(pair)
+                //
+                for ( let ky of keys ) {
+                    //
+                    let afile = `${concerns_dir}/${this.created_dir}${ky}`
+                    //
+                    let data = pair[ky]
+                    if ( (typeof data === "undefined") || (data.length === 0) ) {
+                        data = await fos.load_data_at_path(afile)
+                    }
+                    let data_vars = this.find_substitutions_vars(data)
+                    //
+                    // keep adding to the concerns vars, gathering from all the files.
+                    concerns_vars = Object.assign(concerns_vars,data_vars)
+                    //
+                    let subst_src = `${concerns_dir}/static`
+//
+                    let subst_file = `${subst_src}/${concern}.subst`
+                    let ofile = `${concerns_dir}/pre-staging/${ky}`
+                    ofile = ofile.replace(".tmplt",".html")
+                    //
+                    // Prepares an entry for each file in a subdirectory of the concern.
+                    // A set of variables found in the file will be identified and listed in 
+                    // the *variables* field. The output file is the file to be found in staging.
+                    // The source directory will likely be the *static* directory which will hold
+                    // assets used in the site/app pages of the concern. The subst file, containing
+                    // values and substitution maps for the file to be output will be named here as 
+                    // the 'subst' file. 
+                    // 
+                    concerns_files[ky] = {
+                        "subst" : subst_file,
+                        "output" : ofile,
+                        "source_dir" : subst_src,
+                        "variables" : data_vars
+                    }
+                    //
+                    await fos.ensure_directories(afile,false,true)
+                    await fos.ensure_directories(subst_file,false,true)
+                    await fos.ensure_directories(subst_src)
+                    //
+                    // load the namer db's generated for each file during phase 1.
+                    // It is expected by this time.
+                }
+            }
+            // this is the high level directive for substitution on the file.
+            // Each concern will map the individual files and will track all the
+            // subsitution variables required by the site.
+            all_c_vars[concern] = {
+                "variables" : concerns_vars,
+                "files" : concerns_files
+            }
+        }
+        return all_c_vars
+    }
+
+
+    /**
+     * 
+     * @param {Array} skel_list 
+     * @returns 
+     */
+    get_skel_css_link_files(skel_list,parsed_skels) {
+        //
+        let css_set = {}
+        for ( let skel of skel_list ) {
+            let skeleton = parsed_skels[skel]?.skeleton
+            if ( skeleton &amp;&amp; Array.isArray(skeleton) ) {
+                for ( let line of skeleton ) {
+                    //
+                    if ( line.startsWith("link&lt;css>::") ) {
+                        let css_file = line.substring("link&lt;css>::".length)
+                        css_file = css_file.replace('&lt;&lt;','').trim()
+                        let p = css_set[css_file]
+                        css_set[css_file] = p ? p + 1 : 1
+                    }
+                    //
+                }
+            }
+        }
+        //
+        let css_list = Object.keys(css_set)
+        return css_list
+    }
+
+    /**
+     * 
+     * @param {string} concern 
+     * @param {Array} selected_css 
+     */
+    async publish_css_to_concern_pre_staging(concern,selected_css) {
+        let concern_css_ps_dir = '[websites]/${concern}/pre-staging/css'
+        let css_src_dir = '[alpha_copious]/css'
+        concern_css_ps_dir = this.paths.compile_one_path(concern_css_ps_dir)
+        css_src_dir = this.paths.compile_one_path(css_src_dir)
+        for ( let css of selected_css ) {
+            let css_src_file = `${css_src_dir}/${css}`
+            let css_dst_file = `${concern_css_ps_dir}/${css}`
+            try {
+                await this.fos.copyFile(css_src_file,css_dst_file)
+            } catch (e) {
+                console.log("did not copy",css_src_file)
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param {object} concerns 
+     */
+    async selective_css_publication(concerns,parsed_skels) {
+        //
+        for ( let concern of concerns ) {
+            let c_skelmap = concerns[concern]
+            let skel_list = Object.keys(c_skelmap)
+            let selected_css = this.get_skel_css_link_files(skel_list,parsed_skels)
+            await this.publish_css_to_concern_pre_staging(concern,selected_css)
+        }
+    }
+
+
+    /**
+     * 
+     * Given all the variables found in a file, for a concern,
+     * this method creates JSON structured files (`.subst`)
+     * A subst file is created for each file that a concern needs
+     * for basic static pages and framework pages.
+     * 
+     * Called by `publish_subs_defs`. 
+     * 
+     * 
+     * @param {string} concern 
+     * @param {object} var_set 
+     * @returns {object}
+     */
+    get_subst_vars(concern,var_set,var_src_file) {
+        let subst_obj = {}
+        for ( let avar in var_set ) {
+            if ( (avar[0] === '{') || (avar.indexOf(".") > 0) ) {
+                let base_var_name = (avar[0] === '{') ? avar.replace('{','').replace('}','') : avar
+                //
+                let subkeys = false
+                if ( avar.indexOf(".") > 0 ) {
+                    let vpars = base_var_name.split('.')
+                    base_var_name = vpars.shift()
+                    subkeys = vpars
+                    //
+                    if ( subst_obj[base_var_name] === undefined ) {
+                        subst_obj[base_var_name] = {}
+                    }
+                }
+                //
+                let rec = subst_obj[base_var_name]
+                if ( (typeof rec === "object") &amp;&amp; subkeys.length ) {
+                    let namer = ""
+                    let actor = ""
+                    let file = base_var_name
+                    while ( subkeys.length ) {
+                        let ky = subkeys.shift()
+                        let maybe_rec = rec[ky]
+                        namer = actor
+                        actor = file 
+                        file = ky
+                        if ( maybe_rec === undefined ) {
+                            maybe_rec = ""
+                            if ( subkeys.length ) {
+                                maybe_rec = {}
+                            }
+                        }
+                        rec[ky] = maybe_rec
+                        rec = maybe_rec
+                    }
+                    //
+                    if ( namer.length &amp;&amp; actor.length &amp;&amp; file.length ) {
+                        try {
+                            rec = subst_obj[namer][actor]
+                            //
+                            rec.name = namer
+                            if ( namer.indexOf(actor) > 0 ){
+                                actor = ""
+                            }
+                            actor = parse_util.capitalize(actor)
+                            rec.file = `${namer}${actor}.txt`
+                        } catch(e) {}
+                        //
+                    } else if ( this.namer_in_name_db(concern,base_var_name,var_src_file) ) {
+                        let [found_name,ftype] = this.lookup_app_assignement(concern,base_var_name,var_src_file)
+                        subst_obj[base_var_name] = {
+                            "name" : found_name
+                        }
+                        subst_obj[base_var_name][actor] = {
+                            "file" : `./${found_name}.${ftype}`
+                        }
+                    }
+                    //
+                }
+            } else {
+                subst_obj[avar] = var_set[avar]
+            }
+        }
+        return subst_obj
+    }
+
+
+
+    /**
+     * This method uses specific merge rules that fravor the existing data from previous website 
+     * renditions.
+     * 
+     * @param {object} subst_obj 
+     * @param {object} existing_subst 
+     */
+    merge_existing_subst(subst_obj,existing_subst) {
+        for ( let ky in existing_subst ) {
+            if ( subst_obj[ky] === undefined ) {
+                subst_obj[ky] = existing_subst[ky]
+            } else {
+                if ( (typeof existing_subst[ky] === "object") &amp;&amp; (typeof subst_obj[ky] === "object") ) {
+                    this.merge_existing_subst(subst_obj[ky],existing_subst[ky])
+                } else if ( (typeof existing_subst[ky] === "object") &amp;&amp; (typeof subst_obj[ky] !== "object") ) {
+                    subst_obj[ky] = existing_subst[ky]
+                } else if ( (typeof existing_subst[ky] === "string") &amp;&amp; (typeof subst_obj[ky] === "string") ) {
+                    if ( existing_subst[ky].length > 0 ) {
+                        subst_obj[ky] = existing_subst[ky]
+                    }
+                } else if ( (typeof existing_subst[ky] === "string") &amp;&amp; (typeof subst_obj[ky] === "object") ) {
+                    subst_obj[ky].content =  existing_subst[ky]
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Makes all the pre-staging subsitution maps needed in order to generate 
+     * website/app files to be used in production.
+     * 
+     * EXISTING FILES CAN BE USED HERE...
+     * 
+     * @param {object} subst_defs 
+     */
+    async publish_subs_defs(subst_defs) {
+        //
+        let concerns_subst_map = {}  // each concern will have an entry here.
+        //
+        for ( let concern in subst_defs ) {
+            // set up the map object for the concern
+            concerns_subst_map[concern] = {}
+            //
+            let var_set = subst_defs[concern].variables     // get the set of variables in use
+            let subst_obj = this.get_subst_vars(concern,var_set)        // makes this based on existing template and name_drop db
+            //
+            let concerns_dir = `[websites]/${concern}/${this.created_dir}`
+            concerns_dir = this.concern_to_odir[concern]
+            concerns_dir = this.paths.dirname(concerns_dir)
+            concerns_dir = this.paths.compile_one_path(concerns_dir)
+            let file_path = `${concerns_dir}/${concern}.subst`
+            //
+            let static_src = `[websites]/${concern}/static/${concern}.subst`
+            static_src = this.paths.compile_one_path(static_src)
+            let existing_subst = false
+            if ( fos.pathExists(static_src) ) {
+                existing_subst = await fos.load_json_data_at_path(static_src)
+                if ( existing_subst !== false ) {
+                    this.merge_existing_subst(subst_obj,existing_subst)     // does a merge from the created to existing
+                }
+            }
+            //
+            await fos.write_out_pretty_json(file_path,subst_obj,4)      // an actual subst file for populating variables across the site
+            //
+            // The file containing sitewide variable mappings
+            // this is the top level entry if specific files don't have one.
+            //
+            //  This is a genneral listing (db) of all variables for all sites 
+            //  and for each file in a site.
+            //
+            concerns_subst_map[concern][concern] = {
+                "path" : file_path,
+                "vars" : Object.keys(var_set)
+            }
+            //
+            let files_output = subst_defs[concern].files
+            for ( let file in files_output ) {
+                let file_focus = files_output[file]
+                //
+                let var_set = file_focus.variables
+                let subst_obj = this.get_subst_vars(concern,var_set,file)
+                let file_path = file_focus.output
+                file_path = file_path.replace('.html','_html.subst')
+                //
+                if ( existing_subst !== false ) {
+                    this.merge_existing_subst(subst_obj,existing_subst)
+                }
+                //
+                file_path = await fos.ensure_directories(file_path,'',true)
+                //
+                await fos.write_out_pretty_json(file_path,subst_obj,4)
+                //
+                concerns_subst_map[concern][file] = {
+                    "path" : file_path,
+                    "vars" : Object.keys(var_set)
+                }
+            }
+        }
+
+        // write this entire DB 
+        let subst_map_file = `[websites]/${this.project_dir}/concerns_to_subst_files.json`
+        subst_map_file = this.paths.compile_one_path(subst_map_file)
+        await fos.write_out_pretty_json(subst_map_file,concerns_subst_map,4)
+    }
+
+
+    /**
+     * namer is a variable found in the file.
+     * namer may be in the namer db of a concern, providing 
+     * a calculation or a file description that will be kept with in a subst file.
+     * 
+     * called by get_subst_vars
+     * 
+     * @param {string} namer 
+     * @returns 
+     */
+    namer_in_name_db(concern,namer,file) {
+        if ( file ) {
+            let file_prober = file.replace(".tmplt","_calc.db")
+            for ( let ky of Object.keys(this.all_concerns_namer_db[concern]) ) {
+                if ( ky.indexOf(file_prober) > 0 ) {
+                    if ( namer in this.all_concerns_namer_db[concern][ky] ) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+
+    /**
+     * 
+     * Looks in all the calc section DBs for a given concern.
+     * Within the map of files to sections DBs, this finds the first match for a file name 
+     * that would hold the a DB key, **namer**. If the file and the object can be found
+     * by the sequence of keys, this will return the calc section name (given by an application)
+     * and a file type (given by the applications)
+     * 
+     * This method is used by methods generating subtitution maps to be used during phase 3.
+     * 
+     * @param {string} concern -- the name of a concern such as a url or a business name/token
+     * @param {string} namer -- a field in the a calc section db, e.g. `about_box`
+     * @returns {pair} -- returns the application selected name and file type.
+     */
+    lookup_app_assignement(concern,namer,file) {
+        if ( file ) {
+            let file_prober = file.replace(".tmplt","_calc.db")
+            for ( let ky of Object.keys(this.all_concerns_namer_db[concern]) ) {
+                if ( ky.indexOf(file_prober) > 0 ) {
+                    if ( namer in this.all_concerns_namer_db[concern][ky] ) {
+                        let defs = this.all_concerns_namer_db[concern][ky][namer]
+                        return [defs.name, defs.content.type]
+                    }
+                }
+            }
+        }
+        return["test","html"]
+    }
+
+}
+
+
+module.exports = TemplatesToPreStaging
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Thu Jul 16 2026 23:04:24 GMT-0700 (Pacific Daylight Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>
