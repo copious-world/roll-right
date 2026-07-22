@@ -12,8 +12,8 @@
   },
   "scripts": {
     "test": "node tests/index.js",
-    "prepare" : "node bin/index.js --phase prepare --sources ../websites/template-configs/  --generator generate.json --structure parsed.json",
-    "templates" : "node bin/index.js --phase template --sources ../websites/template-configs/ --generator generate.json --structure parsed.json",
+    "prepare" : "node --inspect bin/index.js --phase prepare --sources ../websites/template-configs/  --generator generate_test.json --structure parsed.json",
+    "templates" : "node bin/index.js --phase template --sources ../websites/template-configs/ --generator generate_test.json --structure parsed.json",
     "page" : "node bin/index.js --phase page --sources ../websites/template-configs/ --values assignments.json",
     "gen-docs": "jsdoc --configure ./tools/jsdoc.conf -a all -R README.md --verbose"
   },
