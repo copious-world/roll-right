@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path');
-const Handlebars = require('handlebars')
+const Handlebars = require('handlebars')            // USES HANDLEBARS
 
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -116,10 +116,11 @@ function load_source_data(datObj,src) {
 // STARTS HERE...
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-let data_file = process.argv[2]  // a subst file
+let data_file = process.argv[2]     // a subst file
 let source_file = process.argv[3]   // a template file file
 let output = process.argv[4]        // an html file 
-let static_dir = process.argv[5]
+let static_dir = process.argv[5]    // a directory containing assets (files) the will be emplaced in the final page
+let  = process.argv[6]
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
@@ -133,7 +134,7 @@ var confObj = JSON.parse(data)
 confObj.srcPath = static_dir
 var source = fs.readFileSync(source_file,'utf8').toString()
 load_source_data(confObj,source)
-
+concern
 //console.dir(confObj)
 //
 
@@ -161,4 +162,12 @@ fs.writeFileSync(output,result)
 
 if ( g_forgotten_files.length ) {
     console.log("echo > " + g_forgotten_files.join('\necho > '))
+}
+
+
+// launch an optional copy to "concern"  
+// A complete top down copy, inclucdes images, costum css, etc.
+if ( concern !== undefined ) {
+    let test_directory = `/var/www/html/${concern}/pre-staging`
+    console.log("Launch copy from",output,"TO",test_directory)
 }
