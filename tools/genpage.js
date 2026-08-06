@@ -44,6 +44,9 @@ function is_file_source(descr) {
     return ((typeof descr === 'object') && ( descr.file || ( descr.content && descr.content.file ) || ( descr.button && descr.button.file ) ))
 }
 
+function is_loop_data_consumer(descr) {
+    return ( (typeof descr === 'object') && ((descr["$_data_source"] !== undefined) && (descr["$_looping"] !== undefined)) )
+}
 
 
 var g_compiler_schedule = []
@@ -60,9 +63,9 @@ function process_sub_content(datObj,descr) {
         if ( src_file[0] === '.' ) {
             src_file = datObj.srcPath + src_file.substr(1)
         }
-        let src = fs.readFileSync(src_file,'utf8').toString()
+        let just_loaded_src = fs.readFileSync(src_file,'utf8').toString()       // READ THE FILE SOURCE
         //
-        let operator = { 'data' : datObj, 'source' : src, 'target' : descr }
+        let operator = { 'data' : datObj, 'source' : just_loaded_src, 'target' : descr }
         //
         if ( descr.button && descr.button.file ) {
             operator.target = descr.button
@@ -84,6 +87,81 @@ function process_sub_content(datObj,descr) {
 }
 
 
+
+
+/**
+ * 
+ * @param {object|string|Array} _data_source 
+ * @param {object} fields -- fields names to emptry strings or qualifiers... useful for scripts and services that filter
+ * @param {string} loop_index 
+ * @returns{Array}
+ */
+async function load_array_of_objects(_data_source,fields,loop_index) {
+    // _data_source can be a file, an rcp link, shell file, etc
+    let array_of_obj = [] // fs.readFileSync(_data_source)   /// if it is a file
+    if ( typeof _data_source === "object" ) {
+        if ( Array.isArray(_data_source) ) {
+            array_of_obj = _data_source
+        } else {
+            switch (_data_source.type ) {
+                case "file": {
+                    try {
+                        let array_of_obj_str = fs.readFileSync(_data_source.file).toString()
+                        array_of_obj = JSON.parse(array_of_obj_str)
+                    } catch (e) {
+                        array_of_obj = []
+                    }
+                    break;
+                }
+                case "script" : {
+                    break
+                }
+                case "service" :{
+                    break
+                }
+            }            
+        }
+    }
+    if ( loop_index !== false ) {
+        let j = 1
+        for ( let item of array_of_obj ) {
+            item[loop_index] = j++
+        }
+    }
+    return array_of_obj
+}
+
+/**
+ * 
+ * "sidebar_sections": {
+        "list": [],
+        "fields": {
+            "_type<array>" : "list",
+            "index++": "",
+            "button_list": {
+                "content": ""
+            },
+            "subjects": ""
+        },
+        "$_looping": "index++",
+        "$_data_source": ""
+    },
+ * 
+ * @param {object} datObj 
+ * @param {object} descr 
+ */
+async function process_looped_sub_content(datObj,descr) {
+    //
+    let loop_index = descr.$_looping ?  descr.$_looping : false
+    let array_of_obj = await load_array_of_objects(descr.$_data_source,descr.fields,loop_index)
+    let array_fld = descr.fields["_type<array>"]
+    descr[array_fld] = array_of_obj
+    //
+    let operator = { 'data' : datObj, 'source' : just_loaded_src, 'target' : descr }
+    g_compiler_schedule.unshift(operator)
+}
+
+
 var g_forgotten_files = []
 /**
  * Takes in a substitution descriptor and a source to apply it to.
@@ -93,21 +171,27 @@ var g_forgotten_files = []
  * 
  * The order is important, most specific to least specific, that being the contents of the output file.
  * 
- * @param {object} datObj 
+ * @param {object} datObj -- the same data object required by handlebars.js (or, more where some subobjects are passed as the data object)
  * @param {string} src 
  */
 function load_source_data(datObj,src) {
     g_compiler_schedule.unshift({ 'data' : datObj, 'source' : src })  // recall this is push
     for ( let field in datObj ) {
         let descr = datObj[field]
+        // it is possible that datObj has only top level variables with string values.
+        // But, some may be arrays of objects, or just one data descriptor
         if ( (typeof descr === 'object') &&  Array.isArray(descr) ) {
             descr.forEach(element => {
                 if ( is_file_source(element) ) {
                     process_sub_content(datObj,element)
+                } else if ( is_loop_data_consumer(element) ) {
+                    process_looped_sub_content(datObj,element)
                 }
             })
         } else if ( is_file_source(descr) ) {
             process_sub_content(datObj,descr)
+        } else if ( is_loop_data_consumer(descr) ) {
+            process_looped_sub_content(datObj,descr)
         }
     }
 }
@@ -117,10 +201,10 @@ function load_source_data(datObj,src) {
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 let data_file = process.argv[2]     // a subst file
-let source_file = process.argv[3]   // a template file file
-let output = process.argv[4]        // an html file 
+let source_file = process.argv[3]   // a template file
+let output = process.argv[4]        // an html file -- the result of completing subsitutions from bottom to top.
 let static_dir = process.argv[5]    // a directory containing assets (files) the will be emplaced in the final page
-let  = process.argv[6]
+let concern = process.argv[6]
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
@@ -134,24 +218,27 @@ var confObj = JSON.parse(data)
 confObj.srcPath = static_dir
 var source = fs.readFileSync(source_file,'utf8').toString()
 load_source_data(confObj,source)
-concern
+
 //console.dir(confObj)
 //
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+// compiler schedule is populated by `load_source_data`
+// The compiler schedule organizes subsitution from lowest depth to tops
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 var result = "nothing"
 g_compiler_schedule.forEach(operator => {
     //let operator = { 'data' : datObj, 'source' : src, 'target' : descr }
-    let source = operator.source
-    let template = Handlebars.compile(source);
-    let confObj = operator.data
+    let source = operator.source        // The operator source may belong to a file loaded as part of a content call
+    let template = Handlebars.compile(source);  // compile some part of the file or the remaining top file
+    let confObj = operator.data                 // the object whose keys are variable names
     //console.dir(confObj)
     let content = template(confObj);
     if ( operator.alteration ) {
         content = operator.alteration(content)
     }
     if ( operator.target ) {
-        operator.target.content = content
+        operator.target.content = content       // the target was established as a higher level subsitution
     }
     result = content
 })
