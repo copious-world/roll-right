@@ -1,6 +1,13 @@
 const fs = require('fs')
 const path = require('path');
 const Handlebars = require('handlebars')            // USES HANDLEBARS
+//
+//
+let SysUtils = require('../lib/sys_utils')
+let sys_utils = new SysUtils({
+    "tools_directory" : `.`
+})
+
 
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -114,9 +121,24 @@ async function load_array_of_objects(_data_source,fields,loop_index) {
                     break;
                 }
                 case "script" : {
+                    try {
+                        let c = Buffer.from(JSON.stringify(fields))
+                        let field_info = c.toString('base64url')
+                        let pars = field_info + (loop_index ? (' ' + loop_index) : "")
+                        let data_str = sys_utils.bash_command(_data_source.file,pars)
+                        data_str = data_str.toString()
+                        if ( data_str && data_str.length ) {
+                            try {
+                                return JSON.parse(data_str)
+                            } catch (e) {
+                            }
+                        }
+                    } catch (e) {
+                        array_of_obj = []
+                    }
                     break
                 }
-                case "service" :{
+                case "service" : {
                     break
                 }
             }            
