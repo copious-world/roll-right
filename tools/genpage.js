@@ -43,9 +43,11 @@ function reset_svg_height_width(svg_txt, output_width, output_height) {
 /**
  * Returns true if this object passed has fields specifying a file to be read.
  * 
+ * The field "file" can be at the top level, 
+ * or it cah be a field one level below "content" or "button"
  * 
  * @param {object} descr 
- * @returns {boolean}
+ * @returns {boolean}"
  */
 function is_file_source(descr) {
     return ((typeof descr === 'object') && ( descr.file || ( descr.content && descr.content.file ) || ( descr.button && descr.button.file ) ))
